@@ -53,15 +53,25 @@ import jinja2
 script_dir = os.path.dirname(os.path.abspath(__file__))
 os.chdir(script_dir)
 
-# root directory where the result of templates will be written to;
-# joining paths one by one adds the correct path separator
-output_dir = os.path.join(script_dir, '..')
+# Settings
+# ========
+#
+# template directory that is scanned recursively (must be *relative*
+# to script directory); all files with an extension of ".jinja" are
+# rendered using Jinja2
+template_dir = '.'
 
-# directory with common template settings
+# directory with common template settings; files in this directory
+# are ignored and not rendered
 settings_dir = '_templates'
 
-# template directory (must be *relative* to script directory!)
-template_dir = '.'
+# each time this string is encountered, a new file is created; this
+# allows you to create multiple files from a single template
+file_separator = '### File: '
+
+# output root directory for rendered files; joining paths one by one
+# adds the correct path separator for the current operating system
+output_dir = os.path.join(script_dir, '..', 'output')
 
 
 # note: use relative paths to access templates in sub-directories
@@ -91,9 +101,6 @@ def render_template(cached_templates, template_filename, output_dir):
     # render template
     template = cached_templates.get_template(template_filename)
     content_of_multiple_files = template.render()
-
-    # split combined file into multiple files
-    file_separator = '### File: '
 
     for content_of_single_file in content_of_multiple_files.split(
             file_separator):
