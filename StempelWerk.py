@@ -59,7 +59,7 @@ os.chdir(script_dir)
 # template directory that is scanned recursively (must be *relative*
 # to script directory); all files with an extension of ".jinja" are
 # rendered using Jinja2
-template_dir = '.'
+template_dir = '10-templates'
 
 # directory with common template settings; files in this directory
 # are ignored and not rendered
@@ -70,8 +70,9 @@ settings_dir = '_templates'
 file_separator = '### File: '
 
 # output root directory for rendered files; joining paths one by one
-# adds the correct path separator for the current operating system
-output_dir = os.path.join(script_dir, '..', 'output')
+# adds the correct path separator for the current operating system,
+# such as "output_dir = os.path.join(script_dir, '..', 'output')"
+output_dir = os.path.join(script_dir, '20-output')
 
 
 # note: use relative paths to access templates in sub-directories
