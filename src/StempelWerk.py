@@ -2,8 +2,8 @@
 
 # ----------------------------------------------------------------------------
 #
-#  StempelWerk 0.3
-#  ===============
+#  StempelWerk
+#  ===========
 #  Automatic code generation from Jinja2 templates
 #
 #  Copyright (c) 2020-2022 Martin Zuther (https://www.mzuther.de/)
@@ -52,6 +52,9 @@ from dataclasses import dataclass
 
 import jinja2
 from DirWalk.DirWalk import dirwalk
+
+
+VERSION = '0.3.0'
 
 # ensure that this script can be called from anywhere
 script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -224,6 +227,13 @@ def process_templates(settings):
         render_template(settings, cached_templates, template_filename)
 
 
+def display_version():
+    print()
+    print(f'[ StempelWerk v{ VERSION }    (c) 2020-2022 Martin Zuther ]')
+    print('[ Licensed under the BSD 3-Clause License           ]')
+    print()
+
+
 if __name__ == '__main__':
     if len(sys.argv) < 2:
         print()
@@ -232,10 +242,7 @@ if __name__ == '__main__':
 
         exit(1)
 
-    print()
-    print('Python: {}'.format(sys.version))
-    print('Jinja2: {}'.format(jinja2.__version__))
-    print()
+    display_version()
 
     # settings path is relative to the path of this script
     settings_path = os.path.join(script_dir, sys.argv[1])
