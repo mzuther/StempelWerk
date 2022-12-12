@@ -85,9 +85,9 @@ os.chdir(script_dir)
 # of using dictionary access ("settings['template_dir']").
 @dataclass
 class Settings:
-    template_dir: str = '../10-templates'
-    output_dir: str = '../20-output'
-    settings_dir_name: str = '00-stencils'
+    template_dir: str
+    output_dir: str
+    settings_dir_name: str
     file_separator: str = '### File: '
 
     def __post_init__(self):
@@ -105,6 +105,9 @@ def load_settings(config_file_path):
         with open(os.path.expanduser(config_file_path)) as f:
             loaded_settings = json.load(f)
 
+        # here's where the magic happens: unpack JSON file into classes
+        settings = Settings(**loaded_settings)
+
     except FileNotFoundError:
         print(f'ERROR: File "{ config_file_path }" not found.')
         config_load_error = True
@@ -114,13 +117,17 @@ def load_settings(config_file_path):
         print(f'ERROR: { err }')
         config_load_error = True
 
-    if config_load_error:
-        print('INFO:  Adding default settings.')
+    except TypeError as err:
+        print(f'ERROR: Did you provide all settings in "{ config_file_path }"?')
+        print(f'ERROR: { err }')
         print()
-        loaded_settings = {}
 
-    # here's where the magic happens: unpack JSON file into classes
-    settings = Settings(**loaded_settings)
+        # print traceback
+        raise err
+
+    if config_load_error:
+        print()
+        exit(1)
 
     return settings
 
