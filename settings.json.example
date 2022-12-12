@@ -1,0 +1,6 @@
+{
+  "template_dir": "../10-templates",
+  "output_dir": "../20-output",
+  "settings_dir_name": "00-stencils",
+  "file_separator": "### File: "
+}

@@ -2,7 +2,7 @@
 
 # ----------------------------------------------------------------------------
 #
-#  StempelWerk 0.1
+#  StempelWerk 0.2
 #  ===============
 #  Automatic code generation from Jinja2 templates
 #
@@ -41,11 +41,14 @@
 #
 # ----------------------------------------------------------------------------
 
+import json
 import os
 import pathlib
 import platform
 import stat
 import sys
+
+from dataclasses import dataclass
 
 import jinja2
 
@@ -56,31 +59,77 @@ os.chdir(script_dir)
 # Settings
 # ========
 #
-# NOTE: when you join paths one by one, this adds the correct path
-# NOTE  separator for the current operating system:
-# NOTE  "output_dir = os.path.join(script_dir, '..', 'output')"
+# NOTE: all paths are relative to the path of this script; please
+# NOTE  separate paths using forward slashes ("/a/b") for cross-platform
+# NOTE  compatibility; StempelWerk will handle the conversion for you
 #
 # path to template directory; this directory is scanned recursively;
 # all files with an extension of ".jinja" are rendered using Jinja2
-template_dir = os.path.join(script_dir, '..', '10-templates')
-
+#
 # name of directory that contains common template settings; files in
 # directories matching this name will be ignored and not rendered
-settings_dir_name = '00-templates'
-
+#
 # each time this string is encountered, a new file is created; this
 # allows you to create multiple files from a single template
-file_separator = '### File: '
-
+#
 # path to output root directory for rendered files
-output_dir = os.path.join(script_dir, '..', '20-output')
 
 
-# note: use relative paths to access templates in sub-directories
+# Auto-create classes to write leaner code
+#
+# The "@dataclass" decorator creates a class, class members, and a
+# constructor with key-word parameters that have default values.
+#
+# In addition, this allows us to address settings with the more
+# readable membership operator ("settings.template_dir") instead
+# of using dictionary access ("settings['template_dir']").
+@dataclass
+class Settings:
+    template_dir: str = '../10-templates'
+    output_dir: str = '../20-output'
+    settings_dir_name: str = '00-stencils'
+    file_separator: str = '### File: '
+
+    def __post_init__(self):
+        # finalize paths
+        self.template_dir = os.path.normpath(
+            os.path.join(script_dir, self.template_dir))
+
+        self.output_dir = os.path.normpath(
+            os.path.join(script_dir, self.output_dir))
+
+
+def load_settings(config_file_path):
+    try:
+        config_load_error = False
+        with open(os.path.expanduser(config_file_path)) as f:
+            loaded_settings = json.load(f)
+
+    except FileNotFoundError:
+        print(f'ERROR: File "{ config_file_path }" not found.')
+        config_load_error = True
+
+    except json.decoder.JSONDecodeError as err:
+        print(f'ERROR: File "{ config_file_path }" is broken:')
+        print(f'ERROR: { err }')
+        config_load_error = True
+
+    if config_load_error:
+        print('INFO:  Adding default settings.')
+        print()
+        loaded_settings = {}
+
+    # here's where the magic happens: unpack JSON file into classes
+    settings = Settings(**loaded_settings)
+
+    return settings
+
+
+# NOTE: use relative paths to access templates in sub-directories
 # (https://stackoverflow.com/a/9644828)
-def cache_templates(template_dir, list_templates=False):
+def cache_templates(settings, list_templates=False):
     # directories containing templates (no need to add sub-directories)
-    template_dir = [template_dir]
+    template_dir = [settings.template_dir]
     templateLoader = jinja2.FileSystemLoader(template_dir)
     cached_templates = jinja2.Environment(
         loader=templateLoader, trim_blocks=True)
@@ -95,8 +144,9 @@ def cache_templates(template_dir, list_templates=False):
     return cached_templates
 
 
-def render_template(cached_templates, template_filename, output_dir):
-    template_filename = os.path.relpath(template_filename, template_dir)
+def render_template(settings, cached_templates, template_filename):
+    template_filename = os.path.relpath(
+        template_filename, settings.template_dir)
     template_filename = template_filename.replace(os.path.sep, '/')
     print('[ {} ]'.format(template_filename))
 
@@ -105,7 +155,7 @@ def render_template(cached_templates, template_filename, output_dir):
     content_of_multiple_files = template.render()
 
     for content_of_single_file in content_of_multiple_files.split(
-            file_separator):
+            settings.file_separator):
         # content starts with file_separator, so first string is empty
         # (or contains whitespace when a template is not well written)
         if not content_of_single_file.strip():
@@ -114,9 +164,10 @@ def render_template(cached_templates, template_filename, output_dir):
         # extract and normalize file name
         output_filename, content = content_of_single_file.split('\n', 1)
         output_filename = os.path.abspath(
-            os.path.join(output_dir, output_filename.strip()))
+            os.path.join(settings.output_dir, output_filename.strip()))
 
-        print('--> {}'.format(os.path.relpath(output_filename, output_dir)))
+        print('--> {}'.format(os.path.relpath(
+            output_filename, settings.output_dir)))
 
         # ensure Batch files use Windows line endings, otherwise
         # seemingly random lines will be executed
@@ -141,19 +192,16 @@ def render_template(cached_templates, template_filename, output_dir):
     print()
 
 
-if __name__ == '__main__':
-    print()
-    print('Python: {}'.format(sys.version))
-    print('Jinja2: {}'.format(jinja2.__version__))
-    print()
-
-    cached_templates = cache_templates(template_dir, list_templates=False)
+def process_templates(settings):
+    cached_templates = cache_templates(settings, list_templates=False)
     template_filenames = []
 
     # find all Jinja2 files in template directory
-    for root_dir, _, files in os.walk(template_dir):
+    for root_dir, _, files in os.walk(settings.template_dir):
         # do not render settings
-        if root_dir.startswith(os.path.join(template_dir, settings_dir_name)):
+        if root_dir.startswith(os.path.join(
+                settings.template_dir,
+                settings.settings_dir_name)):
             continue
 
         for filename in files:
@@ -163,4 +211,25 @@ if __name__ == '__main__':
     # sort templates by location and render each one
     for root_dir, filename in sorted(template_filenames):
         template_filename = os.path.join(root_dir, filename)
-        render_template(cached_templates, template_filename, output_dir)
+
+        render_template(settings, cached_templates, template_filename)
+
+
+if __name__ == '__main__':
+    if len(sys.argv) < 2:
+        print()
+        print('ERROR: Please provide JSON settings file as first parameter.')
+        print()
+
+        exit(1)
+
+    print()
+    print('Python: {}'.format(sys.version))
+    print('Jinja2: {}'.format(jinja2.__version__))
+    print()
+
+    # settings path is relative to the path of this script
+    settings_path = os.path.join(script_dir, sys.argv[1])
+    settings = load_settings(settings_path)
+
+    process_templates(settings)
