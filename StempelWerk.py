@@ -63,7 +63,7 @@ template_dir = '10-templates'
 
 # directory with common template settings; files in this directory
 # are ignored and not rendered
-settings_dir = '_templates'
+settings_dir = '00-templates'
 
 # each time this string is encountered, a new file is created; this
 # allows you to create multiple files from a single template
