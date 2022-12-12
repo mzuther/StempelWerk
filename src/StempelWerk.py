@@ -2,7 +2,7 @@
 
 # ----------------------------------------------------------------------------
 #
-#  StempelWerk 0.2
+#  StempelWerk 0.3
 #  ===============
 #  Automatic code generation from Jinja2 templates
 #
@@ -51,6 +51,7 @@ import sys
 from dataclasses import dataclass
 
 import jinja2
+from DirWalk.DirWalk import dirwalk
 
 # ensure that this script can be called from anywhere
 script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -66,8 +67,8 @@ os.chdir(script_dir)
 # path to template directory; this directory is scanned recursively;
 # all files with an extension of ".jinja" are rendered using Jinja2
 #
-# name of directory that contains common template settings; files in
-# directories matching this name will be ignored and not rendered
+# name of directory that contains main templates ("stencils"); files
+# in directories matching this name will be ignored and not rendered
 #
 # each time this string is encountered, a new file is created; this
 # allows you to create multiple files from a single template
@@ -87,7 +88,7 @@ os.chdir(script_dir)
 class Settings:
     template_dir: str
     output_dir: str
-    settings_dir_name: str
+    stencil_dir_name: str
     file_separator: str = '### File: '
 
     def __post_init__(self):
@@ -200,25 +201,26 @@ def render_template(settings, cached_templates, template_filename):
 
 
 def process_templates(settings):
+    # do not end entries with path separators ("/" or "\")!
+    inclusions = {
+        'excluded_directory_names': [
+            # do not render main templates ("stencils")
+            settings.stencil_dir_name,
+        ],
+        'excluded_file_names': [],
+        'included_file_extensions': [
+            '.jinja',
+        ],
+    }
+
+    # load and cache main templates ("stencils")
     cached_templates = cache_templates(settings, list_templates=False)
-    template_filenames = []
 
     # find all Jinja2 files in template directory
-    for root_dir, _, files in os.walk(settings.template_dir):
-        # do not render settings
-        if root_dir.startswith(os.path.join(
-                settings.template_dir,
-                settings.settings_dir_name)):
-            continue
-
-        for filename in files:
-            if filename.endswith('.jinja'):
-                template_filenames.append([root_dir, filename])
-
-    # sort templates by location and render each one
-    for root_dir, filename in sorted(template_filenames):
-        template_filename = os.path.join(root_dir, filename)
-
+    for template_filename in dirwalk(
+            settings.template_dir,
+            included=inclusions,
+            modified_after=None):
         render_template(settings, cached_templates, template_filename)
 
 

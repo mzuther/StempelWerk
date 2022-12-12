@@ -1,2 +1,2 @@
 #! /usr/bin/bash
-python3 "./src/StempelWerk.py" ../settings.json.example
+python3 "./src/StempelWerk.py" ../settings_example.json
