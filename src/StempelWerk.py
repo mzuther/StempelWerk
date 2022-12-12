@@ -56,23 +56,24 @@ os.chdir(script_dir)
 # Settings
 # ========
 #
-# template directory that is scanned recursively (must be *relative*
-# to script directory); all files with an extension of ".jinja" are
-# rendered using Jinja2
-template_dir = '10-templates'
+# NOTE: when you join paths one by one, this adds the correct path
+# NOTE  separator for the current operating system:
+# NOTE  "output_dir = os.path.join(script_dir, '..', 'output')"
+#
+# path to template directory; this directory is scanned recursively;
+# all files with an extension of ".jinja" are rendered using Jinja2
+template_dir = os.path.join(script_dir, '..', '10-templates')
 
-# directory with common template settings; files in this directory
-# are ignored and not rendered
-settings_dir = '00-templates'
+# name of directory that contains common template settings; files in
+# directories matching this name will be ignored and not rendered
+settings_dir_name = '00-templates'
 
 # each time this string is encountered, a new file is created; this
 # allows you to create multiple files from a single template
 file_separator = '### File: '
 
-# output root directory for rendered files; joining paths one by one
-# adds the correct path separator for the current operating system,
-# such as "output_dir = os.path.join(script_dir, '..', 'output')"
-output_dir = os.path.join(script_dir, '20-output')
+# path to output root directory for rendered files
+output_dir = os.path.join(script_dir, '..', '20-output')
 
 
 # note: use relative paths to access templates in sub-directories
@@ -152,7 +153,7 @@ if __name__ == '__main__':
     # find all Jinja2 files in template directory
     for root_dir, _, files in os.walk(template_dir):
         # do not render settings
-        if root_dir.startswith(os.path.join(template_dir, settings_dir)):
+        if root_dir.startswith(os.path.join(template_dir, settings_dir_name)):
             continue
 
         for filename in files:

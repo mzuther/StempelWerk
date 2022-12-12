@@ -1,2 +1,2 @@
 #! /usr/bin/bash
-python3 "./StempelWerk.py"
+python3 "./src/StempelWerk.py"
