@@ -65,9 +65,8 @@ def dirwalk_recurse(root_directory, directories_first, include_directories,
                 is_included = True
 
                 # exclude directories
-                if included.get('excluded_directory_names', []):
-                    is_included = is_included and \
-                        path_basename not in included['excluded_directory_names']
+                if is_included and included.get('excluded_directory_names', []):
+                    is_included = path_basename not in included['excluded_directory_names']
 
                 if is_included:
                     directories.append(path_relname)
@@ -76,18 +75,16 @@ def dirwalk_recurse(root_directory, directories_first, include_directories,
                 is_included = True
 
                 # exclude files
-                if included.get('excluded_file_names', []):
-                    is_included = is_included and \
-                        path_basename not in included['excluded_file_names']
+                if is_included and included.get('excluded_file_names', []):
+                    is_included = path_basename not in included['excluded_file_names']
 
                 # only include some file extensions
-                if included.get('included_file_extensions', []):
+                if is_included and included.get('included_file_extensions', []):
                     _, file_extension = os.path.splitext(path_relname)
-                    is_included = is_included and \
-                        file_extension in included['included_file_extensions']
+                    is_included = file_extension in included['included_file_extensions']
 
                 # only include files modified after a given date
-                if modified_after:
+                if is_included and modified_after:
                     # get timestamp of linked file, not of symlink
                     stat_result = current_path.stat(follow_symlinks=True)
 
@@ -98,8 +95,7 @@ def dirwalk_recurse(root_directory, directories_first, include_directories,
                     modification_time_in_seconds = math.ceil(
                         stat_result.st_mtime_ns / 1e9)
 
-                    is_included = is_included and \
-                        modification_time_in_seconds >= modified_after
+                    is_included = modification_time_in_seconds >= modified_after
 
                 if is_included:
                     files.append(path_relname)
