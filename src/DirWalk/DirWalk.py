@@ -48,16 +48,15 @@ import sys
 
 def dirwalk_recurse(root_directory, directories_first, include_directories,
                     follow_symlinks, included, modified_after):
-    root_name = os.fsdecode(root_directory)
-
     directories = []
     files = []
 
     # "os.scandir" minimizes system calls (including the retrieval of timestamps)
     with os.scandir(root_directory) as paths_in_directory:
         for current_path in paths_in_directory:
-            path_name = os.fsdecode(current_path.name)
-            path_relname = os.path.normpath(os.path.join(root_name, path_name))
+            path_name = current_path.name
+            path_relname = os.path.normpath(
+                os.path.join(root_directory, path_name))
             path_basename = os.path.basename(path_relname)
 
             # process directories
