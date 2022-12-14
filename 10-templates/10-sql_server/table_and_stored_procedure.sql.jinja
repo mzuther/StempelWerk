@@ -90,7 +90,7 @@
 
 {# -------------------------------------------------------------------------- #}
 
-{{- common.start_new_file('10-sql_server/10-' + table.source + '.sql') -}}
+{{- common.start_new_file('10-sql_server/10-' + table.target + '.sql') -}}
 
 {{- create_table.render(table, columns, common, name) -}}
 
