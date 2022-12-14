@@ -104,9 +104,12 @@ class Settings:
 
 
 def load_settings(config_file_path):
+    config_file_path = os.path.normpath(
+        os.path.expanduser(config_file_path))
+
     try:
         config_load_error = False
-        with open(os.path.expanduser(config_file_path)) as f:
+        with open(config_file_path) as f:
             loaded_settings = json.load(f)
 
         # here's where the magic happens: unpack JSON file into classes
@@ -158,11 +161,12 @@ def cache_templates(settings, list_templates=False):
 def render_template(settings, cached_templates, template_filename):
     template_filename = os.path.relpath(
         template_filename, settings.template_dir)
-    template_filename = template_filename.replace(os.path.sep, '/')
     print('[ {} ]'.format(template_filename))
 
     # render template
-    template = cached_templates.get_template(template_filename)
+    template = cached_templates.get_template(
+        # Jinja2 cannot handle Windows paths with backslashes
+        template_filename.replace(os.path.sep, '/'))
     content_of_multiple_files = template.render()
 
     for content_of_single_file in content_of_multiple_files.split(
@@ -184,7 +188,7 @@ def render_template(settings, cached_templates, template_filename):
         # seemingly random lines will be executed
         if output_filename.endswith('.bat'):
             newline = '\r\n'
-        # otherwise, use default line ending of system
+        # in any other case, use default line ending of system
         else:
             newline = None
 
