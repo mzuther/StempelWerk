@@ -60,26 +60,8 @@ VERSION = '0.3.1'
 script_dir = os.path.dirname(os.path.abspath(__file__))
 os.chdir(script_dir)
 
-# Settings
-# ========
-#
-# NOTE: all paths are relative to the path of this script; please
-# NOTE  separate paths using forward slashes ("/a/b") for cross-platform
-# NOTE  compatibility; StempelWerk will handle the conversion for you
-#
-# path to template directory; this directory is scanned recursively;
-# all files with an extension of ".jinja" are rendered using Jinja2
-#
-# name of directory that contains main templates ("stencils"); files
-# in directories matching this name will be ignored and not rendered
-#
-# each time this string is encountered, a new file is created; this
-# allows you to create multiple files from a single template
-#
-# path to output root directory for rendered files
 
-
-# Auto-create classes to write leaner code
+# Auto-create settings class to write leaner code
 #
 # The "@dataclass" decorator creates a class, class members, and a
 # constructor with key-word parameters that have default values.
@@ -214,14 +196,14 @@ def process_templates(settings_path):
     # do not end entries with path separators ("/" or "\")!
     inclusions = {
         'excluded_directory_names': [
-            # do not render main templates ("stencils")
+            # do not render stencils
             settings.stencil_dir_name,
         ],
         'excluded_file_names': [],
         'included_file_extensions': settings.included_file_extensions,
     }
 
-    # load and cache main templates ("stencils")
+    # load and cache stencils
     cached_templates = cache_templates(settings, list_templates=False)
 
     # find all Jinja2 files in template directory
