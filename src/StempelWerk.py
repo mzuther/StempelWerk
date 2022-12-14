@@ -60,7 +60,7 @@ from DirWalk.DirWalk import dirwalk
 script_dir = os.path.dirname(os.path.abspath(__file__))
 os.chdir(script_dir)
 
-VERSION = '0.4.0'
+VERSION = '0.4.1'
 LAST_RUN_FILE = os.path.normpath(
     os.path.join(script_dir, '../.last_run'))
 
@@ -151,10 +151,18 @@ def render_template(settings, cached_templates, template_filename):
     print('[ {} ]'.format(template_filename))
 
     # render template
-    template = cached_templates.get_template(
-        # Jinja2 cannot handle Windows paths with backslashes
-        template_filename.replace(os.path.sep, '/'))
-    content_of_multiple_files = template.render()
+    try:
+        template = cached_templates.get_template(
+            # Jinja2 cannot handle Windows paths with backslashes
+            template_filename.replace(os.path.sep, '/'))
+        content_of_multiple_files = template.render()
+    except (jinja2.exceptions.TemplateSyntaxError,
+            jinja2.exceptions.TemplateAssertionError) as err:
+        print()
+        print(f'ERROR: { err.message } (line { err.lineno })')
+        print()
+
+        raise(err)
 
     for content_of_single_file in content_of_multiple_files.split(
             settings.file_separator):
