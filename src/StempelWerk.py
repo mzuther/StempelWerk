@@ -41,7 +41,9 @@
 #
 # ----------------------------------------------------------------------------
 
+import datetime
 import json
+import math
 import os
 import pathlib
 import platform
@@ -54,11 +56,13 @@ import jinja2
 from DirWalk.DirWalk import dirwalk
 
 
-VERSION = '0.3.2'
-
 # ensure that this script can be called from anywhere
 script_dir = os.path.dirname(os.path.abspath(__file__))
 os.chdir(script_dir)
+
+VERSION = '0.4.0'
+LAST_RUN_FILE = os.path.normpath(
+    os.path.join(script_dir, '../.last_run'))
 
 
 # Auto-create settings class to write leaner code
@@ -190,7 +194,7 @@ def render_template(settings, cached_templates, template_filename):
     print()
 
 
-def process_templates(settings_path):
+def process_templates(settings_path, only_modified=False):
     settings = load_settings(settings_path)
 
     # do not end entries with path separators ("/" or "\")!
@@ -206,12 +210,30 @@ def process_templates(settings_path):
     # load and cache stencils
     cached_templates = cache_templates(settings, list_templates=False)
 
+    modified_after = None
+    if only_modified:
+        try:
+            # get time of last run
+            with open(LAST_RUN_FILE) as f:
+                modified_after = f.read().strip()
+        except IOError:
+            modified_after = None
+
     # find all Jinja2 files in template directory
     for template_filename in dirwalk(
             settings.template_dir,
             included=inclusions,
-            modified_after=None):
+            modified_after=modified_after):
         render_template(settings, cached_templates, template_filename)
+
+    # save time of current run
+    with open(LAST_RUN_FILE, mode='w') as f:
+        # round down to ensure that files with inaccurate timestamps and
+        # other edge cases are included
+        current_timestamp = math.floor(
+            datetime.datetime.now().timestamp())
+
+        f.write(str(current_timestamp))
 
 
 def display_version():
@@ -231,7 +253,18 @@ if __name__ == '__main__':
 
     display_version()
 
-    # settings path is relative to the path of this script
-    settings_path = os.path.join(script_dir, sys.argv[1])
+    command_line_arguments = list(sys.argv)
+    only_modified = False
 
-    process_templates(settings_path)
+    # extremely primitive command line parsing
+    if '--only-modified' in command_line_arguments:
+        only_modified = True
+        command_line_arguments.remove('--only-modified')
+
+    # highly sophisticated command line parsing
+    settings_path = command_line_arguments.pop()
+
+    # settings path is relative to the path of this script
+    settings_path = os.path.join(script_dir, settings_path)
+
+    process_templates(settings_path, only_modified)

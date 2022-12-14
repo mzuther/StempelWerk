@@ -5,8 +5,24 @@ _Automatic code generation from Jinja2 templates_
 Generate your code by running the following command:
 
 ```bash
-python3 ./src/StempelWerk.py PATH_TO_SETTINGS_FILE
+python3 ./src/StempelWerk.py [--only-modified] PATH_TO_SETTINGS_FILE
 ```
+
+## Performance
+
+By default, StempelWerk renders all template files located in the
+specified template directory.
+
+When you use the command line argument `--only-modified`, however,
+StempelWerk tries to process only the template files that have changed
+since the last successful run. Use of this command line argument is
+highly discouraged in CI/CD pipelines!
+
+_This logic is not infallible: some file systems update modification
+times in a weird manner, and changes to master templates (called
+"stencils" in StempelWerk) are currently not handled. However, in such
+a case you can simply use StempelWerk without the `--only-modified`
+argument._
 
 ## Settings
 
@@ -32,10 +48,9 @@ directory.
 
 ### `stencil_dir_name`
 
-Name of directory that contains master templates (called "stencils" in
-StempelWerk). All files in `template_dir/stencil_dir_name` will be
-loaded into Jinja2 and can be referenced from other templates at
-runtime.
+Name of directory that contains stencils. All files in
+`template_dir/stencil_dir_name` will be loaded into Jinja2 and can be
+referenced from other templates at runtime.
 
 In addition, files in any directory matching this name will not be
 rendered.
