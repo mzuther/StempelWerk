@@ -8,6 +8,21 @@ Generate your code by running the following command:
 python3 ./src/StempelWerk.py [--only-modified] PATH_TO_SETTINGS_FILE
 ```
 
+## Installation
+
+StempelWerk was developed using Python v3.8, so an older version might
+not work.
+
+Run the following lines - possibly in a virtual environment - to
+upgrade `pip` and install the dependencies:
+
+```bash
+python3 -m pip install --user --upgrade pip
+
+# "namespace()" was introduced in v2.1.0
+python3 -m pip install --user --upgrade "Jinja2>=2.1.0"
+```
+
 ## Performance
 
 By default, StempelWerk renders all template files located in the
