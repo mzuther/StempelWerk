@@ -54,7 +54,7 @@ import jinja2
 from DirWalk.DirWalk import dirwalk
 
 
-VERSION = '0.3.0'
+VERSION = '0.3.1'
 
 # ensure that this script can be called from anywhere
 script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -92,6 +92,7 @@ class Settings:
     template_dir: str
     output_dir: str
     stencil_dir_name: str
+    included_file_extensions: list
     file_separator: str = '### File: '
 
     def __post_init__(self):
@@ -207,7 +208,9 @@ def render_template(settings, cached_templates, template_filename):
     print()
 
 
-def process_templates(settings):
+def process_templates(settings_path):
+    settings = load_settings(settings_path)
+
     # do not end entries with path separators ("/" or "\")!
     inclusions = {
         'excluded_directory_names': [
@@ -215,9 +218,7 @@ def process_templates(settings):
             settings.stencil_dir_name,
         ],
         'excluded_file_names': [],
-        'included_file_extensions': [
-            '.jinja',
-        ],
+        'included_file_extensions': settings.included_file_extensions,
     }
 
     # load and cache main templates ("stencils")
@@ -250,6 +251,5 @@ if __name__ == '__main__':
 
     # settings path is relative to the path of this script
     settings_path = os.path.join(script_dir, sys.argv[1])
-    settings = load_settings(settings_path)
 
-    process_templates(settings)
+    process_templates(settings_path)

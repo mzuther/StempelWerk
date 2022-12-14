@@ -2,5 +2,6 @@
   "template_dir": "../10-templates",
   "output_dir": "../20-output",
   "stencil_dir_name": "00-stencils",
+  "included_file_extensions": [".jinja"],
   "file_separator": "### File: "
 }
