@@ -56,13 +56,11 @@ import jinja2
 from DirWalk.DirWalk import dirwalk
 
 
+VERSION = '0.4.2'
+
 # ensure that this script can be called from anywhere
 script_dir = os.path.dirname(os.path.abspath(__file__))
 os.chdir(script_dir)
-
-VERSION = '0.4.1'
-LAST_RUN_FILE = os.path.normpath(
-    os.path.join(script_dir, '../.last_run'))
 
 
 # Auto-create settings class to write leaner code
@@ -79,6 +77,7 @@ class Settings:
     output_dir: str
     stencil_dir_name: str
     included_file_extensions: list
+    last_run_file: str = '../.last_run'
     file_separator: str = '### File: '
 
     def __post_init__(self):
@@ -88,6 +87,9 @@ class Settings:
 
         self.output_dir = os.path.normpath(
             os.path.join(script_dir, self.output_dir))
+
+        self.last_run_file = os.path.normpath(
+            os.path.join(script_dir, self.last_run_file))
 
 
 def load_settings(config_file_path):
@@ -222,7 +224,7 @@ def process_templates(settings_path, only_modified=False):
     if only_modified:
         try:
             # get time of last run
-            with open(LAST_RUN_FILE) as f:
+            with open(settings.last_run_file) as f:
                 modified_after = f.read().strip()
         except IOError:
             modified_after = None
@@ -235,7 +237,7 @@ def process_templates(settings_path, only_modified=False):
         render_template(settings, cached_templates, template_filename)
 
     # save time of current run
-    with open(LAST_RUN_FILE, mode='w') as f:
+    with open(settings.last_run_file, mode='w') as f:
         # round down to ensure that files with inaccurate timestamps and
         # other edge cases are included
         current_timestamp = math.floor(

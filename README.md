@@ -76,11 +76,25 @@ List containing file extensions (e.g. `.sql`). Only files with a
 matching extension are considered to be templates and will be passed
 to Jinja2.
 
+### `last_run_file`
+
+Path to the file in which the time of the last successful run will be
+stored.
+
+**Default value: `../.last_run`**
+
+_If your operating system handles temporary directories correctly
+(Windows does not), you could store this file in one of them
+(e.g. `/tmp/`). This way, all template files would be rendered once
+after starting the system._
+
 ### `file_separator`
 
 Each time this string is encountered in the rendered ouput of a
 template, a new file is created. This allows you to create multiple
 files from a single template.
+
+**Default value: `### File: `**
 
 _Please see example templates to learn how to use this feature._
 

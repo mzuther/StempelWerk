@@ -3,5 +3,6 @@
   "output_dir": "../20-output",
   "stencil_dir_name": "00-stencils",
   "included_file_extensions": [".jinja"],
+  "last_run_file": "../.last_run",
   "file_separator": "### File: "
 }
