@@ -134,27 +134,27 @@ def cache_templates(settings, list_templates=False):
     # directories containing templates (no need to add sub-directories)
     template_dir = [settings.template_dir]
     templateLoader = jinja2.FileSystemLoader(template_dir)
-    cached_templates = jinja2.Environment(
+    jinja_environment = jinja2.Environment(
         loader=templateLoader, trim_blocks=True)
 
     # list all templates in cache
     if list_templates:
         print('Templates:')
-        for template_filename in cached_templates.list_templates():
+        for template_filename in jinja_environment.list_templates():
             print('* {}'.format(template_filename))
         print()
 
-    return cached_templates
+    return jinja_environment
 
 
-def render_template(settings, cached_templates, template_filename):
+def render_template(settings, jinja_environment, template_filename):
     template_filename = os.path.relpath(
         template_filename, settings.template_dir)
     print('[ {} ]'.format(template_filename))
 
     # render template
     try:
-        template = cached_templates.get_template(
+        template = jinja_environment.get_template(
             # Jinja2 cannot handle Windows paths with backslashes
             template_filename.replace(os.path.sep, '/'))
         content_of_multiple_files = template.render()
@@ -207,6 +207,9 @@ def render_template(settings, cached_templates, template_filename):
 def process_templates(settings_path, only_modified=False):
     settings = load_settings(settings_path)
 
+    # create Jinja2 environment and pre-load stencils
+    jinja_environment = cache_templates(settings, list_templates=False)
+
     # do not end entries with path separators ("/" or "\")!
     inclusions = {
         'excluded_directory_names': [
@@ -216,9 +219,6 @@ def process_templates(settings_path, only_modified=False):
         'excluded_file_names': [],
         'included_file_extensions': settings.included_file_extensions,
     }
-
-    # load and cache stencils
-    cached_templates = cache_templates(settings, list_templates=False)
 
     modified_after = None
     if only_modified:
@@ -234,7 +234,7 @@ def process_templates(settings_path, only_modified=False):
             settings.template_dir,
             included=inclusions,
             modified_after=modified_after):
-        render_template(settings, cached_templates, template_filename)
+        render_template(settings, jinja_environment, template_filename)
 
     # save time of current run
     with open(settings.last_run_file, mode='w') as f:
