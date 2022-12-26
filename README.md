@@ -76,6 +76,16 @@ List containing file extensions (e.g. `.sql`). Only files with a
 matching extension are considered to be templates and will be passed
 to Jinja2.
 
+### `update_environment`
+
+List containing paths to Python files. After creating the Jinja2
+environment, these files will be sorted alphabetically (to guarantee a
+stable execution order) and executed. Use this feature to add filters
+to the environment, or perform any other task Python is capable of.
+
+_Warning: there are no security checks to prevent you from deleting
+all of your files and doing other mischief, so please be careful!_
+
 ### `last_run_file`
 
 Path to the file in which the time of the last successful run will be

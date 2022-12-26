@@ -15,7 +15,7 @@ CREATE TABLE DEMO.MultiFile_Target
     -- -------------------------------------------------- --
     String_Column    NVARCHAR(200) COLLATE Latin1_General_100_CI_AS,
     -- -------------------------------------------------- --
-    -- this comment has been added automatically
+    -- este es un comentario automatico
     Integer_Column   INT DEFAULT 10,
     Numeric_Column   DECIMAL(10, 5) NOT NULL,
 

@@ -56,7 +56,7 @@ import jinja2
 from DirWalk.DirWalk import dirwalk
 
 
-VERSION = '0.4.2'
+VERSION = '0.5.0'
 
 # ensure that this script can be called from anywhere
 script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -77,6 +77,7 @@ class Settings:
     output_dir: str
     stencil_dir_name: str
     included_file_extensions: list
+    update_environment: list
     last_run_file: str = '../.last_run'
     file_separator: str = '### File: '
 
@@ -204,11 +205,38 @@ def render_template(settings, jinja_environment, template_filename):
     print()
 
 
+def update_environment(jinja_environment, execute_filenames):
+    # sort filenames to guarantee a stable execution order
+    for code_filename in sorted(execute_filenames):
+        print(f'CUSTOM: Executing "{ code_filename}" ...')
+
+        try:
+            with open(code_filename) as f:
+                custom_code = f.read()
+
+        except FileNotFoundError:
+            print(f'ERROR: File "{ code_filename }" not found.')
+            print()
+            exit(1)
+
+        compiled_code = compile(custom_code, code_filename, mode='exec')
+        exec(compiled_code)
+
+        print(f'CUSTOM: Done.')
+        print()
+
+    return jinja_environment
+
+
 def process_templates(settings_path, only_modified=False):
     settings = load_settings(settings_path)
 
     # create Jinja2 environment and pre-load stencils
     jinja_environment = cache_templates(settings, list_templates=False)
+
+    # update environment and execute custom code
+    jinja_environment = update_environment(
+        jinja_environment, settings.update_environment)
 
     # do not end entries with path separators ("/" or "\")!
     inclusions = {

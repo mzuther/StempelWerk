@@ -39,7 +39,7 @@
         'name': 'Integer_Column',
         'type': 'INT',
         'default': '10',
-        'comment': 'this comment has been added automatically'
+        'comment': 'este es un comentario automatico',
     },
     {
         'name': 'Numeric_Column',
@@ -61,7 +61,7 @@
             SELECT
 {% for column in columns if not column.ignore_cte -%}
 {%- if column.comment %}
-                -- {{ column.comment }}
+                -- {{ column.comment | upper_first() | add_exclamation_mark(column.comment is spanish) }}
 {% endif %}
                 {{ column.name }}
                 {{- ',' if not loop.last }}

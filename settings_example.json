@@ -2,7 +2,13 @@
   "template_dir": "../10-templates",
   "output_dir": "../20-output",
   "stencil_dir_name": "00-stencils",
-  "included_file_extensions": [".jinja"],
+  "included_file_extensions": [
+    ".jinja"
+  ],
+  "update_environment": [
+    "./custom/add_filters.py",
+    "./custom/add_tests.py"
+  ],
   "last_run_file": "../.last_run",
   "file_separator": "### File: "
 }

@@ -22,7 +22,7 @@ BEGIN
                 -- -------------------------------------------------- --
                 String_Column,
                 -- -------------------------------------------------- --
-                -- this comment has been added automatically
+                -- ¡Este es un comentario automatico!
                 Integer_Column
             FROM
                 DEMO.MultiFile_Source
@@ -54,7 +54,7 @@ BEGIN
                 SELECT
                     tgt.String_Column,
                     -- -------------------------------------------------- --
-                    -- this comment has been added automatically
+                    -- este es un comentario automatico
                     tgt.Integer_Column,
                     tgt.Numeric_Column
 
@@ -63,7 +63,7 @@ BEGIN
                 SELECT
                     src.String_Column,
                     -- -------------------------------------------------- --
-                    -- this comment has been added automatically
+                    -- este es un comentario automatico
                     src.Integer_Column,
                     src.Numeric_Column
             )
