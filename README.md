@@ -2,11 +2,17 @@
 
 _Automatic code generation from Jinja2 templates_
 
-Generate your code by running the following command:
-
-```bash
-python3 ./src/StempelWerk.py [--only-modified] PATH_TO_SETTINGS_FILE
-```
+<figure style="display: flex; flex-flow: column;">
+  <img src="include/wallpaper-surface-printing-machine.jpg"
+       alt="Illustration of an old printing machine" />
+  <figurecaption style="font-size: 0.85em; padding: 0.5em;">
+    <em>
+      Illustration by Narcisse Navellier (obtained from
+      <a href="https://commons.wikimedia.org/wiki/File:Wallpaper-surface-printing-machine.jpg">
+        Wikimedia Commons</a>)
+    </em>
+  </figurecaption>
+</figure>
 
 ## Installation
 
@@ -21,6 +27,14 @@ python3 -m pip install --user --upgrade pip
 
 # "namespace()" was introduced in v2.1.0
 python3 -m pip install --user --upgrade "Jinja2>=2.1.0"
+```
+
+## Execution
+
+Generate your code from templates by running the following command:
+
+```bash
+python3 ./src/StempelWerk.py [--only-modified] PATH_TO_SETTINGS_FILE
 ```
 
 ## Performance
