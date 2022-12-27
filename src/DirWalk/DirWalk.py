@@ -154,7 +154,6 @@ if __name__ == '__main__':
 
     SOURCE_DIR = sys.argv[1]
 
-    # do not end entries with path separators ("/" or "\")!
     INCLUSIONS = {
         'excluded_directory_names': [
         ],

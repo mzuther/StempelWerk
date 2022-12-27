@@ -55,7 +55,7 @@ import jinja2
 from DirWalk.DirWalk import dirwalk
 
 
-VERSION = '0.5.0'
+VERSION = '0.5.1'
 
 # ensure that this script can be called from anywhere
 script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -228,18 +228,10 @@ def update_environment(jinja_environment, execute_filenames):
     return jinja_environment
 
 
-def process_templates(settings_path, only_modified=False):
+def process_templates(settings_path, process_only_modified=False):
     settings = load_settings(settings_path)
 
-    # create Jinja2 environment and pre-load stencils
-    jinja_environment = cache_templates(settings, list_templates=False)
-
-    # update environment and execute custom code
-    jinja_environment = update_environment(
-        jinja_environment, settings.update_environment)
-
-    # do not end entries with path separators ("/" or "\")!
-    inclusions = {
+    dirwalk_inclusions = {
         'excluded_directory_names': [
             # do not render stencils
             settings.stencil_dir_name,
@@ -249,20 +241,32 @@ def process_templates(settings_path, only_modified=False):
     }
 
     modified_after = None
-    if only_modified:
+    if process_only_modified:
+        # get time of last run
         try:
-            # get time of last run
             with open(settings.last_run_file) as f:
                 modified_after = f.read().strip()
         except IOError:
             modified_after = None
 
     # find all Jinja2 files in template directory
-    for template_filename in dirwalk(
-            settings.template_dir,
-            included=inclusions,
-            modified_after=modified_after):
-        render_template(settings, jinja_environment, template_filename)
+    template_filenames = dirwalk(
+        settings.template_dir,
+        included=dirwalk_inclusions,
+        modified_after=modified_after)
+
+    # only load Jinja2 when there are files that need to be processed
+    if template_filenames:
+        # create Jinja2 environment and pre-load stencils
+        jinja_environment = cache_templates(settings, list_templates=False)
+
+        # execute custom Python code
+        jinja_environment = update_environment(
+            jinja_environment, settings.update_environment)
+
+        # process templates
+        for template_filename in template_filenames:
+            render_template(settings, jinja_environment, template_filename)
 
     # save time of current run
     with open(settings.last_run_file, mode='w') as f:
@@ -292,11 +296,11 @@ if __name__ == '__main__':
     display_version()
 
     command_line_arguments = list(sys.argv)
-    only_modified = False
+    process_only_modified = False
 
     # extremely primitive command line parsing
     if '--only-modified' in command_line_arguments:
-        only_modified = True
+        process_only_modified = True
         command_line_arguments.remove('--only-modified')
 
     # highly sophisticated command line parsing
@@ -305,4 +309,4 @@ if __name__ == '__main__':
     # settings path is relative to the path of this script
     settings_path = os.path.join(script_dir, settings_path)
 
-    process_templates(settings_path, only_modified)
+    process_templates(settings_path, process_only_modified)
