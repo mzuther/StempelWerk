@@ -93,6 +93,13 @@ class Settings:
             os.path.join(script_dir, self.last_run_file))
 
 
+def display_version():
+    print()
+    print(f'[ StempelWerk v{ VERSION }    (c) 2020-2022 Martin Zuther ]')
+    print('[ Licensed under the BSD 3-Clause License           ]')
+    print()
+
+
 def load_settings(config_file_path):
     config_file_path = os.path.normpath(
         os.path.expanduser(config_file_path))
@@ -131,7 +138,7 @@ def load_settings(config_file_path):
 
 # NOTE: use relative paths to access templates in sub-directories
 # (https://stackoverflow.com/a/9644828)
-def cache_templates(settings, list_templates=False):
+def create_environment(settings, list_templates=False):
     # directories containing templates (no need to add sub-directories)
     template_dir = [settings.template_dir]
     templateLoader = jinja2.FileSystemLoader(template_dir)
@@ -148,7 +155,30 @@ def cache_templates(settings, list_templates=False):
     return jinja_environment
 
 
-def render_template(settings, jinja_environment, template_filename):
+def update_environment(scripts_for_execution, jinja_environment):
+    # sort filenames to guarantee a stable execution order
+    for code_filename in sorted(scripts_for_execution):
+        print(f'CUSTOM: Executing "{ code_filename}" ...')
+
+        try:
+            with open(code_filename) as f:
+                custom_code = f.read()
+
+        except FileNotFoundError:
+            print(f'ERROR: File "{ code_filename }" not found.')
+            print()
+            exit(1)
+
+        compiled_code = compile(custom_code, code_filename, mode='exec')
+        exec(compiled_code)
+
+        print(f'CUSTOM: Done.')
+        print()
+
+    return jinja_environment
+
+
+def render_template(template_filename, jinja_environment, settings):
     template_filename = os.path.relpath(
         template_filename, settings.template_dir)
     print('[ {} ]'.format(template_filename))
@@ -205,29 +235,6 @@ def render_template(settings, jinja_environment, template_filename):
     print()
 
 
-def update_environment(jinja_environment, execute_filenames):
-    # sort filenames to guarantee a stable execution order
-    for code_filename in sorted(execute_filenames):
-        print(f'CUSTOM: Executing "{ code_filename}" ...')
-
-        try:
-            with open(code_filename) as f:
-                custom_code = f.read()
-
-        except FileNotFoundError:
-            print(f'ERROR: File "{ code_filename }" not found.')
-            print()
-            exit(1)
-
-        compiled_code = compile(custom_code, code_filename, mode='exec')
-        exec(compiled_code)
-
-        print(f'CUSTOM: Done.')
-        print()
-
-    return jinja_environment
-
-
 def process_templates(settings_path, process_only_modified=False):
     settings = load_settings(settings_path)
 
@@ -258,15 +265,15 @@ def process_templates(settings_path, process_only_modified=False):
     # only load Jinja2 when there are files that need to be processed
     if template_filenames:
         # create Jinja2 environment and pre-load stencils
-        jinja_environment = cache_templates(settings, list_templates=False)
+        jinja_environment = create_environment(settings, list_templates=False)
 
         # execute custom Python code
         jinja_environment = update_environment(
-            jinja_environment, settings.update_environment)
+            settings.update_environment, jinja_environment)
 
         # process templates
         for template_filename in template_filenames:
-            render_template(settings, jinja_environment, template_filename)
+            render_template(template_filename, jinja_environment, settings)
 
     # save time of current run
     with open(settings.last_run_file, mode='w') as f:
@@ -276,13 +283,6 @@ def process_templates(settings_path, process_only_modified=False):
             datetime.datetime.now().timestamp())
 
         f.write(str(current_timestamp))
-
-
-def display_version():
-    print()
-    print(f'[ StempelWerk v{ VERSION }    (c) 2020-2022 Martin Zuther ]')
-    print('[ Licensed under the BSD 3-Clause License           ]')
-    print()
 
 
 if __name__ == '__main__':
