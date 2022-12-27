@@ -3,7 +3,7 @@
   "output_dir": "../20-output",
   "stencil_dir_name": "00-stencils",
   "included_file_extensions": [
-    ".jinja"
+    "*.sql.jinja"
   ],
   "update_environment": [
     "./custom/add_filters.py",

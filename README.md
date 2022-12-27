@@ -2,15 +2,17 @@
 
 _Automatic code generation from Jinja2 templates_
 
-<figure style="display: flex; flex-flow: column;">
+<figure style="display: flex; flex-flow: column; max-width: 25em;">
   <img src="include/wallpaper-surface-printing-machine.jpg"
        alt="Illustration of an old printing machine" />
-  <figurecaption style="font-size: 0.85em; padding: 0.5em;">
-    <em>
-      Illustration by Narcisse Navellier (obtained from
-      <a href="https://commons.wikimedia.org/wiki/File:Wallpaper-surface-printing-machine.jpg">
-        Wikimedia Commons</a>)
-    </em>
+  <figurecaption>
+    <small>
+      <em>
+        Illustration by Narcisse Navellier (obtained from
+        <a href="https://commons.wikimedia.org/wiki/File:Wallpaper-surface-printing-machine.jpg">
+          Wikimedia Commons</a>)
+      </em>
+    </small>
   </figurecaption>
 </figure>
 
@@ -86,9 +88,9 @@ rendered.
 
 ### `included_file_extensions`
 
-List containing file extensions (e.g. `.sql`). Only files with a
-matching extension are considered to be templates and will be passed
-to Jinja2.
+List containing file extensions (e.g. `*.sql.jinja`). Only files with
+a [matching extension](https://docs.python.org/3/library/fnmatch.html)
+are considered to be templates and will be passed to Jinja2.
 
 ### `update_environment`
 

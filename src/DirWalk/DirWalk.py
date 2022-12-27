@@ -41,6 +41,7 @@
 #
 # ----------------------------------------------------------------------------
 
+import fnmatch
 import math
 import os
 import sys
@@ -79,8 +80,11 @@ def dirwalk_recurse(root_directory, directories_first, include_directories,
 
                 # only include some file extensions
                 if is_included and included.get('included_file_extensions', []):
-                    _, file_extension = os.path.splitext(path_relname)
-                    is_included = file_extension in included['included_file_extensions']
+                    for extension in included['included_file_extensions']:
+                        if fnmatch.fnmatch(path_basename, extension):
+                            break
+                    else:
+                        is_included = False
 
                 # only include files modified after a given date
                 if is_included and modified_after:
