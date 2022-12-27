@@ -41,6 +41,7 @@
 #
 # ----------------------------------------------------------------------------
 
+import dataclasses
 import datetime
 import json
 import math
@@ -49,8 +50,6 @@ import pathlib
 import platform
 import stat
 import sys
-
-from dataclasses import dataclass
 
 import jinja2
 from DirWalk.DirWalk import dirwalk
@@ -71,13 +70,14 @@ os.chdir(script_dir)
 # In addition, this allows us to address settings with the more
 # readable membership operator ("settings.template_dir") instead
 # of using dictionary access ("settings['template_dir']").
-@dataclass
+@dataclasses.dataclass
 class Settings:
     template_dir: str
     output_dir: str
     stencil_dir_name: str
     included_file_extensions: list
-    update_environment: list
+    update_environment: list = dataclasses.field(
+        default_factory=list)
     last_run_file: str = '../.last_run'
     file_separator: str = '### File: '
 
