@@ -91,12 +91,14 @@ def dirwalk_recurse(root_directory, directories_first, include_directories,
                     # get timestamp of linked file, not of symlink
                     stat_result = current_path.stat(follow_symlinks=True)
 
-                    # according to the Python documentation, "st_mtime_ns" gets
-                    # the exact timestamp, although nanoseconds may be missing
-                    # or inexact; round up to ensure that files with inaccurate
+                    # "st_mtime_ns" gets the exact timestamp, although
+                    # nanoseconds may be missing or inexact
+                    modification_time_in_seconds = stat_result.st_mtime_ns / 1e9
+
+                    # round up to ensure that files with inaccurate
                     # timestamps and other edge cases are included
                     modification_time_in_seconds = math.ceil(
-                        stat_result.st_mtime_ns / 1e9)
+                        modification_time_in_seconds)
 
                     is_included = modification_time_in_seconds >= modified_after
 

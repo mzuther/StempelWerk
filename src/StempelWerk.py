@@ -154,20 +154,28 @@ class StempelWerk:
 
 
     def _create_environment(self):
-        # NOTE: use relative paths to access templates in sub-directories
-        # (https://stackoverflow.com/a/9644828)
-        #
-        # directories containing templates (no need to add sub-directories)
-        template_dir = [self.settings.template_dir]
-        templateLoader = jinja2.FileSystemLoader(template_dir)
+        # Jinja also loads templates from sub-directories
+        template_loader = jinja2.FileSystemLoader(self.settings.template_dir)
+
+        # FIXME: do not hard-code Jinja options
+        jinja_options = {
+            'trim_blocks': True
+        }
+
         self.jinja_environment = jinja2.Environment(
-            loader=templateLoader, trim_blocks=True)
+            loader=template_loader, **jinja_options)
 
         # list all templates in cache
         if self.show_debug_messages:
-            print('DEBUG: Templates:')
+            print('DEBUG: Loaded templates:')
+            print('DEBUG:')
+
             for template_filename in self.jinja_environment.list_templates():
                 print('DEBUG: * {}'.format(template_filename))
+
+            print('DEBUG:')
+            print('DEBUG: Use relative paths to access templates in sub-directories')
+            print('DEBUG: (https://stackoverflow.com/a/9644828).')
             print()
 
         # execute custom Python code
@@ -203,8 +211,8 @@ class StempelWerk:
                 exit(1)
 
             # FIXME: don't do this at home -- I'm a professional :)
-            jinja_environment = self.jinja_environment
-            show_debug_messages = self.show_debug_messages
+            jinja_environment = self.jinja_environment      # noqa: F841
+            show_debug_messages = self.show_debug_messages  # noqa: F841
 
             compiled_code = compile(custom_code, code_filename, mode='exec')
             exec(compiled_code)
@@ -224,10 +232,11 @@ class StempelWerk:
 
         # render template
         try:
+            # Jinja2 cannot handle Windows paths with backslashes
             template = self.jinja_environment.get_template(
-                # Jinja2 cannot handle Windows paths with backslashes
                 template_filename.replace(os.path.sep, '/'))
             content_of_multiple_files = template.render()
+
         except (jinja2.exceptions.TemplateSyntaxError,
                 jinja2.exceptions.TemplateAssertionError) as err:
             print()
@@ -245,8 +254,11 @@ class StempelWerk:
 
             # extract and normalize file name
             output_filename, content = content_of_single_file.split('\n', 1)
-            output_filename = os.path.abspath(
-                os.path.join(self.settings.output_dir, output_filename.strip()))
+
+            output_filename = output_filename.strip()
+            output_filename = os.path.join(
+                self.settings.output_dir, output_filename)
+            output_filename = os.path.abspath(output_filename)
 
             print('--> {}'.format(os.path.relpath(
                 output_filename, self.settings.output_dir)))
@@ -275,10 +287,8 @@ class StempelWerk:
 
     def process_templates(self, process_only_modified=False):
         dirwalk_inclusions = {
-            'excluded_directory_names': [
-                # do not render stencils
-                self.settings.stencil_dir_name,
-            ],
+            # do not render stencils
+            'excluded_directory_names': [self.settings.stencil_dir_name],
             'excluded_file_names': [],
             'included_file_extensions': self.settings.included_file_extensions,
         }
@@ -300,19 +310,18 @@ class StempelWerk:
 
         # only load Jinja2 when there are files that need to be processed
         if template_filenames:
-            # create Jinja2 environment and pre-load stencils
             self._create_environment()
 
-            # process templates
             for template_filename in template_filenames:
                 self.render_template(template_filename)
 
         # save time of current run
         with open(self.settings.last_run_file, mode='w') as f:
+            current_timestamp = datetime.datetime.now().timestamp()
+
             # round down to ensure that files with inaccurate timestamps and
             # other edge cases are included
-            current_timestamp = math.floor(
-                datetime.datetime.now().timestamp())
+            current_timestamp = math.floor(current_timestamp)
 
             f.write(str(current_timestamp))
 
