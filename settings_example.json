@@ -5,7 +5,7 @@
   "included_file_extensions": [
     "*.sql.jinja"
   ],
-  "update_environment": [
+  "execute_python_scripts": [
     "./custom/add_filters.py",
     "./custom/add_tests.py"
   ],

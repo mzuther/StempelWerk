@@ -76,7 +76,7 @@ class Settings:
     output_dir: str
     stencil_dir_name: str
     included_file_extensions: list
-    update_environment: list = dataclasses.field(
+    execute_python_scripts: list = dataclasses.field(
         default_factory=list)
     last_run_file: str = '../.last_run'
     file_separator: str = '### File: '
@@ -155,9 +155,9 @@ def create_environment(settings, list_templates=False):
     return jinja_environment
 
 
-def update_environment(scripts_for_execution, jinja_environment):
+def update_environment(jinja_environment, settings):
     # sort filenames to guarantee a stable execution order
-    for code_filename in sorted(scripts_for_execution):
+    for code_filename in sorted(settings.execute_python_scripts):
         print(f'CUSTOM: Executing "{ code_filename}" ...')
 
         try:
@@ -269,7 +269,7 @@ def process_templates(settings_path, process_only_modified=False):
 
         # execute custom Python code
         jinja_environment = update_environment(
-            settings.update_environment, jinja_environment)
+            jinja_environment, settings)
 
         # process templates
         for template_filename in template_filenames:

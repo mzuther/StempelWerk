@@ -92,7 +92,7 @@ List containing file extensions (e.g. `*.sql.jinja`). Only files with
 a [matching extension](https://docs.python.org/3/library/fnmatch.html)
 are considered to be templates and will be passed to Jinja2.
 
-### `update_environment`
+### `execute_python_scripts`
 
 List containing paths to Python files. After creating the Jinja2
 environment, these files will be sorted alphabetically (to guarantee a
