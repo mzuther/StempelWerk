@@ -99,3 +99,9 @@
 {{- common.start_new_file('10-sql_server/20-' + table.procedure + '.sql') -}}
 
 {{- create_procedure.render(table, columns, procedure, common, name) -}}
+
+{# -------------------------------------------------------------------------- #}
+
+{{- common.start_new_file('10-sql_server/20-' + table.procedure + '_Debug.txt') -}}
+
+{% debug %}

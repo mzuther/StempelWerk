@@ -1,6 +1,6 @@
 # StempelWerk
 
-_Automatic code generation from Jinja2 templates_
+_Automatic code generation from Jinja templates_
 
 <figure style="display: flex; flex-flow: column; max-width: 25em;">
   <img src="include/wallpaper-surface-printing-machine.jpg"
@@ -70,7 +70,7 @@ for you._
 
 Path to root of template directory. This directory is scanned
 recursively and all files with an extension matching the setting
-`included_file_extensions` will be rendered using Jinja2.
+`included_file_extensions` will be rendered using Jinja.
 
 ### `output_dir`
 
@@ -80,7 +80,7 @@ directory.
 ### `stencil_dir_name`
 
 Name of directory that contains stencils. All files in
-`template_dir/stencil_dir_name` will be loaded into Jinja2 and can be
+`template_dir/stencil_dir_name` will be loaded into Jinja and can be
 referenced from other templates at runtime.
 
 In addition, files in any directory matching this name will not be
@@ -90,14 +90,21 @@ rendered.
 
 List containing file extensions (e.g. `*.sql.jinja`). Only files with
 a [matching extension](https://docs.python.org/3/library/fnmatch.html)
-are considered to be templates and will be passed to Jinja2.
+are considered to be templates and will be passed to Jinja.
+
+### `jinja_extensions`
+
+List containing Jinja extensions that will be loaded into the Jinja
+environment.
 
 ### `execute_python_scripts`
 
-List containing paths to Python files. After creating the Jinja2
-environment, these files will be sorted alphabetically (to guarantee a
-stable execution order) and executed. Use this feature to add filters
-to the environment, or perform any other task Python is capable of.
+List containing paths to Python files. After creating the Jinja
+environment and loading Jinja extensions, this list will be sorted
+alphabetically to guarantee a stable execution order, and executed.
+
+Use this feature to add filters to the environment, or perform any
+other task Python is capable of.
 
 _Warning: there are no security checks to prevent you from deleting
 all of your files and doing other mischief, so please be careful!_

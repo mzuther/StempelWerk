@@ -5,6 +5,9 @@
   "included_file_extensions": [
     "*.sql.jinja"
   ],
+  "jinja_extensions": [
+    "jinja2.ext.debug"
+  ],
   "execute_python_scripts": [
     "./custom/add_filters.py",
     "./custom/add_tests.py"

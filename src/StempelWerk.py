@@ -55,7 +55,7 @@ import jinja2
 from DirWalk.DirWalk import dirwalk
 
 
-VERSION = '0.5.2'
+VERSION = '0.6.0'
 
 # ensure that this script can be called from anywhere
 script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -76,6 +76,8 @@ class Settings:
     output_dir: str
     stencil_dir_name: str
     included_file_extensions: list
+    jinja_extensions: list = dataclasses.field(
+        default_factory=list)
     execute_python_scripts: list = dataclasses.field(
         default_factory=list)
     last_run_file: str = '../.last_run'
@@ -156,7 +158,18 @@ def create_environment(settings, list_templates=False):
 
 
 def update_environment(jinja_environment, settings):
-    # sort filenames to guarantee a stable execution order
+    # load Jinja extensions first so they can be referenced in custom
+    # Python code
+    for extension in settings.jinja_extensions:
+        print(f'CUSTOM: Adding extension "{ extension }" ...')
+
+        jinja_environment.add_extension(extension)
+
+        print(f'CUSTOM: Done.')
+        print()
+
+    # run custom Python code; sort filenames to guarantee a stable
+    # execution order
     for code_filename in sorted(settings.execute_python_scripts):
         print(f'CUSTOM: Executing "{ code_filename}" ...')
 
