@@ -55,47 +55,47 @@ import jinja2
 from DirWalk.DirWalk import dirwalk
 
 
-VERSION = '0.6.1'
-
 # ensure that this script can be called from anywhere
 script_dir = os.path.dirname(os.path.abspath(__file__))
 os.chdir(script_dir)
 
 
-# Auto-create settings class to write leaner code
-#
-# The "@dataclass" decorator creates a class, class members, and a
-# constructor with key-word parameters that have default values.
-#
-# In addition, this allows us to address settings with the more
-# readable membership operator ("settings.template_dir") instead
-# of using dictionary access ("settings['template_dir']").
-@dataclasses.dataclass
-class StempelWerkSettings:
-    template_dir: str
-    output_dir: str
-    stencil_dir_name: str
-    included_file_extensions: list
-    jinja_extensions: list = dataclasses.field(
-        default_factory=list)
-    execute_python_scripts: list = dataclasses.field(
-        default_factory=list)
-    last_run_file: str = '../.last_run'
-    file_separator: str = '### File: '
-
-    def __post_init__(self):
-        # finalize paths
-        self.template_dir = os.path.normpath(
-            os.path.join(script_dir, self.template_dir))
-
-        self.output_dir = os.path.normpath(
-            os.path.join(script_dir, self.output_dir))
-
-        self.last_run_file = os.path.normpath(
-            os.path.join(script_dir, self.last_run_file))
-
-
 class StempelWerk:
+    VERSION = '0.6.1'
+
+    # Auto-create settings class to write leaner code
+    #
+    # The "@dataclass" decorator creates a class, class members, and a
+    # constructor with key-word parameters that have default values.
+    #
+    # In addition, this allows us to address settings with the more
+    # readable membership operator ("settings.template_dir") instead
+    # of using dictionary access ("settings['template_dir']").
+    @dataclasses.dataclass
+    class Settings:
+        template_dir: str
+        output_dir: str
+        stencil_dir_name: str
+        included_file_extensions: list
+        jinja_extensions: list = dataclasses.field(
+            default_factory=list)
+        execute_python_scripts: list = dataclasses.field(
+            default_factory=list)
+        last_run_file: str = '../.last_run'
+        file_separator: str = '### File: '
+
+        def __post_init__(self):
+            # finalize paths
+            self.template_dir = os.path.normpath(
+                os.path.join(script_dir, self.template_dir))
+
+            self.output_dir = os.path.normpath(
+                os.path.join(script_dir, self.output_dir))
+
+            self.last_run_file = os.path.normpath(
+                os.path.join(script_dir, self.last_run_file))
+
+
     def __init__(self, config_file_path, show_debug_messages=False):
         self._display_version()
 
@@ -105,7 +105,7 @@ class StempelWerk:
 
     def _display_version(self):
         print()
-        print(f'[ StempelWerk v{ VERSION }    (c) 2020-2022 Martin Zuther ]')
+        print(f'[ StempelWerk v{ self.VERSION }    (c) 2020-2022 Martin Zuther ]')
         print('[ Licensed under the BSD 3-Clause License           ]')
         print()
 
@@ -120,7 +120,7 @@ class StempelWerk:
                 loaded_settings = json.load(f)
 
             # here's where the magic happens: unpack JSON file into classes
-            self.settings = StempelWerkSettings(**loaded_settings)
+            self.settings = self.Settings(**loaded_settings)
 
         except FileNotFoundError:
             print(f'ERROR: File "{ config_file_path }" not found.')
