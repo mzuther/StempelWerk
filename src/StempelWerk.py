@@ -95,19 +95,20 @@ class StempelWerkSettings:
             os.path.join(script_dir, self.last_run_file))
 
 
-def display_version():
-    print()
-    print(f'[ StempelWerk v{ VERSION }    (c) 2020-2022 Martin Zuther ]')
-    print('[ Licensed under the BSD 3-Clause License           ]')
-    print()
-
-
 class StempelWerk:
-    def __init__(self):
-        display_version()
+    def __init__(self, config_file_path):
+        self._display_version()
+        self._load_settings(config_file_path)
 
 
-    def load_settings(self, config_file_path):
+    def _display_version(self):
+        print()
+        print(f'[ StempelWerk v{ VERSION }    (c) 2020-2022 Martin Zuther ]')
+        print('[ Licensed under the BSD 3-Clause License           ]')
+        print()
+
+
+    def _load_settings(self, config_file_path):
         config_file_path = os.path.normpath(
             os.path.expanduser(config_file_path))
 
@@ -117,7 +118,7 @@ class StempelWerk:
                 loaded_settings = json.load(f)
 
             # here's where the magic happens: unpack JSON file into classes
-            settings = StempelWerkSettings(**loaded_settings)
+            self.settings = StempelWerkSettings(**loaded_settings)
 
         except FileNotFoundError:
             print(f'ERROR: File "{ config_file_path }" not found.')
@@ -140,15 +141,13 @@ class StempelWerk:
             print()
             exit(1)
 
-        return settings
 
-
-    def create_environment(self, settings, list_templates=False):
+    def _create_environment(self, list_templates=False):
         # NOTE: use relative paths to access templates in sub-directories
         # (https://stackoverflow.com/a/9644828)
         #
         # directories containing templates (no need to add sub-directories)
-        template_dir = [settings.template_dir]
+        template_dir = [self.settings.template_dir]
         templateLoader = jinja2.FileSystemLoader(template_dir)
         jinja_environment = jinja2.Environment(
             loader=templateLoader, trim_blocks=True)
@@ -163,10 +162,10 @@ class StempelWerk:
         return jinja_environment
 
 
-    def update_environment(self, jinja_environment, settings):
+    def _update_environment(self, jinja_environment):
         # load Jinja extensions first so they can be referenced in custom
         # Python code
-        for extension in settings.jinja_extensions:
+        for extension in self.settings.jinja_extensions:
             print(f'CUSTOM: Adding extension "{ extension }" ...')
 
             jinja_environment.add_extension(extension)
@@ -176,7 +175,7 @@ class StempelWerk:
 
         # run custom Python code; sort filenames to guarantee a stable
         # execution order
-        for code_filename in sorted(settings.execute_python_scripts):
+        for code_filename in sorted(self.settings.execute_python_scripts):
             print(f'CUSTOM: Executing "{ code_filename}" ...')
 
             try:
@@ -197,9 +196,9 @@ class StempelWerk:
         return jinja_environment
 
 
-    def render_template(self, template_filename, jinja_environment, settings):
+    def render_template(self, template_filename, jinja_environment):
         template_filename = os.path.relpath(
-            template_filename, settings.template_dir)
+            template_filename, self.settings.template_dir)
         print('[ {} ]'.format(template_filename))
 
         # render template
@@ -217,7 +216,7 @@ class StempelWerk:
             raise(err)
 
         for content_of_single_file in content_of_multiple_files.split(
-                settings.file_separator):
+                self.settings.file_separator):
             # content starts with file_separator, so first string is empty
             # (or contains whitespace when a template is not well written)
             if not content_of_single_file.strip():
@@ -226,10 +225,10 @@ class StempelWerk:
             # extract and normalize file name
             output_filename, content = content_of_single_file.split('\n', 1)
             output_filename = os.path.abspath(
-                os.path.join(settings.output_dir, output_filename.strip()))
+                os.path.join(self.settings.output_dir, output_filename.strip()))
 
             print('--> {}'.format(os.path.relpath(
-                output_filename, settings.output_dir)))
+                output_filename, self.settings.output_dir)))
 
             # ensure Batch files use Windows line endings, otherwise
             # seemingly random lines will be executed
@@ -253,50 +252,47 @@ class StempelWerk:
         print()
 
 
-    def process_templates(self, settings_path, process_only_modified=False):
-        settings = self.load_settings(settings_path)
-
+    def process_templates(self, process_only_modified=False):
         dirwalk_inclusions = {
             'excluded_directory_names': [
                 # do not render stencils
-                settings.stencil_dir_name,
+                self.settings.stencil_dir_name,
             ],
             'excluded_file_names': [],
-            'included_file_extensions': settings.included_file_extensions,
+            'included_file_extensions': self.settings.included_file_extensions,
         }
 
         modified_after = None
         if process_only_modified:
             # get time of last run
             try:
-                with open(settings.last_run_file) as f:
+                with open(self.settings.last_run_file) as f:
                     modified_after = f.read().strip()
             except IOError:
                 modified_after = None
 
         # find all Jinja2 files in template directory
         template_filenames = dirwalk(
-            settings.template_dir,
+            self.settings.template_dir,
             included=dirwalk_inclusions,
             modified_after=modified_after)
 
         # only load Jinja2 when there are files that need to be processed
         if template_filenames:
             # create Jinja2 environment and pre-load stencils
-            jinja_environment = self.create_environment(
-                settings, list_templates=False)
+            jinja_environment = self._create_environment(
+                list_templates=False)
 
             # execute custom Python code
-            jinja_environment = self.update_environment(
-                jinja_environment, settings)
+            jinja_environment = self._update_environment(
+                jinja_environment)
 
             # process templates
             for template_filename in template_filenames:
-                self.render_template(
-                    template_filename, jinja_environment, settings)
+                self.render_template(template_filename, jinja_environment)
 
         # save time of current run
-        with open(settings.last_run_file, mode='w') as f:
+        with open(self.settings.last_run_file, mode='w') as f:
             # round down to ensure that files with inaccurate timestamps and
             # other edge cases are included
             current_timestamp = math.floor(
@@ -327,5 +323,5 @@ if __name__ == '__main__':
     # settings path is relative to the path of this script
     settings_path = os.path.join(script_dir, settings_path)
 
-    stempel_werk = StempelWerk()
-    stempel_werk.process_templates(settings_path, process_only_modified)
+    stempel_werk = StempelWerk(settings_path)
+    stempel_werk.process_templates(process_only_modified)
