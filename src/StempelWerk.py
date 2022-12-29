@@ -41,6 +41,7 @@
 #
 # ----------------------------------------------------------------------------
 
+import copy
 import dataclasses
 import datetime
 import json
@@ -56,7 +57,7 @@ from DirWalk.DirWalk import dirwalk
 
 
 class StempelWerk:
-    VERSION = '0.6.2'
+    VERSION = '0.6.3'
 
     # Auto-create settings class to write leaner code
     #
@@ -317,29 +318,37 @@ class StempelWerk:
 
 
 if __name__ == '__main__':
-    show_debug_messages = False
-
-    if len(sys.argv) < 2:
-        print()
-        print('ERROR: Please provide JSON settings file as first parameter.')
-        print()
-
-        exit(1)
-
-    command_line_arguments = list(sys.argv)
-    process_only_modified = False
-
     # extremely primitive command line parsing
-    if '--only-modified' in command_line_arguments:
-        process_only_modified = True
-        command_line_arguments.remove('--only-modified')
+    class CommandLineArguments:
+        def __init__(self):
+            self.cla = copy.copy(sys.argv)
+            del self.cla[0]
+
+        def get_option(self, option):
+            if option in self.cla:
+                self.cla.remove(option)
+                return True
+            return False
+
+        def get_config_path(self):
+            if len(self.cla) != 1:
+                print()
+                print('ERROR: Please provide JSON settings file as parameter.')
+                print()
+                exit(1)
+                # highly sophisticated command line parsing
+            return self.cla.pop()
+
+
+    script_dir = os.path.dirname(os.path.abspath(__file__))
 
     # ensure that this script can be called from anywhere
-    root_dir = os.path.dirname(os.path.abspath(__file__))
-    os.chdir(root_dir)
+    os.chdir(script_dir)
 
-    # highly sophisticated command line parsing
-    config_file_path = command_line_arguments.pop()
+    cla = CommandLineArguments()
+    process_only_modified = cla.get_option('--only-modified')
+    show_debug_messages = cla.get_option('--debug')
+    config_file_path = cla.get_config_path()
 
-    sw = StempelWerk(root_dir, config_file_path, show_debug_messages)
+    sw = StempelWerk(script_dir, config_file_path, show_debug_messages)
     sw.process_templates(process_only_modified)
