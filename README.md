@@ -39,6 +39,9 @@ Generate your code from templates by running the following command:
 python3 ./src/StempelWerk.py [--only-modified] PATH_TO_SETTINGS_FILE
 ```
 
+Jinja is run with default options, with the exception that
+`trim_blocks` is set to `True`.
+
 ## Performance
 
 By default, StempelWerk renders all template files located in the
@@ -94,10 +97,14 @@ are considered to be templates and will be passed to Jinja.
 
 ### `jinja_extensions`
 
+**Default value: []**
+
 List containing Jinja extensions that will be loaded into the Jinja
 environment.
 
 ### `execute_python_scripts`
+
+**Default value: []**
 
 List containing paths to Python files. After creating the Jinja
 environment and loading Jinja extensions, this list will be sorted
@@ -111,10 +118,10 @@ all of your files and doing other mischief, so please be careful!_
 
 ### `last_run_file`
 
+**Default value: `../.last_run`**
+
 Path to the file in which the time of the last successful run will be
 stored.
-
-**Default value: `../.last_run`**
 
 _If your operating system handles temporary directories correctly
 (Windows does not), you could store this file in one of them
@@ -123,11 +130,21 @@ after starting the system._
 
 ### `file_separator`
 
+**Default value: `### File: `**
+
 Each time this string is encountered in the rendered ouput of a
 template, a new file is created. This allows you to create multiple
 files from a single template.
 
-**Default value: `### File: `**
+The code relies on the following order: file separator, path to the
+output file, a newline character (`\n`), and contents of the output
+file:
+
+```text
+### File: dir/spam.py
+def spam():
+    return 'eggs'
+```
 
 _Please see example templates to learn how to use this feature._
 
