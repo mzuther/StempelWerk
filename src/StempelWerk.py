@@ -55,13 +55,8 @@ import jinja2
 from DirWalk.DirWalk import dirwalk
 
 
-# ensure that this script can be called from anywhere
-script_dir = os.path.dirname(os.path.abspath(__file__))
-os.chdir(script_dir)
-
-
 class StempelWerk:
-    VERSION = '0.6.1'
+    VERSION = '0.6.2'
 
     # Auto-create settings class to write leaner code
     #
@@ -73,6 +68,7 @@ class StempelWerk:
     # of using dictionary access ("settings['template_dir']").
     @dataclasses.dataclass
     class Settings:
+        root_dir: str
         template_dir: str
         output_dir: str
         stencil_dir_name: str
@@ -84,22 +80,33 @@ class StempelWerk:
         last_run_file: str = '../.last_run'
         file_separator: str = '### File: '
 
+        @staticmethod
+        def finalize_path(root_dir, original_path):
+            new_path = os.path.join(root_dir, original_path)
+            new_path = os.path.expanduser(new_path)
+            new_path = os.path.normpath(new_path)
+
+            return new_path
+
+
         def __post_init__(self):
             # finalize paths
-            self.template_dir = os.path.normpath(
-                os.path.join(script_dir, self.template_dir))
+            self.template_dir = self.finalize_path(
+                self.root_dir, self.template_dir)
 
-            self.output_dir = os.path.normpath(
-                os.path.join(script_dir, self.output_dir))
+            self.output_dir = self.finalize_path(
+                self.root_dir, self.output_dir)
 
-            self.last_run_file = os.path.normpath(
-                os.path.join(script_dir, self.last_run_file))
+            self.last_run_file = self.finalize_path(
+                self.root_dir, self.last_run_file)
 
 
-    def __init__(self, config_file_path, show_debug_messages=False):
+    def __init__(self, root_dir, config_file_path, show_debug_messages=False):
         self._display_version()
 
         self.show_debug_messages = show_debug_messages
+        self.root_dir = os.path.normpath(os.path.expanduser(root_dir))
+
         self._load_settings(config_file_path)
 
 
@@ -111,15 +118,16 @@ class StempelWerk:
 
 
     def _load_settings(self, config_file_path):
-        config_file_path = os.path.normpath(
-            os.path.expanduser(config_file_path))
+        config_file_path = self.Settings.finalize_path(
+            self.root_dir, config_file_path)
 
         try:
             config_load_error = False
             with open(config_file_path) as f:
                 loaded_settings = json.load(f)
+                loaded_settings['root_dir'] = self.root_dir
 
-            # here's where the magic happens: unpack JSON file into classes
+            # here's where the magic happens: unpack JSON file into class
             self.settings = self.Settings(**loaded_settings)
 
         except FileNotFoundError:
@@ -136,7 +144,7 @@ class StempelWerk:
             print(f'ERROR: { err }')
             print()
 
-            # print traceback
+            # print traceback to help with debugging
             raise err
 
         if config_load_error:
@@ -326,11 +334,12 @@ if __name__ == '__main__':
         process_only_modified = True
         command_line_arguments.remove('--only-modified')
 
+    # ensure that this script can be called from anywhere
+    root_dir = os.path.dirname(os.path.abspath(__file__))
+    os.chdir(root_dir)
+
     # highly sophisticated command line parsing
-    settings_path = command_line_arguments.pop()
+    config_file_path = command_line_arguments.pop()
 
-    # settings path is relative to the path of this script
-    settings_path = os.path.join(script_dir, settings_path)
-
-    stempel_werk = StempelWerk(settings_path, show_debug_messages)
-    stempel_werk.process_templates(process_only_modified)
+    sw = StempelWerk(root_dir, config_file_path, show_debug_messages)
+    sw.process_templates(process_only_modified)
