@@ -131,6 +131,11 @@ files from a single template.
 
 _Please see example templates to learn how to use this feature._
 
+## Code of conduct
+
+Please read the [code of conduct](./CODE_OF_CONDUCT.md) before asking
+for help, filing bug reports or contributing to this project. Thanks!
+
 ## License
 
 Copyright (c) 2020-2022 [Martin Zuther](https://www.mzuther.de/)
