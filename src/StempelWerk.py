@@ -55,7 +55,7 @@ import jinja2
 from DirWalk.DirWalk import dirwalk
 
 
-VERSION = '0.6.0'
+VERSION = '0.6.1'
 
 # ensure that this script can be called from anywhere
 script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -96,8 +96,10 @@ class StempelWerkSettings:
 
 
 class StempelWerk:
-    def __init__(self, config_file_path):
+    def __init__(self, config_file_path, show_debug_messages=False):
         self._display_version()
+
+        self.show_debug_messages = show_debug_messages
         self._load_settings(config_file_path)
 
 
@@ -142,7 +144,7 @@ class StempelWerk:
             exit(1)
 
 
-    def _create_environment(self, list_templates=False):
+    def _create_environment(self):
         # NOTE: use relative paths to access templates in sub-directories
         # (https://stackoverflow.com/a/9644828)
         #
@@ -153,10 +155,10 @@ class StempelWerk:
             loader=templateLoader, trim_blocks=True)
 
         # list all templates in cache
-        if list_templates:
-            print('Templates:')
+        if self.show_debug_messages:
+            print('DEBUG: Templates:')
             for template_filename in self.jinja_environment.list_templates():
-                print('* {}'.format(template_filename))
+                print('DEBUG: * {}'.format(template_filename))
             print()
 
         # execute custom Python code
@@ -167,17 +169,20 @@ class StempelWerk:
         # load Jinja extensions first so they can be referenced in custom
         # Python code
         for extension in self.settings.jinja_extensions:
-            print(f'CUSTOM: Adding extension "{ extension }" ...')
+            if self.show_debug_messages:
+                print(f'DEBUG: Adding extension "{ extension }" ...')
 
             self.jinja_environment.add_extension(extension)
 
-            print(f'CUSTOM: Done.')
-            print()
+            if self.show_debug_messages:
+                print(f'DEBUG: Done.')
+                print()
 
         # run custom Python code; sort filenames to guarantee a stable
         # execution order
         for code_filename in sorted(self.settings.execute_python_scripts):
-            print(f'CUSTOM: Executing "{ code_filename}" ...')
+            if self.show_debug_messages:
+                print(f'DEBUG: Executing "{ code_filename}" ...')
 
             try:
                 with open(code_filename) as f:
@@ -190,6 +195,7 @@ class StempelWerk:
 
             # FIXME: don't do this at home -- I'm a professional :)
             jinja_environment = self.jinja_environment
+            show_debug_messages = self.show_debug_messages
 
             compiled_code = compile(custom_code, code_filename, mode='exec')
             exec(compiled_code)
@@ -197,8 +203,9 @@ class StempelWerk:
             # FIXME: don't do this at home -- really, don't!!!
             self.jinja_environment = jinja_environment
 
-            print(f'CUSTOM: Done.')
-            print()
+            if self.show_debug_messages:
+                print(f'DEBUG: Done.')
+                print()
 
 
     def render_template(self, template_filename):
@@ -285,7 +292,7 @@ class StempelWerk:
         # only load Jinja2 when there are files that need to be processed
         if template_filenames:
             # create Jinja2 environment and pre-load stencils
-            self._create_environment(list_templates=False)
+            self._create_environment()
 
             # process templates
             for template_filename in template_filenames:
@@ -302,6 +309,8 @@ class StempelWerk:
 
 
 if __name__ == '__main__':
+    show_debug_messages = False
+
     if len(sys.argv) < 2:
         print()
         print('ERROR: Please provide JSON settings file as first parameter.')
@@ -323,5 +332,5 @@ if __name__ == '__main__':
     # settings path is relative to the path of this script
     settings_path = os.path.join(script_dir, settings_path)
 
-    stempel_werk = StempelWerk(settings_path)
+    stempel_werk = StempelWerk(settings_path, show_debug_messages)
     stempel_werk.process_templates(process_only_modified)
