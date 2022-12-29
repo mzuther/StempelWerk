@@ -71,7 +71,7 @@ os.chdir(script_dir)
 # readable membership operator ("settings.template_dir") instead
 # of using dictionary access ("settings['template_dir']").
 @dataclasses.dataclass
-class Settings:
+class StempelWerkSettings:
     template_dir: str
     output_dir: str
     stencil_dir_name: str
@@ -102,200 +102,207 @@ def display_version():
     print()
 
 
-def load_settings(config_file_path):
-    config_file_path = os.path.normpath(
-        os.path.expanduser(config_file_path))
-
-    try:
-        config_load_error = False
-        with open(config_file_path) as f:
-            loaded_settings = json.load(f)
-
-        # here's where the magic happens: unpack JSON file into classes
-        settings = Settings(**loaded_settings)
-
-    except FileNotFoundError:
-        print(f'ERROR: File "{ config_file_path }" not found.')
-        config_load_error = True
-
-    except json.decoder.JSONDecodeError as err:
-        print(f'ERROR: File "{ config_file_path }" is broken:')
-        print(f'ERROR: { err }')
-        config_load_error = True
-
-    except TypeError as err:
-        print(f'ERROR: Did you provide all settings in "{ config_file_path }"?')
-        print(f'ERROR: { err }')
-        print()
-
-        # print traceback
-        raise err
-
-    if config_load_error:
-        print()
-        exit(1)
-
-    return settings
+class StempelWerk:
+    def __init__(self):
+        display_version()
 
 
-# NOTE: use relative paths to access templates in sub-directories
-# (https://stackoverflow.com/a/9644828)
-def create_environment(settings, list_templates=False):
-    # directories containing templates (no need to add sub-directories)
-    template_dir = [settings.template_dir]
-    templateLoader = jinja2.FileSystemLoader(template_dir)
-    jinja_environment = jinja2.Environment(
-        loader=templateLoader, trim_blocks=True)
-
-    # list all templates in cache
-    if list_templates:
-        print('Templates:')
-        for template_filename in jinja_environment.list_templates():
-            print('* {}'.format(template_filename))
-        print()
-
-    return jinja_environment
-
-
-def update_environment(jinja_environment, settings):
-    # load Jinja extensions first so they can be referenced in custom
-    # Python code
-    for extension in settings.jinja_extensions:
-        print(f'CUSTOM: Adding extension "{ extension }" ...')
-
-        jinja_environment.add_extension(extension)
-
-        print(f'CUSTOM: Done.')
-        print()
-
-    # run custom Python code; sort filenames to guarantee a stable
-    # execution order
-    for code_filename in sorted(settings.execute_python_scripts):
-        print(f'CUSTOM: Executing "{ code_filename}" ...')
+    def load_settings(self, config_file_path):
+        config_file_path = os.path.normpath(
+            os.path.expanduser(config_file_path))
 
         try:
-            with open(code_filename) as f:
-                custom_code = f.read()
+            config_load_error = False
+            with open(config_file_path) as f:
+                loaded_settings = json.load(f)
+
+            # here's where the magic happens: unpack JSON file into classes
+            settings = StempelWerkSettings(**loaded_settings)
 
         except FileNotFoundError:
-            print(f'ERROR: File "{ code_filename }" not found.')
+            print(f'ERROR: File "{ config_file_path }" not found.')
+            config_load_error = True
+
+        except json.decoder.JSONDecodeError as err:
+            print(f'ERROR: File "{ config_file_path }" is broken:')
+            print(f'ERROR: { err }')
+            config_load_error = True
+
+        except TypeError as err:
+            print(f'ERROR: Did you provide all settings in "{ config_file_path }"?')
+            print(f'ERROR: { err }')
+            print()
+
+            # print traceback
+            raise err
+
+        if config_load_error:
             print()
             exit(1)
 
-        compiled_code = compile(custom_code, code_filename, mode='exec')
-        exec(compiled_code)
-
-        print(f'CUSTOM: Done.')
-        print()
-
-    return jinja_environment
+        return settings
 
 
-def render_template(template_filename, jinja_environment, settings):
-    template_filename = os.path.relpath(
-        template_filename, settings.template_dir)
-    print('[ {} ]'.format(template_filename))
+    def create_environment(self, settings, list_templates=False):
+        # NOTE: use relative paths to access templates in sub-directories
+        # (https://stackoverflow.com/a/9644828)
+        #
+        # directories containing templates (no need to add sub-directories)
+        template_dir = [settings.template_dir]
+        templateLoader = jinja2.FileSystemLoader(template_dir)
+        jinja_environment = jinja2.Environment(
+            loader=templateLoader, trim_blocks=True)
 
-    # render template
-    try:
-        template = jinja_environment.get_template(
-            # Jinja2 cannot handle Windows paths with backslashes
-            template_filename.replace(os.path.sep, '/'))
-        content_of_multiple_files = template.render()
-    except (jinja2.exceptions.TemplateSyntaxError,
-            jinja2.exceptions.TemplateAssertionError) as err:
-        print()
-        print(f'ERROR: { err.message } (line { err.lineno })')
-        print()
+        # list all templates in cache
+        if list_templates:
+            print('Templates:')
+            for template_filename in jinja_environment.list_templates():
+                print('* {}'.format(template_filename))
+            print()
 
-        raise(err)
-
-    for content_of_single_file in content_of_multiple_files.split(
-            settings.file_separator):
-        # content starts with file_separator, so first string is empty
-        # (or contains whitespace when a template is not well written)
-        if not content_of_single_file.strip():
-            continue
-
-        # extract and normalize file name
-        output_filename, content = content_of_single_file.split('\n', 1)
-        output_filename = os.path.abspath(
-            os.path.join(settings.output_dir, output_filename.strip()))
-
-        print('--> {}'.format(os.path.relpath(
-            output_filename, settings.output_dir)))
-
-        # ensure Batch files use Windows line endings, otherwise
-        # seemingly random lines will be executed
-        if output_filename.endswith('.bat'):
-            newline = '\r\n'
-        # in any other case, use default line ending of system
-        else:
-            newline = None
-
-        # Jinja2 encodes all strings in UTF-8
-        with open(
-                output_filename, mode='w', encoding='utf-8',
-                newline=newline) as f:
-            f.write(content)
-
-        # make Linux shell files executable by owner
-        if output_filename.endswith('.sh') and platform.system() == 'Linux':
-            with pathlib.Path(output_filename) as f:
-                mode = f.stat().st_mode
-                f.chmod(mode | stat.S_IXUSR)
-
-    print()
+        return jinja_environment
 
 
-def process_templates(settings_path, process_only_modified=False):
-    settings = load_settings(settings_path)
+    def update_environment(self, jinja_environment, settings):
+        # load Jinja extensions first so they can be referenced in custom
+        # Python code
+        for extension in settings.jinja_extensions:
+            print(f'CUSTOM: Adding extension "{ extension }" ...')
 
-    dirwalk_inclusions = {
-        'excluded_directory_names': [
-            # do not render stencils
-            settings.stencil_dir_name,
-        ],
-        'excluded_file_names': [],
-        'included_file_extensions': settings.included_file_extensions,
-    }
+            jinja_environment.add_extension(extension)
 
-    modified_after = None
-    if process_only_modified:
-        # get time of last run
+            print(f'CUSTOM: Done.')
+            print()
+
+        # run custom Python code; sort filenames to guarantee a stable
+        # execution order
+        for code_filename in sorted(settings.execute_python_scripts):
+            print(f'CUSTOM: Executing "{ code_filename}" ...')
+
+            try:
+                with open(code_filename) as f:
+                    custom_code = f.read()
+
+            except FileNotFoundError:
+                print(f'ERROR: File "{ code_filename }" not found.')
+                print()
+                exit(1)
+
+            compiled_code = compile(custom_code, code_filename, mode='exec')
+            exec(compiled_code)
+
+            print(f'CUSTOM: Done.')
+            print()
+
+        return jinja_environment
+
+
+    def render_template(self, template_filename, jinja_environment, settings):
+        template_filename = os.path.relpath(
+            template_filename, settings.template_dir)
+        print('[ {} ]'.format(template_filename))
+
+        # render template
         try:
-            with open(settings.last_run_file) as f:
-                modified_after = f.read().strip()
-        except IOError:
-            modified_after = None
+            template = jinja_environment.get_template(
+                # Jinja2 cannot handle Windows paths with backslashes
+                template_filename.replace(os.path.sep, '/'))
+            content_of_multiple_files = template.render()
+        except (jinja2.exceptions.TemplateSyntaxError,
+                jinja2.exceptions.TemplateAssertionError) as err:
+            print()
+            print(f'ERROR: { err.message } (line { err.lineno })')
+            print()
 
-    # find all Jinja2 files in template directory
-    template_filenames = dirwalk(
-        settings.template_dir,
-        included=dirwalk_inclusions,
-        modified_after=modified_after)
+            raise(err)
 
-    # only load Jinja2 when there are files that need to be processed
-    if template_filenames:
-        # create Jinja2 environment and pre-load stencils
-        jinja_environment = create_environment(settings, list_templates=False)
+        for content_of_single_file in content_of_multiple_files.split(
+                settings.file_separator):
+            # content starts with file_separator, so first string is empty
+            # (or contains whitespace when a template is not well written)
+            if not content_of_single_file.strip():
+                continue
 
-        # execute custom Python code
-        jinja_environment = update_environment(
-            jinja_environment, settings)
+            # extract and normalize file name
+            output_filename, content = content_of_single_file.split('\n', 1)
+            output_filename = os.path.abspath(
+                os.path.join(settings.output_dir, output_filename.strip()))
 
-        # process templates
-        for template_filename in template_filenames:
-            render_template(template_filename, jinja_environment, settings)
+            print('--> {}'.format(os.path.relpath(
+                output_filename, settings.output_dir)))
 
-    # save time of current run
-    with open(settings.last_run_file, mode='w') as f:
-        # round down to ensure that files with inaccurate timestamps and
-        # other edge cases are included
-        current_timestamp = math.floor(
-            datetime.datetime.now().timestamp())
+            # ensure Batch files use Windows line endings, otherwise
+            # seemingly random lines will be executed
+            if output_filename.endswith('.bat'):
+                newline = '\r\n'
+            # in any other case, use default line ending of system
+            else:
+                newline = None
 
-        f.write(str(current_timestamp))
+            # Jinja2 encodes all strings in UTF-8
+            with open(output_filename, mode='w', encoding='utf-8',
+                      newline=newline) as f:
+                f.write(content)
+
+            # make Linux shell files executable by owner
+            if output_filename.endswith('.sh') and platform.system() == 'Linux':
+                with pathlib.Path(output_filename) as f:
+                    mode = f.stat().st_mode
+                    f.chmod(mode | stat.S_IXUSR)
+
+        print()
+
+
+    def process_templates(self, settings_path, process_only_modified=False):
+        settings = self.load_settings(settings_path)
+
+        dirwalk_inclusions = {
+            'excluded_directory_names': [
+                # do not render stencils
+                settings.stencil_dir_name,
+            ],
+            'excluded_file_names': [],
+            'included_file_extensions': settings.included_file_extensions,
+        }
+
+        modified_after = None
+        if process_only_modified:
+            # get time of last run
+            try:
+                with open(settings.last_run_file) as f:
+                    modified_after = f.read().strip()
+            except IOError:
+                modified_after = None
+
+        # find all Jinja2 files in template directory
+        template_filenames = dirwalk(
+            settings.template_dir,
+            included=dirwalk_inclusions,
+            modified_after=modified_after)
+
+        # only load Jinja2 when there are files that need to be processed
+        if template_filenames:
+            # create Jinja2 environment and pre-load stencils
+            jinja_environment = self.create_environment(
+                settings, list_templates=False)
+
+            # execute custom Python code
+            jinja_environment = self.update_environment(
+                jinja_environment, settings)
+
+            # process templates
+            for template_filename in template_filenames:
+                self.render_template(
+                    template_filename, jinja_environment, settings)
+
+        # save time of current run
+        with open(settings.last_run_file, mode='w') as f:
+            # round down to ensure that files with inaccurate timestamps and
+            # other edge cases are included
+            current_timestamp = math.floor(
+                datetime.datetime.now().timestamp())
+
+            f.write(str(current_timestamp))
 
 
 if __name__ == '__main__':
@@ -305,8 +312,6 @@ if __name__ == '__main__':
         print()
 
         exit(1)
-
-    display_version()
 
     command_line_arguments = list(sys.argv)
     process_only_modified = False
@@ -322,4 +327,5 @@ if __name__ == '__main__':
     # settings path is relative to the path of this script
     settings_path = os.path.join(script_dir, settings_path)
 
-    process_templates(settings_path, process_only_modified)
+    stempel_werk = StempelWerk()
+    stempel_werk.process_templates(settings_path, process_only_modified)
