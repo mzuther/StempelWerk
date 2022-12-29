@@ -149,26 +149,27 @@ class StempelWerk:
         # directories containing templates (no need to add sub-directories)
         template_dir = [self.settings.template_dir]
         templateLoader = jinja2.FileSystemLoader(template_dir)
-        jinja_environment = jinja2.Environment(
+        self.jinja_environment = jinja2.Environment(
             loader=templateLoader, trim_blocks=True)
 
         # list all templates in cache
         if list_templates:
             print('Templates:')
-            for template_filename in jinja_environment.list_templates():
+            for template_filename in self.jinja_environment.list_templates():
                 print('* {}'.format(template_filename))
             print()
 
-        return jinja_environment
+        # execute custom Python code
+        self._update_environment()
 
 
-    def _update_environment(self, jinja_environment):
+    def _update_environment(self):
         # load Jinja extensions first so they can be referenced in custom
         # Python code
         for extension in self.settings.jinja_extensions:
             print(f'CUSTOM: Adding extension "{ extension }" ...')
 
-            jinja_environment.add_extension(extension)
+            self.jinja_environment.add_extension(extension)
 
             print(f'CUSTOM: Done.')
             print()
@@ -187,23 +188,27 @@ class StempelWerk:
                 print()
                 exit(1)
 
+            # FIXME: don't do this at home -- I'm a professional :)
+            jinja_environment = self.jinja_environment
+
             compiled_code = compile(custom_code, code_filename, mode='exec')
             exec(compiled_code)
+
+            # FIXME: don't do this at home -- really, don't!!!
+            self.jinja_environment = jinja_environment
 
             print(f'CUSTOM: Done.')
             print()
 
-        return jinja_environment
 
-
-    def render_template(self, template_filename, jinja_environment):
+    def render_template(self, template_filename):
         template_filename = os.path.relpath(
             template_filename, self.settings.template_dir)
         print('[ {} ]'.format(template_filename))
 
         # render template
         try:
-            template = jinja_environment.get_template(
+            template = self.jinja_environment.get_template(
                 # Jinja2 cannot handle Windows paths with backslashes
                 template_filename.replace(os.path.sep, '/'))
             content_of_multiple_files = template.render()
@@ -280,16 +285,11 @@ class StempelWerk:
         # only load Jinja2 when there are files that need to be processed
         if template_filenames:
             # create Jinja2 environment and pre-load stencils
-            jinja_environment = self._create_environment(
-                list_templates=False)
-
-            # execute custom Python code
-            jinja_environment = self._update_environment(
-                jinja_environment)
+            self._create_environment(list_templates=False)
 
             # process templates
             for template_filename in template_filenames:
-                self.render_template(template_filename, jinja_environment)
+                self.render_template(template_filename)
 
         # save time of current run
         with open(self.settings.last_run_file, mode='w') as f:
