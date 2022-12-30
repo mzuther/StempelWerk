@@ -11,9 +11,9 @@
   "jinja_extensions": [
     "jinja2.ext.debug"
   ],
-  "execute_python_scripts": [
-    "./custom/add_filters.py",
-    "./custom/add_tests.py"
+  "custom_modules": [
+    "src.custom.add_filters",
+    "src.custom.add_tests"
   ],
   "last_run_file": "../.last_run",
   "file_separator": "### File: "

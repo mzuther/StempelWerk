@@ -148,13 +148,17 @@ _Most default values work well for me, but I **always** enable
 List containing Jinja extensions that will be loaded into the Jinja
 environment.
 
-### `execute_python_scripts`
+### `custom_modules`
 
 **Default value: []**
 
-List containing paths to Python files. After creating the Jinja
-environment and loading Jinja extensions, the scripts in this list
-will be executed.
+List with Python modules containing a `CustomCode` class that inherits
+`CustomCodeTemplate`.
+
+After creating the Jinja environment and loading Jinja extensions,
+each module will be imported, an instance of `CustomCode` created and
+its method `update_environment()` called. This method must return a
+Jinja environment.
 
 Use this feature to add filters to the environment, or perform any
 other task Python is capable of.

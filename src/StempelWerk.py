@@ -58,7 +58,7 @@ from .DirWalk.DirWalk import dirwalk
 
 
 class StempelWerk:
-    VERSION = '0.6.4'
+    VERSION = '0.6.5'
 
     # Auto-create settings class to write leaner code
     #
@@ -79,7 +79,7 @@ class StempelWerk:
             default_factory=dict)
         jinja_extensions: list = dataclasses.field(
             default_factory=list)
-        execute_python_scripts: list = dataclasses.field(
+        custom_modules: list = dataclasses.field(
             default_factory=list)
         last_run_file: str = '../.last_run'
         file_separator: str = '### File: '
@@ -210,36 +210,12 @@ class StempelWerk:
             self._print_debug()
 
         # run custom Python code
-        for script_path in self.settings.execute_python_scripts:
-            self._print_debug(f'Executing "{ script_path}" ...')
-
-            # convert "./path/name.py" to ".module.name"
-            module_name, _ = os.path.splitext(script_path)
-
-            # handle leading "." and ".." path components
-            leading_module_component = module_name.split(
-                os.path.sep, 1)[0]
-            if leading_module_component in ['.', '..']:
-                module_name = module_name[1:]
-
-            module_name = module_name.replace(os.sep, '.')
-            module_name_absolute = importlib.util.resolve_name(
-                module_name, __spec__.parent)
-
-            script_path = self.Settings.finalize_path(
-                self.root_dir, script_path)
-
-            if not os.path.isfile(script_path):
-                self._print_error(f'File "{ script_path }" not found.')
-                self._print_error()
-                exit(1)
-
-            self._print_debug(
-                f'"{ module_name }" --> "{ module_name_absolute }"')
+        for module_name in self.settings.custom_modules:
+            self._print_debug(f'Loading module "{ module_name }" ...')
 
             # import code as module
-            module_spec = importlib.util.spec_from_file_location(
-                module_name_absolute, script_path)
+            module_spec = importlib.util.find_spec(
+                module_name)
             imported_module = importlib.util.module_from_spec(
                 module_spec)
 
@@ -248,6 +224,8 @@ class StempelWerk:
             custom_code = imported_module.CustomCode(
                 copy.deepcopy(self.settings),
                 self.show_debug_messages)
+
+            self._print_debug('Updating environment ...')
 
             # finally, update the Jinja environment
             self.jinja_environment = custom_code.update_environment(

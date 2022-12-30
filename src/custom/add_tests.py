@@ -1,4 +1,4 @@
-from ..CustomCodeTemplate import CustomCodeTemplate
+from src.CustomCodeTemplate import CustomCodeTemplate
 
 
 class CustomCode(CustomCodeTemplate):
