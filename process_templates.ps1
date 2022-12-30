@@ -1,2 +1,2 @@
 # process all templates
-python ".\src\StempelWerk.py" "..\settings_example.json"
+python -m src.StempelWerk "../settings_example.json"

@@ -1,4 +1,4 @@
 #! /usr/bin/bash
 
 # process all templates
-python3 "./src/StempelWerk.py" ../settings_example.json
+python3 -m src.StempelWerk "../settings_example.json"

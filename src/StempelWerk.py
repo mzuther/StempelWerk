@@ -54,7 +54,7 @@ import stat
 import sys
 
 import jinja2
-from DirWalk.DirWalk import dirwalk
+from .DirWalk.DirWalk import dirwalk
 
 
 class StempelWerk:

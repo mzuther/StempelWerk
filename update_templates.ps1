@@ -1,2 +1,2 @@
-# process all templates
-python ".\src\StempelWerk.py" --only-modified "..\settings_example.json"
+# process only templates modified since the last run
+python -m src.StempelWerk --only-modified "../settings_example.json"
