@@ -123,6 +123,24 @@ List containing file extensions (e.g. `*.sql.jinja`). Only files with
 a [matching extension](https://docs.python.org/3/library/fnmatch.html)
 are considered to be templates and will be passed to Jinja.
 
+### `jinja_options`
+
+**Default value: {}**
+
+Dictionary containing [initialization
+parameters](https://jinja.palletsprojects.com/en/3.1.x/api/#jinja2.Environment)
+for the Jinja environment. Note: assigning a value to the key `loader`
+does not make sense and will also break StempelWerk.
+
+_Most default values work well for me, but I **always** enable
+[`trim_blocks`](https://jinja.palletsprojects.com/en/3.1.x/templates/#whitespace-control):_
+
+```json
+  "jinja_options": {
+    "trim_blocks": true
+  },
+```
+
 ### `jinja_extensions`
 
 **Default value: []**
@@ -186,5 +204,6 @@ for help, filing bug reports or contributing to this project. Thanks!
 Copyright (c) 2020-2022 [Martin Zuther](https://www.mzuther.de/)
 
 This program is free software and licensed under the terms of the [BSD
-3-Clause License](./LICENSE.md). **Thank you for using free
-software!**
+3-Clause License](./LICENSE.md).
+
+**Thank you for using free software!**

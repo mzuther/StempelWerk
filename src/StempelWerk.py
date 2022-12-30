@@ -57,7 +57,7 @@ from DirWalk.DirWalk import dirwalk
 
 
 class StempelWerk:
-    VERSION = '0.6.3'
+    VERSION = '0.6.4'
 
     # Auto-create settings class to write leaner code
     #
@@ -74,6 +74,8 @@ class StempelWerk:
         output_dir: str
         stencil_dir_name: str
         included_file_extensions: list
+        jinja_options: list = dataclasses.field(
+            default_factory=dict)
         jinja_extensions: list = dataclasses.field(
             default_factory=list)
         execute_python_scripts: list = dataclasses.field(
@@ -174,13 +176,8 @@ class StempelWerk:
         # Jinja also loads templates from sub-directories
         template_loader = jinja2.FileSystemLoader(self.settings.template_dir)
 
-        # FIXME: do not hard-code Jinja options
-        jinja_options = {
-            'trim_blocks': True
-        }
-
         self.jinja_environment = jinja2.Environment(
-            loader=template_loader, **jinja_options)
+            loader=template_loader, **self.settings.jinja_options)
 
         # list all templates in cache
         if self.show_debug_messages:
