@@ -107,6 +107,7 @@ class StempelWerk:
     def __init__(self, root_dir, config_file_path, show_debug_messages=False):
         self._display_version()
 
+        self.jinja_environment = None
         self.show_debug_messages = show_debug_messages
         root_dir = os.path.normpath(os.path.expanduser(root_dir))
 
@@ -172,7 +173,7 @@ class StempelWerk:
             exit(1)
 
 
-    def _create_environment(self):
+    def create_environment(self):
         # Jinja also loads templates from sub-directories
         template_loader = jinja2.FileSystemLoader(self.settings.template_dir)
 
@@ -236,7 +237,9 @@ class StempelWerk:
 
 
     def render_template(self, template_filename):
-        # TODO: create environment automatically
+        # create environment automatically
+        if not self.jinja_environment:
+            self.create_environment()
 
         template_filename = os.path.relpath(
             template_filename, self.settings.template_dir)
@@ -322,8 +325,6 @@ class StempelWerk:
 
         # only load Jinja2 when there are files that need to be processed
         if template_filenames:
-            self._create_environment()
-
             for template_filename in template_filenames:
                 self.render_template(template_filename)
 
