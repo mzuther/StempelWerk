@@ -16,6 +16,29 @@ _Automatic code generation from Jinja templates_
   </figurecaption>
 </figure>
 
+## Introduction
+
+StempelWerk has been created to prevent copy-and-paste errors and
+reduce tedious manual work. This can lead to a tremendous saving in
+development time and cost.
+
+_I have used StempelWerk in a professional project to generate most
+code (SQL) and even part of the documentation (Markdown). After nine
+months, I had saved over 100 hours of working time! In this figure,
+the overhead of writing stencils and moving existing code to templates
+has been taken into account, whereas the possible prevention of
+copy-and-paste bugs has not._
+
+Here are the main "selling points" of StempelWerk:
+
+- the template system is extremely lightweight and easy to understand
+- it can be introduced gradually and undertake quite complex tasks
+- it may be removed at any time by simply removing the template files
+  and editing the code by hand
+- Jinja's [Template Designer
+  Documentation](https://jinja.palletsprojects.com/en/3.1.x/templates/)
+  is of excellent quality
+
 ## Installation
 
 StempelWerk was developed using Python v3.8, so an older version might
@@ -36,13 +59,18 @@ python3 -m pip install --user --upgrade "Jinja2>=2.1.0"
 Generate your code from templates by running the following command:
 
 ```bash
-python3 ./src/StempelWerk.py [--only-modified] PATH_TO_SETTINGS_FILE
+python3 ./src/StempelWerk.py [--only-modified] [--debug] PATH_TO_SETTINGS_FILE
 ```
 
 Jinja is run with default options, with the exception that
 `trim_blocks` is set to `True`.
 
-## Performance
+### Command line argument `--debug`
+
+Adding this command line argument will display additional information
+such as loaded templates and added extensions.
+
+### Command line argument `--only-modified`
 
 By default, StempelWerk renders all template files located in the
 specified template directory.
