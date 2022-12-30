@@ -28,6 +28,3 @@ def update_environment(jinja_environment, show_debug_messages):
     display_environment_change(new_filters, old_filters, 'filters')
 
     return jinja_environment
-
-
-update_environment(jinja_environment, show_debug_messages)  # noqa: F821

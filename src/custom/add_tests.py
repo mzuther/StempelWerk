@@ -21,6 +21,3 @@ def update_environment(jinja_environment, show_debug_messages):
     display_environment_change(new_tests, old_tests, 'tests')
 
     return jinja_environment
-
-
-update_environment(jinja_environment, show_debug_messages)  # noqa: F821

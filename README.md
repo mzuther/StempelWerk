@@ -153,8 +153,8 @@ environment.
 **Default value: []**
 
 List containing paths to Python files. After creating the Jinja
-environment and loading Jinja extensions, this list will be sorted
-alphabetically to guarantee a stable execution order, and executed.
+environment and loading Jinja extensions, the scripts in this list
+will be executed.
 
 Use this feature to add filters to the environment, or perform any
 other task Python is capable of.

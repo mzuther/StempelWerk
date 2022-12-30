@@ -44,6 +44,7 @@
 import copy
 import dataclasses
 import datetime
+import importlib
 import json
 import math
 import os
@@ -109,9 +110,9 @@ class StempelWerk:
 
         self.jinja_environment = None
         self.show_debug_messages = show_debug_messages
-        root_dir = os.path.normpath(os.path.expanduser(root_dir))
+        self.root_dir = os.path.normpath(os.path.expanduser(root_dir))
 
-        self._load_settings(root_dir, config_file_path)
+        self._load_settings(config_file_path)
 
 
     def _display_version(self):
@@ -138,15 +139,15 @@ class StempelWerk:
             print()
 
 
-    def _load_settings(self, root_dir, config_file_path):
+    def _load_settings(self, config_file_path):
         config_file_path = self.Settings.finalize_path(
-            root_dir, config_file_path)
+            self.root_dir, config_file_path)
 
         try:
             config_load_error = False
             with open(config_file_path) as f:
                 loaded_settings = json.load(f)
-                loaded_settings['_root_dir'] = root_dir
+                loaded_settings['_root_dir'] = self.root_dir
 
             # here's where the magic happens: unpack JSON file into class
             self.settings = self.Settings(**loaded_settings)
@@ -208,29 +209,33 @@ class StempelWerk:
             self._print_debug('Done.')
             self._print_debug()
 
-        # run custom Python code; sort filenames to guarantee a stable
-        # execution order
-        for code_filename in sorted(self.settings.execute_python_scripts):
-            self._print_debug(f'Executing "{ code_filename}" ...')
+        # run custom Python code
+        for script_path in self.settings.execute_python_scripts:
+            self._print_debug(f'Executing "{ script_path}" ...')
 
-            try:
-                with open(code_filename) as f:
-                    custom_code = f.read()
+            script_path = self.Settings.finalize_path(
+                self.root_dir, script_path)
 
-            except FileNotFoundError:
-                self._print_error(f'File "{ code_filename }" not found.')
+            if not os.path.isfile(script_path):
+                self._print_error(f'File "{ script_path }" not found.')
                 self._print_error()
                 exit(1)
 
-            # FIXME: don't do this at home -- I'm a professional :)
-            jinja_environment = self.jinja_environment      # noqa: F841
-            show_debug_messages = self.show_debug_messages  # noqa: F841
+            # use file name as module name; the module is not stored
+            # in "sys.modules", so duplicate names should be okay
+            module_name, _ = os.path.splitext(
+                os.path.basename(script_path))
 
-            compiled_code = compile(custom_code, code_filename, mode='exec')
-            exec(compiled_code)
+            # import code as module
+            module_spec = importlib.util.spec_from_file_location(
+                module_name, script_path)
+            imported_module = importlib.util.module_from_spec(
+                module_spec)
 
-            # FIXME: don't do this at home -- really, don't!!!
-            self.jinja_environment = jinja_environment
+            # execute module its own namespace and update environment
+            module_spec.loader.exec_module(imported_module)
+            imported_module.update_environment(
+                self.jinja_environment, self.show_debug_messages)
 
             self._print_debug('Done.')
             self._print_debug()
