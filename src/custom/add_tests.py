@@ -1,23 +1,34 @@
-def update_environment(jinja_environment, show_debug_messages):
+from ..CustomCodeTemplate import CustomCodeTemplate
 
-    def display_environment_change(new, old, display_type):
+
+class CustomCode(CustomCodeTemplate):
+    def __init__(self, copy_of_settings, show_debug_messages):
+        super().__init__(copy_of_settings, show_debug_messages)
+
+
+    def _display_environment_change(self, new, old, display_type):
         added = ['"' + s + '"' for s in sorted(new - old)]
         count = len(added)
         added = ', '.join(added)
 
-        if show_debug_messages:
+        if self.show_debug_messages:
             print(f'DEBUG: Added { count } { display_type }: { added }.')
 
 
-    def is_spanish(string):
-        return 'este es' in string
+    def update_environment(self, jinja_environment):
+        jinja_environment = super().update_environment(
+            jinja_environment)
 
 
-    old_tests = set(jinja_environment.tests)
+        def is_spanish(string):
+            return 'este es' in string
 
-    jinja_environment.tests["spanish"] = is_spanish
 
-    new_tests = set(jinja_environment.tests)
-    display_environment_change(new_tests, old_tests, 'tests')
+        old_tests = set(jinja_environment.tests)
 
-    return jinja_environment
+        jinja_environment.tests["spanish"] = is_spanish
+
+        new_tests = set(jinja_environment.tests)
+        self._display_environment_change(new_tests, old_tests, 'tests')
+
+        return jinja_environment

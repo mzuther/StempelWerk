@@ -213,6 +213,19 @@ class StempelWerk:
         for script_path in self.settings.execute_python_scripts:
             self._print_debug(f'Executing "{ script_path}" ...')
 
+            # convert "./path/name.py" to ".module.name"
+            module_name, _ = os.path.splitext(script_path)
+
+            # handle leading "." and ".." path components
+            leading_module_component = module_name.split(
+                os.path.sep, 1)[0]
+            if leading_module_component in ['.', '..']:
+                module_name = module_name[1:]
+
+            module_name = module_name.replace(os.sep, '.')
+            module_name_absolute = importlib.util.resolve_name(
+                module_name, __spec__.parent)
+
             script_path = self.Settings.finalize_path(
                 self.root_dir, script_path)
 
@@ -221,21 +234,24 @@ class StempelWerk:
                 self._print_error()
                 exit(1)
 
-            # use file name as module name; the module is not stored
-            # in "sys.modules", so duplicate names should be okay
-            module_name, _ = os.path.splitext(
-                os.path.basename(script_path))
+            self._print_debug(
+                f'"{ module_name }" --> "{ module_name_absolute }"')
 
             # import code as module
             module_spec = importlib.util.spec_from_file_location(
-                module_name, script_path)
+                module_name_absolute, script_path)
             imported_module = importlib.util.module_from_spec(
                 module_spec)
 
-            # execute module its own namespace and update environment
+            # execute module its own namespace
             module_spec.loader.exec_module(imported_module)
-            imported_module.update_environment(
-                self.jinja_environment, self.show_debug_messages)
+            custom_code = imported_module.CustomCode(
+                copy.deepcopy(self.settings),
+                self.show_debug_messages)
+
+            # finally, update the Jinja environment
+            self.jinja_environment = custom_code.update_environment(
+                self.jinja_environment)
 
             self._print_debug('Done.')
             self._print_debug()
