@@ -2,8 +2,8 @@ from src.StempelWerk import StempelWerk
 
 
 class CustomCode(StempelWerk.CustomCodeTemplate):
-    def __init__(self, copy_of_settings, show_debug_messages):
-        super().__init__(copy_of_settings, show_debug_messages)
+    def __init__(self, copy_of_settings):
+        super().__init__(copy_of_settings)
 
 
     def _display_environment_change(self, new, old, display_type):
@@ -11,7 +11,7 @@ class CustomCode(StempelWerk.CustomCodeTemplate):
         count = len(added)
         added = ', '.join(added)
 
-        if self.show_debug_messages:
+        if self.settings.show_debug_messages:
             print(f'DEBUG: Added { count } { display_type }: { added }.')
 
 

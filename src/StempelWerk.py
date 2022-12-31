@@ -87,6 +87,7 @@ class StempelWerk:
             default_factory=list)
         last_run_file: str = '../.last_run'
         file_separator: str = '### File: '
+        show_debug_messages: bool = False
 
         @staticmethod
         def finalize_path(root_dir, original_path):
@@ -111,11 +112,10 @@ class StempelWerk:
 
     # Template class for customizing the Jinja environment
     class CustomCodeTemplate:  # noqa: E301
-        def __init__(self, copy_of_settings, show_debug_messages):
+        def __init__(self, copy_of_settings):
             # this is only a copy; changing this variable does not change
             # the settings of StempelWerk
             self.settings = copy_of_settings
-            self.show_debug_messages = show_debug_messages
 
         def update_environment(self, jinja_environment):
             return jinja_environment
@@ -126,10 +126,9 @@ class StempelWerk:
         self._display_version()
 
         self.jinja_environment = None
-        self.show_debug_messages = show_debug_messages
         self.root_dir = os.path.normpath(os.path.expanduser(root_dir))
 
-        self._load_settings(config_file_path)
+        self._load_settings(config_file_path, show_debug_messages)
 
 
     def _display_version(self):
@@ -147,7 +146,7 @@ class StempelWerk:
 
 
     def _print_debug(self, message=''):
-        if not self.show_debug_messages:
+        if not self.settings.show_debug_messages:
             return
 
         if message:
@@ -156,7 +155,7 @@ class StempelWerk:
             print()
 
 
-    def _load_settings(self, config_file_path):
+    def _load_settings(self, config_file_path, show_debug_messages):
         config_file_path = self.Settings.finalize_path(
             self.root_dir, config_file_path)
 
@@ -164,6 +163,7 @@ class StempelWerk:
             config_load_error = False
             with open(config_file_path) as f:
                 loaded_settings = json.load(f)
+                loaded_settings['show_debug_messages'] = show_debug_messages
                 loaded_settings['_root_dir'] = self.root_dir
 
             # here's where the magic happens: unpack JSON file into class
@@ -199,7 +199,7 @@ class StempelWerk:
             loader=template_loader, **self.settings.jinja_options)
 
         # list all templates in cache
-        if self.show_debug_messages:
+        if self.settings.show_debug_messages:
             self._print_debug('Loaded templates:')
             self._print_debug(' ')
 
@@ -239,8 +239,7 @@ class StempelWerk:
             # execute module its own namespace
             module_spec.loader.exec_module(imported_module)
             custom_code = imported_module.CustomCode(
-                copy.deepcopy(self.settings),
-                self.show_debug_messages)
+                copy.deepcopy(self.settings))
 
             self._print_debug('Updating environment ...')
 
