@@ -60,7 +60,19 @@ from .DirWalk.DirWalk import dirwalk
 class StempelWerk:
     # ---------------------------------------------------------------------
 
-    VERSION = '0.6.5'
+    APPLICATION = 'StempelWerk'
+    VERSION = '0.6.6'
+
+    AUTHOR = 'Martin Zuther'
+    LICENSE = 'BSD 3-Clause License'
+    COPYRIGHT = f'{ APPLICATION } v{ VERSION }    (c) 2020-2022 { AUTHOR }'
+
+    @staticmethod
+    def display_version():
+        print()
+        print(f'[ { StempelWerk.COPYRIGHT } ]')
+        print(f'[ Licensed under the { StempelWerk.LICENSE }           ]')
+        print()
 
     # ---------------------------------------------------------------------
 
@@ -74,7 +86,7 @@ class StempelWerk:
     # of using dictionary access ("settings['template_dir']").
     @dataclasses.dataclass
     class Settings:
-        _root_dir: str
+        root_dir: str
         template_dir: str
         output_dir: str
         stencil_dir_name: str
@@ -100,13 +112,13 @@ class StempelWerk:
         def __post_init__(self):
             # finalize paths
             self.template_dir = self.finalize_path(
-                self._root_dir, self.template_dir)
+                self.root_dir, self.template_dir)
 
             self.output_dir = self.finalize_path(
-                self._root_dir, self.output_dir)
+                self.root_dir, self.output_dir)
 
             self.last_run_file = self.finalize_path(
-                self._root_dir, self.last_run_file)
+                self.root_dir, self.last_run_file)
 
     # ---------------------------------------------------------------------
 
@@ -123,19 +135,8 @@ class StempelWerk:
     # ---------------------------------------------------------------------
 
     def __init__(self, root_dir, config_file_path, show_debug_messages=False):
-        self._display_version()
-
-        self.jinja_environment = None
-        self.root_dir = os.path.normpath(os.path.expanduser(root_dir))
-
-        self._load_settings(config_file_path, show_debug_messages)
-
-
-    def _display_version(self):
-        print()
-        print(f'[ StempelWerk v{ self.VERSION }    (c) 2020-2022 Martin Zuther ]')
-        print('[ Licensed under the BSD 3-Clause License           ]')
-        print()
+        self.display_version()
+        self._load_settings(config_file_path, root_dir, show_debug_messages)
 
 
     def _print_error(self, message=''):
@@ -155,16 +156,19 @@ class StempelWerk:
             print()
 
 
-    def _load_settings(self, config_file_path, show_debug_messages):
+    def _load_settings(self, config_file_path, root_dir, show_debug_messages):
+        root_dir = os.path.normpath(
+            os.path.expanduser(root_dir))
+
         config_file_path = self.Settings.finalize_path(
-            self.root_dir, config_file_path)
+            root_dir, config_file_path)
 
         try:
             config_load_error = False
             with open(config_file_path) as f:
                 loaded_settings = json.load(f)
+                loaded_settings['root_dir'] = root_dir
                 loaded_settings['show_debug_messages'] = show_debug_messages
-                loaded_settings['_root_dir'] = self.root_dir
 
             # here's where the magic happens: unpack JSON file into class
             self.settings = self.Settings(**loaded_settings)
@@ -253,7 +257,7 @@ class StempelWerk:
 
     def render_template(self, template_filename):
         # create environment automatically
-        if not self.jinja_environment:
+        if not hasattr(self, 'jinja_environment'):
             self.create_environment()
 
         template_filename = os.path.relpath(
