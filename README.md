@@ -153,7 +153,7 @@ environment.
 **Default value: []**
 
 List with Python modules containing a `CustomCode` class that inherits
-`CustomCodeTemplate`.
+`StempelWerk.CustomCodeTemplate`.
 
 After creating the Jinja environment and loading Jinja extensions,
 each module will be imported, an instance of `CustomCode` created and

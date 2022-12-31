@@ -58,7 +58,11 @@ from .DirWalk.DirWalk import dirwalk
 
 
 class StempelWerk:
+    # ---------------------------------------------------------------------
+
     VERSION = '0.6.5'
+
+    # ---------------------------------------------------------------------
 
     # Auto-create settings class to write leaner code
     #
@@ -89,7 +93,6 @@ class StempelWerk:
             new_path = os.path.join(root_dir, original_path)
             new_path = os.path.expanduser(new_path)
             new_path = os.path.normpath(new_path)
-
             return new_path
 
 
@@ -104,6 +107,20 @@ class StempelWerk:
             self.last_run_file = self.finalize_path(
                 self._root_dir, self.last_run_file)
 
+    # ---------------------------------------------------------------------
+
+    # Template class for customizing the Jinja environment
+    class CustomCodeTemplate:  # noqa: E301
+        def __init__(self, copy_of_settings, show_debug_messages):
+            # this is only a copy; changing this variable does not change
+            # the settings of StempelWerk
+            self.settings = copy_of_settings
+            self.show_debug_messages = show_debug_messages
+
+        def update_environment(self, jinja_environment):
+            return jinja_environment
+
+    # ---------------------------------------------------------------------
 
     def __init__(self, root_dir, config_file_path, show_debug_messages=False):
         self._display_version()

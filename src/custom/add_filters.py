@@ -1,7 +1,7 @@
-from src.CustomCodeTemplate import CustomCodeTemplate
+from src.StempelWerk import StempelWerk
 
 
-class CustomCode(CustomCodeTemplate):
+class CustomCode(StempelWerk.CustomCodeTemplate):
     def __init__(self, copy_of_settings, show_debug_messages):
         super().__init__(copy_of_settings, show_debug_messages)
 
