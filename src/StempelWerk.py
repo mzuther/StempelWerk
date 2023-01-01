@@ -6,7 +6,7 @@
 #  ===========
 #  Automatic code generation from Jinja2 templates
 #
-#  Copyright (c) 2020-2022 Martin Zuther (https://www.mzuther.de/)
+#  Copyright (c) 2020-2023 Martin Zuther (https://www.mzuther.de/)
 #
 #  Redistribution and use in source and binary forms, with or without
 #  modification, are permitted provided that the following conditions
@@ -65,7 +65,7 @@ class StempelWerk:
 
     AUTHOR = 'Martin Zuther'
     LICENSE = 'BSD 3-Clause License'
-    COPYRIGHT = f'{ APPLICATION } v{ VERSION }    (c) 2020-2022 { AUTHOR }'
+    COPYRIGHT = f'{ APPLICATION } v{ VERSION }    (c) 2020-2023 { AUTHOR }'
 
     @staticmethod
     def display_version():
