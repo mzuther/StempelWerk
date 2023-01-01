@@ -206,7 +206,7 @@ class StempelWerk:
 
         # NOTE: Jinja also loads templates from sub-directories
         template_loader = jinja2.FileSystemLoader(
-            # FIXME: only load templates in stencil directory?
+            # cache stencils and templates to improve performance
             self.settings.template_dir)
 
         self.jinja_environment = jinja2.Environment(
@@ -378,15 +378,15 @@ class StempelWerk:
             # get time of last run
             try:
                 with open(self.settings.last_run_file) as f:
-                    modified_after = f.read().strip()
+                    modified_after = f.read()
+                    modified_after = modified_after.strip()
             except IOError:
                 modified_after = None
 
         # find all Jinja2 files in template directory
-        template_filenames = dirwalk(
-            self.settings.template_dir,
-            included=dirwalk_inclusions,
-            modified_after=modified_after)
+        template_filenames = dirwalk(self.settings.template_dir,
+                                     included=dirwalk_inclusions,
+                                     modified_after=modified_after)
 
         # only load Jinja2 when there are files that need to be processed
         if template_filenames:

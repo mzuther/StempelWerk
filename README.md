@@ -110,11 +110,12 @@ directory.
 
 ### `stencil_dir_name`
 
-Name of directory that contains stencils. All files in
-`template_dir/stencil_dir_name` will be loaded into Jinja and can be
-referenced from other templates at runtime.
+Name of the directory that contains stencils. There may be one or more
+directories with this name, and all of them must be located somewhere
+under `template_dir`. This ensures that stencils are loaded into Jinja
+and can be referenced from templates at runtime.
 
-In addition, files in any directory matching this name will not be
+In addition, files in directories matching this name will not be
 rendered.
 
 ### `included_file_extensions`
