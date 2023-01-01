@@ -91,12 +91,14 @@ class StempelWerk:
         output_dir: str
         stencil_dir_name: str
         included_file_extensions: list
+        # ----------------------------------------
         jinja_options: list = dataclasses.field(
             default_factory=dict)
         jinja_extensions: list = dataclasses.field(
             default_factory=list)
         custom_modules: list = dataclasses.field(
             default_factory=list)
+        # ----------------------------------------
         last_run_file: str = '../.last_run'
         file_separator: str = '### File: '
         show_debug_messages: bool = False
@@ -125,8 +127,8 @@ class StempelWerk:
     # Template class for customizing the Jinja environment
     class CustomCodeTemplate:  # noqa: E301
         def __init__(self, copy_of_settings):
-            # this is only a copy; changing this variable does not change
-            # the settings of StempelWerk
+            # this is only a copy; changing this variable does *not*
+            # change the settings of StempelWerk
             self.settings = copy_of_settings
 
         def update_environment(self, jinja_environment):
@@ -136,27 +138,25 @@ class StempelWerk:
 
     def __init__(self, root_dir, config_file_path, show_debug_messages=False):
         self.display_version()
-        self._load_settings(config_file_path, root_dir, show_debug_messages)
+        self._load_settings(root_dir, config_file_path, show_debug_messages)
+
+
+    def _print_context(self, context, message):
+        if message:
+            message = f'{ context }: { message }'
+        print(message)
 
 
     def _print_error(self, message=''):
-        if message:
-            print(f'ERROR: { message }')
-        else:
-            print()
+        self._print_context('ERROR', message)
 
 
     def _print_debug(self, message=''):
-        if not self.settings.show_debug_messages:
-            return
-
-        if message:
-            print(f'DEBUG: { message }')
-        else:
-            print()
+        if self.settings.show_debug_messages:
+            self._print_context('DEBUG', message)
 
 
-    def _load_settings(self, config_file_path, root_dir, show_debug_messages):
+    def _load_settings(self, root_dir, config_file_path, show_debug_messages):
         root_dir = os.path.normpath(
             os.path.expanduser(root_dir))
 
