@@ -61,7 +61,7 @@ class StempelWerk:
     # ---------------------------------------------------------------------
 
     APPLICATION = 'StempelWerk'
-    VERSION = '0.6.6'
+    VERSION = '0.7.0'
 
     AUTHOR = 'Martin Zuther'
     LICENSE = 'BSD 3-Clause License'
