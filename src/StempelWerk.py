@@ -364,6 +364,8 @@ class StempelWerk:
 
 
     def process_templates(self, process_only_modified=False):
+        start_of_processing = datetime.datetime.now()
+
         dirwalk_inclusions = {
             'excluded_directory_names': [
                 # do not render stencils
@@ -395,13 +397,13 @@ class StempelWerk:
 
         # save time of current run
         with open(self.settings.last_run_file, mode='w') as f:
-            current_timestamp = datetime.datetime.now().timestamp()
+            start_of_processing = start_of_processing.timestamp()
 
             # round down to ensure that files with inaccurate timestamps and
             # other edge cases are included
-            current_timestamp = math.floor(current_timestamp)
+            start_of_processing = math.floor(start_of_processing)
 
-            f.write(str(current_timestamp))
+            f.write(str(start_of_processing))
 
 
 if __name__ == '__main__':
