@@ -390,20 +390,27 @@ class StempelWerk:
                                      included=dirwalk_inclusions,
                                      modified_after=modified_after)
 
-        # only load Jinja2 when there are files that need to be processed
+        # only save time of current run when files are processed
         if template_filenames:
             for template_filename in template_filenames:
                 self.render_template(template_filename)
 
-        # save time of current run
-        with open(self.settings.last_run_file, mode='w') as f:
-            start_of_processing = start_of_processing.timestamp()
+            # save time of current run
+            with open(self.settings.last_run_file, mode='w') as f:
+                # convert to UNIX time
+                start_of_processing_timestamp = start_of_processing.timestamp()
 
-            # round down to ensure that files with inaccurate timestamps and
-            # other edge cases are included
-            start_of_processing = math.floor(start_of_processing)
+                # round down to ensure that files with inaccurate timestamps and
+                # other edge cases are included
+                start_of_processing_timestamp = math.floor(
+                    start_of_processing_timestamp)
 
-            f.write(str(start_of_processing))
+                f.write(str(start_of_processing_timestamp))
+
+            if self.settings.show_debug_messages:
+                processing_time = datetime.datetime.now() - start_of_processing
+                self._print_debug(f'Total processing time: { processing_time }')
+                self._print_debug()
 
 
 if __name__ == '__main__':
