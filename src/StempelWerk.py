@@ -105,9 +105,12 @@ class StempelWerk:
 
         @staticmethod
         def finalize_path(root_dir, original_path):
+            original_path = original_path.strip()
+
             new_path = os.path.join(root_dir, original_path)
             new_path = os.path.expanduser(new_path)
             new_path = os.path.normpath(new_path)
+
             return new_path
 
 
@@ -293,13 +296,16 @@ class StempelWerk:
 
         template_filename = os.path.relpath(
             template_filename, self.settings.template_dir)
+
         print('[ {} ]'.format(template_filename))
+
+        # Jinja2 cannot handle Windows paths
+        if os.path.sep != '/':
+            template_filename = template_filename.replace(os.path.sep, '/')
 
         # render template
         try:
-            # Jinja2 cannot handle Windows paths with backslashes
-            template = self.jinja_environment.get_template(
-                template_filename.replace(os.path.sep, '/'))
+            template = self.jinja_environment.get_template(template_filename)
             content_of_multiple_files = template.render()
 
         except (jinja2.exceptions.TemplateSyntaxError,
@@ -310,50 +316,59 @@ class StempelWerk:
 
             raise(err)
 
-        for content_of_single_file in content_of_multiple_files.split(
-                self.settings.file_separator):
-            # content starts with file_separator, so first string is empty
-            # (or contains whitespace when a template is not well written)
-            if not content_of_single_file.strip():
-                continue
+        # split content of mutliple files at "file_separator"
+        split_contents = content_of_multiple_files.split(
+            self.settings.file_separator)
 
-            # extract and normalize file name
-            output_filename, content = content_of_single_file.split('\n', 1)
-
-            output_filename = output_filename.strip()
-            output_filename = os.path.join(
-                self.settings.output_dir, output_filename)
-            output_filename = os.path.abspath(output_filename)
-
-            print('--> {}'.format(os.path.relpath(
-                output_filename, self.settings.output_dir)))
-
-            # ensure Batch files use Windows line endings, otherwise
-            # seemingly random lines will be executed
-            if output_filename.endswith('.bat'):
-                newline = '\r\n'
-            # in any other case, use default line ending of system
-            else:
-                newline = None
-
-            # Jinja2 encodes all strings in UTF-8
-            with open(output_filename, mode='w', encoding='utf-8',
-                      newline=newline) as f:
-                f.write(content)
-
-            # make Linux shell files executable by owner
-            if output_filename.endswith('.sh') and platform.system() == 'Linux':
-                with pathlib.Path(output_filename) as f:
-                    mode = f.stat().st_mode
-                    f.chmod(mode | stat.S_IXUSR)
+        for content_of_single_file in split_contents:
+            self._render_template_single(content_of_single_file)
 
         print()
 
 
+    def _render_template_single(self, content_of_single_file):
+        # content starts with file_separator, so first string is empty
+        # (or contains whitespace when a template is not well written)
+        if not content_of_single_file.strip():
+            return
+
+        # extract and normalize file name
+        output_filename, content = content_of_single_file.split('\n', 1)
+
+        output_filename = self.Settings.finalize_path(
+            self.settings.output_dir, output_filename)
+
+        _, file_extension = os.path.splitext(output_filename)
+
+        print('--> {}'.format(os.path.relpath(
+            output_filename, self.settings.output_dir)))
+
+        # use default line ending of system
+        newline = None
+
+        # but ensure Batch files use Windows line endings, otherwise
+        # seemingly random lines will be executed
+        if file_extension == '.bat':
+            newline = '\r\n'
+
+        # Jinja2 encodes all strings in UTF-8
+        with open(output_filename, mode='w', encoding='utf-8',
+                  newline=newline) as f:
+            f.write(content)
+
+        # make Linux shell files executable by owner
+        if file_extension == '.sh' and platform.system() == 'Linux':
+            with pathlib.Path(output_filename) as f:
+                mode = f.stat().st_mode
+                f.chmod(mode | stat.S_IXUSR)
+
+
     def process_templates(self, process_only_modified=False):
         dirwalk_inclusions = {
-            # do not render stencils
-            'excluded_directory_names': [self.settings.stencil_dir_name],
+            'excluded_directory_names': [
+                # do not render stencils
+                self.settings.stencil_dir_name
+            ],
             'excluded_file_names': [],
             'included_file_extensions': self.settings.included_file_extensions,
         }
