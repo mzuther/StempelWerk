@@ -167,6 +167,9 @@ class StempelWerk:
             config_load_error = False
             with open(config_file_path) as f:
                 loaded_settings = json.load(f)
+
+                # add settings from command line (or overwrite if
+                # specified in JSON)
                 loaded_settings['root_dir'] = root_dir
                 loaded_settings['show_debug_messages'] = show_debug_messages
 
@@ -196,60 +199,88 @@ class StempelWerk:
 
 
     def create_environment(self):
-        # Jinja also loads templates from sub-directories
-        template_loader = jinja2.FileSystemLoader(self.settings.template_dir)
+        self._print_debug('Loading templates:')
+
+        # NOTE: Jinja also loads templates from sub-directories
+        template_loader = jinja2.FileSystemLoader(
+            # FIXME: only load templates in stencil directory?
+            self.settings.template_dir)
 
         self.jinja_environment = jinja2.Environment(
-            loader=template_loader, **self.settings.jinja_options)
+            loader=template_loader,
+            **self.settings.jinja_options)
+
+        template_filenames = self.jinja_environment.list_templates()
+
+        if not template_filenames:
+            self._print_error()
+            self._print_error('No templates found.')
+            self._print_error()
+            exit(1)
 
         # list all templates in cache
         if self.settings.show_debug_messages:
-            self._print_debug('Loaded templates:')
             self._print_debug(' ')
 
-            for template_filename in self.jinja_environment.list_templates():
-                self._print_debug(f'* { template_filename }')
+            for template_filename in template_filenames:
+                self._print_debug(f'  - { template_filename }')
 
             self._print_debug(' ')
-            self._print_debug('Use relative paths to access templates in sub-directories')
-            self._print_debug('(https://stackoverflow.com/a/9644828).')
+            self._print_debug('  Use relative paths to access templates in sub-directories')
+            self._print_debug('  (https://stackoverflow.com/a/9644828).')
+            self._print_debug(' ')
+            self._print_debug('Done.')
             self._print_debug()
 
-        # execute custom Python code
+        # load extensions and run custom Python code
         self._update_environment()
 
 
     def _update_environment(self):
         # load Jinja extensions first so they can be referenced in custom
         # Python code
-        for extension in self.settings.jinja_extensions:
-            self._print_debug(f'Adding extension "{ extension }" ...')
+        if self.settings.jinja_extensions:
+            self._print_debug('Loading extensions:')
+            self._print_debug(' ')
 
-            self.jinja_environment.add_extension(extension)
+            for extension in self.settings.jinja_extensions:
+                self._print_debug(f'  - { extension }')
+                self.jinja_environment.add_extension(extension)
 
+            self._print_debug(' ')
             self._print_debug('Done.')
             self._print_debug()
 
         # run custom Python code
-        for module_name in self.settings.custom_modules:
-            self._print_debug(f'Loading module "{ module_name }" ...')
+        if self.settings.custom_modules:
+            self._print_debug('Loading custom modules:')
+            self._print_debug(' ')
 
-            # import code as module
-            module_spec = importlib.util.find_spec(
-                module_name)
-            imported_module = importlib.util.module_from_spec(
-                module_spec)
+            for module_name in self.settings.custom_modules:
+                self._print_debug(f'  [ { module_name } ]')
 
-            # execute module its own namespace
-            module_spec.loader.exec_module(imported_module)
-            custom_code = imported_module.CustomCode(
-                copy.deepcopy(self.settings))
+                # import code as module
+                module_spec = importlib.util.find_spec(
+                    module_name)
+                imported_module = importlib.util.module_from_spec(
+                    module_spec)
 
-            self._print_debug('Updating environment ...')
+                # execute module its own namespace
+                module_spec.loader.exec_module(
+                    imported_module)
 
-            # finally, update the Jinja environment
-            self.jinja_environment = custom_code.update_environment(
-                self.jinja_environment)
+                # prevent changes to settings
+                custom_code = imported_module.CustomCode(
+                    copy.deepcopy(self.settings))
+
+                self._print_debug('  - Updating environment ...')
+
+                # execute custom code and store updated Jinja environment
+                self.jinja_environment = custom_code.update_environment(
+                    self.jinja_environment)
+
+                self._print_debug('  - Done.')
+                self._print_debug(' ')
 
             self._print_debug('Done.')
             self._print_debug()

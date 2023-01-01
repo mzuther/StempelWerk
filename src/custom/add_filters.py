@@ -12,7 +12,7 @@ class CustomCode(StempelWerk.CustomCodeTemplate):
         added = ', '.join(added)
 
         if self.settings.show_debug_messages:
-            print(f'DEBUG: Added { count } { display_type }: { added }.')
+            print(f'DEBUG:   - Added { count } { display_type }: { added }.')
 
 
     def update_environment(self, jinja_environment):
