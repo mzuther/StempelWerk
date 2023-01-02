@@ -61,7 +61,7 @@ class StempelWerk:
     # ---------------------------------------------------------------------
 
     APPLICATION = 'StempelWerk'
-    VERSION = '0.7.1'
+    VERSION = '0.7.2'
 
     AUTHOR = 'Martin Zuther'
     LICENSE = 'BSD 3-Clause License'
@@ -147,9 +147,9 @@ class StempelWerk:
 
     # ---------------------------------------------------------------------
 
-    def __init__(self, root_dir, config_file_path, verbose=False):
+    def __init__(self, config_file_path, verbose=False):
         self.display_version()
-        self._load_settings(root_dir, config_file_path, verbose)
+        self._load_settings(config_file_path, verbose)
 
 
     @staticmethod
@@ -178,34 +178,30 @@ class StempelWerk:
             self._print_debug(message)
 
 
-    def _load_settings(self, root_dir, config_file_path, verbose):
+    def _load_settings(self, config_file_path, verbose):
+        # all relative paths are based on the location of this file
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+
         root_dir = os.path.normpath(
-            os.path.expanduser(root_dir))
+            os.path.expanduser(script_dir))
 
         config_file_path = self.Settings.finalize_path(
             root_dir, config_file_path)
 
         try:
-            config_load_error = False
             with open(config_file_path) as f:
                 loaded_settings = json.load(f)
 
-                # add settings from command line (or overwrite if
-                # specified in JSON)
-                loaded_settings['root_dir'] = root_dir
-                loaded_settings['verbose'] = verbose
-
-            # here's where the magic happens: unpack JSON file into class
-            self.settings = self.Settings(**loaded_settings)
-
         except FileNotFoundError:
             self.print_error(f'File "{ config_file_path }" not found.')
-            config_load_error = True
+            self.print_error()
+            exit(1)
 
         except json.decoder.JSONDecodeError as err:
             self.print_error(f'File "{ config_file_path }" is broken:')
             self.print_error(f'{ err }')
-            config_load_error = True
+            self.print_error()
+            exit(1)
 
         except TypeError as err:
             self.print_error(f'Did you provide all settings in "{ config_file_path }"?')
@@ -215,9 +211,13 @@ class StempelWerk:
             # print traceback to help with debugging
             raise err
 
-        if config_load_error:
-            self.print_error()
-            exit(1)
+        # add settings from command line (or overwrite if
+        # specified in JSON)
+        loaded_settings['root_dir'] = root_dir
+        loaded_settings['verbose'] = verbose
+
+        # here's where the magic happens: unpack JSON file into class
+        self.settings = self.Settings(**loaded_settings)
 
 
     def create_environment(self):
@@ -470,12 +470,10 @@ if __name__ == '__main__':
             return self.cla.pop()
 
 
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-
     cla = CommandLineArguments()
     process_only_modified = cla.get_option('--only-modified')
     verbose = cla.get_option('--verbose')
     config_file_path = cla.get_config_path()
 
-    sw = StempelWerk(script_dir, config_file_path, verbose)
+    sw = StempelWerk(config_file_path, verbose)
     sw.process_templates(process_only_modified)
