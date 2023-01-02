@@ -100,7 +100,7 @@ class StempelWerk:
             default_factory=list)
         # ----------------------------------------
         last_run_file: str = '../.last_run'
-        file_separator: str = '### File: '
+        file_separator: str = '============ SNIP HERE ============'
         verbose: bool = False
 
         @staticmethod
@@ -367,6 +367,9 @@ class StempelWerk:
         if not content_of_single_file.strip():
             return
 
+        # remove split artifacts
+        content_of_single_file = content_of_single_file.lstrip()
+
         # extract and normalize file name
         output_filename, content = content_of_single_file.split('\n', 1)
 
@@ -387,6 +390,7 @@ class StempelWerk:
             newline = '\r\n'
 
         # Jinja2 encodes all strings in UTF-8
+        # FIXME: create output folder
         with open(output_filename, mode='w', encoding='utf-8',
                   newline=newline) as f:
             f.write(content)

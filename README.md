@@ -182,18 +182,19 @@ after starting the system._
 
 ### `file_separator`
 
-**Default value: `### File: `**
+**Default value: `============ SNIP HERE ============`**
 
 Each time this string is encountered in the rendered ouput of a
 template, a new file is created. This allows you to create multiple
 files from a single template.
 
-The code relies on the following order: file separator, path to the
-output file, a newline character (`\n`), and contents of the output
-file:
+The code relies on the following order: file separator, optional
+whitespace, path to the output file, a newline character (`\n`), and
+contents of the output file:
 
 ```text
-### File: dir/spam.py
+============ SNIP HERE ============
+spam/eggs.py
 def spam():
     return 'eggs'
 ```
