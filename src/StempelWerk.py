@@ -426,10 +426,9 @@ class StempelWerk:
 
                 f.write(str(start_of_processing_timestamp))
 
-            if self.settings.verbose:
-                processing_time = datetime.datetime.now() - start_of_processing
-                self.print_debug(f'Total processing time: { processing_time }')
-                self.print_debug()
+            processing_time = datetime.datetime.now() - start_of_processing
+            print(f'Total processing time: { processing_time }')
+            print()
 
 
 if __name__ == '__main__':
