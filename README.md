@@ -59,16 +59,11 @@ python3 -m pip install --user --upgrade "Jinja2>=2.1.0"
 Generate your code from templates by running the following command:
 
 ```bash
-python3 ./src/StempelWerk.py [--only-modified] [--debug] PATH_TO_SETTINGS_FILE
+python3 ./src/StempelWerk.py [--only-modified] [--verbose] PATH_TO_SETTINGS_FILE
 ```
 
 Jinja is run with default options, with the exception that
 `trim_blocks` is set to `True`.
-
-### Command line argument `--debug`
-
-Adding this command line argument will display additional information
-such as loaded templates and added extensions.
 
 ### Command line argument `--only-modified`
 
@@ -85,6 +80,11 @@ times in a weird manner, and changes to master templates (called
 "stencils" in StempelWerk) are currently not handled. However, in such
 a case you can simply use StempelWerk without the `--only-modified`
 argument._
+
+### Command line argument `--verbose`
+
+Adding this command line argument will display additional information
+useful for debugging such as loaded templates and added extensions.
 
 ## Settings
 

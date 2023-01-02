@@ -101,7 +101,7 @@ class StempelWerk:
         # ----------------------------------------
         last_run_file: str = '../.last_run'
         file_separator: str = '### File: '
-        show_debug_messages: bool = False
+        verbose: bool = False
 
         @staticmethod
         def finalize_path(root_dir, original_path):
@@ -139,9 +139,9 @@ class StempelWerk:
 
     # ---------------------------------------------------------------------
 
-    def __init__(self, root_dir, config_file_path, show_debug_messages=False):
+    def __init__(self, root_dir, config_file_path, verbose=False):
         self.display_version()
-        self._load_settings(root_dir, config_file_path, show_debug_messages)
+        self._load_settings(root_dir, config_file_path, verbose)
 
 
     def _print_context(self, context, message):
@@ -155,11 +155,11 @@ class StempelWerk:
 
 
     def _print_debug(self, message=''):
-        if self.settings.show_debug_messages:
+        if self.settings.verbose:
             self._print_context('DEBUG', message)
 
 
-    def _load_settings(self, root_dir, config_file_path, show_debug_messages):
+    def _load_settings(self, root_dir, config_file_path, verbose):
         root_dir = os.path.normpath(
             os.path.expanduser(root_dir))
 
@@ -174,7 +174,7 @@ class StempelWerk:
                 # add settings from command line (or overwrite if
                 # specified in JSON)
                 loaded_settings['root_dir'] = root_dir
-                loaded_settings['show_debug_messages'] = show_debug_messages
+                loaded_settings['verbose'] = verbose
 
             # here's where the magic happens: unpack JSON file into class
             self.settings = self.Settings(**loaded_settings)
@@ -222,7 +222,7 @@ class StempelWerk:
             exit(1)
 
         # list all templates in cache
-        if self.settings.show_debug_messages:
+        if self.settings.verbose:
             self._print_debug(' ')
 
             for template_filename in template_filenames:
@@ -407,7 +407,7 @@ class StempelWerk:
 
                 f.write(str(start_of_processing_timestamp))
 
-            if self.settings.show_debug_messages:
+            if self.settings.verbose:
                 processing_time = datetime.datetime.now() - start_of_processing
                 self._print_debug(f'Total processing time: { processing_time }')
                 self._print_debug()
@@ -443,8 +443,8 @@ if __name__ == '__main__':
 
     cla = CommandLineArguments()
     process_only_modified = cla.get_option('--only-modified')
-    show_debug_messages = cla.get_option('--debug')
+    verbose = cla.get_option('--verbose')
     config_file_path = cla.get_config_path()
 
-    sw = StempelWerk(script_dir, config_file_path, show_debug_messages)
+    sw = StempelWerk(script_dir, config_file_path, verbose)
     sw.process_templates(process_only_modified)

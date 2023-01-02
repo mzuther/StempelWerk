@@ -11,7 +11,7 @@ class CustomCode(StempelWerk.CustomCodeTemplate):
         count = len(added)
         added = ', '.join(added)
 
-        if self.settings.show_debug_messages:
+        if self.settings.verbose:
             print(f'DEBUG:   - Added { count } { display_type }: { added }.')
 
 
