@@ -10,9 +10,7 @@ class CustomCode(StempelWerk.CustomCodeTemplate):
         added = ['"' + s + '"' for s in sorted(new - old)]
         count = len(added)
         added = ', '.join(added)
-
-        if self.settings.verbose:
-            print(f'DEBUG:   - Added { count } { display_type }: { added }.')
+        self.print_debug(f'  - Added { count } { display_type }: { added }.')
 
 
     def update_environment(self, jinja_environment):

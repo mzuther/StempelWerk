@@ -137,6 +137,14 @@ class StempelWerk:
         def update_environment(self, jinja_environment):
             return jinja_environment
 
+        def print_error(self, message=''):
+            StempelWerk._print_error(message)
+
+
+        def print_debug(self, message=''):
+            if self.settings.verbose:
+                StempelWerk._print_debug(message)
+
     # ---------------------------------------------------------------------
 
     def __init__(self, root_dir, config_file_path, verbose=False):
@@ -144,19 +152,30 @@ class StempelWerk:
         self._load_settings(root_dir, config_file_path, verbose)
 
 
-    def _print_context(self, context, message):
+    @staticmethod
+    def _print_context(context, message):
         if message:
             message = f'{ context }: { message }'
         print(message)
 
 
-    def _print_error(self, message=''):
-        self._print_context('ERROR', message)
+    @staticmethod
+    def _print_error(message=''):
+        StempelWerk._print_context('ERROR', message)
 
 
-    def _print_debug(self, message=''):
+    @staticmethod
+    def _print_debug(message=''):
+        StempelWerk._print_context('DEBUG', message)
+
+
+    def print_error(self, message=''):
+        self._print_error(message)
+
+
+    def print_debug(self, message=''):
         if self.settings.verbose:
-            self._print_context('DEBUG', message)
+            self._print_debug(message)
 
 
     def _load_settings(self, root_dir, config_file_path, verbose):
@@ -180,29 +199,29 @@ class StempelWerk:
             self.settings = self.Settings(**loaded_settings)
 
         except FileNotFoundError:
-            self._print_error(f'File "{ config_file_path }" not found.')
+            self.print_error(f'File "{ config_file_path }" not found.')
             config_load_error = True
 
         except json.decoder.JSONDecodeError as err:
-            self._print_error(f'File "{ config_file_path }" is broken:')
-            self._print_error(f'{ err }')
+            self.print_error(f'File "{ config_file_path }" is broken:')
+            self.print_error(f'{ err }')
             config_load_error = True
 
         except TypeError as err:
-            self._print_error(f'Did you provide all settings in "{ config_file_path }"?')
-            self._print_error(f'{ err }')
-            self._print_error()
+            self.print_error(f'Did you provide all settings in "{ config_file_path }"?')
+            self.print_error(f'{ err }')
+            self.print_error()
 
             # print traceback to help with debugging
             raise err
 
         if config_load_error:
-            self._print_error()
+            self.print_error()
             exit(1)
 
 
     def create_environment(self):
-        self._print_debug('Loading templates:')
+        self.print_debug('Loading templates:')
 
         # NOTE: Jinja also loads templates from sub-directories
         template_loader = jinja2.FileSystemLoader(
@@ -216,24 +235,24 @@ class StempelWerk:
         template_filenames = self.jinja_environment.list_templates()
 
         if not template_filenames:
-            self._print_error()
-            self._print_error('No templates found.')
-            self._print_error()
+            self.print_error()
+            self.print_error('No templates found.')
+            self.print_error()
             exit(1)
 
         # list all templates in cache
         if self.settings.verbose:
-            self._print_debug(' ')
+            self.print_debug(' ')
 
             for template_filename in template_filenames:
-                self._print_debug(f'  - { template_filename }')
+                self.print_debug(f'  - { template_filename }')
 
-            self._print_debug(' ')
-            self._print_debug('  Use relative paths to access templates in sub-directories')
-            self._print_debug('  (https://stackoverflow.com/a/9644828).')
-            self._print_debug(' ')
-            self._print_debug('Done.')
-            self._print_debug()
+            self.print_debug(' ')
+            self.print_debug('  Use relative paths to access templates in sub-directories')
+            self.print_debug('  (https://stackoverflow.com/a/9644828).')
+            self.print_debug(' ')
+            self.print_debug('Done.')
+            self.print_debug()
 
         # load extensions and run custom Python code
         self._update_environment()
@@ -243,24 +262,24 @@ class StempelWerk:
         # load Jinja extensions first so they can be referenced in custom
         # Python code
         if self.settings.jinja_extensions:
-            self._print_debug('Loading extensions:')
-            self._print_debug(' ')
+            self.print_debug('Loading extensions:')
+            self.print_debug(' ')
 
             for extension in self.settings.jinja_extensions:
-                self._print_debug(f'  - { extension }')
+                self.print_debug(f'  - { extension }')
                 self.jinja_environment.add_extension(extension)
 
-            self._print_debug(' ')
-            self._print_debug('Done.')
-            self._print_debug()
+            self.print_debug(' ')
+            self.print_debug('Done.')
+            self.print_debug()
 
         # run custom Python code
         if self.settings.custom_modules:
-            self._print_debug('Loading custom modules:')
-            self._print_debug(' ')
+            self.print_debug('Loading custom modules:')
+            self.print_debug(' ')
 
             for module_name in self.settings.custom_modules:
-                self._print_debug(f'  [ { module_name } ]')
+                self.print_debug(f'  [ { module_name } ]')
 
                 # import code as module
                 module_spec = importlib.util.find_spec(
@@ -276,17 +295,17 @@ class StempelWerk:
                 custom_code = imported_module.CustomCode(
                     copy.deepcopy(self.settings))
 
-                self._print_debug('  - Updating environment ...')
+                self.print_debug('  - Updating environment ...')
 
                 # execute custom code and store updated Jinja environment
                 self.jinja_environment = custom_code.update_environment(
                     self.jinja_environment)
 
-                self._print_debug('  - Done.')
-                self._print_debug(' ')
+                self.print_debug('  - Done.')
+                self.print_debug(' ')
 
-            self._print_debug('Done.')
-            self._print_debug()
+            self.print_debug('Done.')
+            self.print_debug()
 
 
     def render_template(self, template_filename):
@@ -310,9 +329,9 @@ class StempelWerk:
 
         except (jinja2.exceptions.TemplateSyntaxError,
                 jinja2.exceptions.TemplateAssertionError) as err:
-            self._print_error()
-            self._print_error(f'{ err.message } (line { err.lineno })')
-            self._print_error()
+            self.print_error()
+            self.print_error(f'{ err.message } (line { err.lineno })')
+            self.print_error()
 
             raise(err)
 
@@ -409,8 +428,8 @@ class StempelWerk:
 
             if self.settings.verbose:
                 processing_time = datetime.datetime.now() - start_of_processing
-                self._print_debug(f'Total processing time: { processing_time }')
-                self._print_debug()
+                self.print_debug(f'Total processing time: { processing_time }')
+                self.print_debug()
 
 
 if __name__ == '__main__':
@@ -428,9 +447,9 @@ if __name__ == '__main__':
 
         def get_config_path(self):
             if len(self.cla) != 1:
-                self._print_error()
-                self._print_error('Please provide JSON settings file as parameter.')
-                self._print_error()
+                StempelWerk._print_error()
+                StempelWerk._print_error('Please provide JSON settings file as parameter.')
+                StempelWerk._print_error()
                 exit(1)
                 # highly sophisticated command line parsing
             return self.cla.pop()
