@@ -61,7 +61,7 @@ class StempelWerk:
     # ---------------------------------------------------------------------
 
     APPLICATION = 'StempelWerk'
-    VERSION = '0.7.0'
+    VERSION = '0.7.1'
 
     AUTHOR = 'Martin Zuther'
     LICENSE = 'BSD 3-Clause License'
@@ -455,9 +455,6 @@ if __name__ == '__main__':
 
 
     script_dir = os.path.dirname(os.path.abspath(__file__))
-
-    # ensure that this script can be called from anywhere
-    os.chdir(script_dir)
 
     cla = CommandLineArguments()
     process_only_modified = cla.get_option('--only-modified')
