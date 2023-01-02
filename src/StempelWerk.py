@@ -221,9 +221,10 @@ class StempelWerk:
 
 
     def create_environment(self):
-        self.print_debug('Loading templates:')
+        self.print_debug('Loading templates ...')
 
-        # NOTE: Jinja also loads templates from sub-directories
+        # NOTE: Jinja loads templates from sub-directories;
+        # NOTE: stencils will also be included
         template_loader = jinja2.FileSystemLoader(
             # cache stencils and templates to improve performance
             self.settings.template_dir)
@@ -240,19 +241,34 @@ class StempelWerk:
             self.print_error()
             exit(1)
 
+        stencil_filenames = []
+        for stencil_filename in template_filenames:
+            path_components = os.path.split(stencil_filename)
+            if self.settings.stencil_dir_name in path_components:
+                stencil_filenames.append(stencil_filename)
+
+        # display warning and continue processing (some people might
+        # not want to use stencils)
+        if not stencil_filenames:
+            self.print_error()
+            self.print_error('No stencils found.')
+            self.print_error()
         # list all templates in cache
-        if self.settings.verbose:
+        elif self.settings.verbose:
+            self.print_debug(' ')
+            self.print_debug('Available stencils:')
             self.print_debug(' ')
 
-            for template_filename in template_filenames:
-                self.print_debug(f'  - { template_filename }')
+            for stencil_filename in stencil_filenames:
+                self.print_debug(f'  - { stencil_filename }')
 
             self.print_debug(' ')
             self.print_debug('  Use relative paths to access templates in sub-directories')
             self.print_debug('  (https://stackoverflow.com/a/9644828).')
             self.print_debug(' ')
-            self.print_debug('Done.')
-            self.print_debug()
+
+        self.print_debug('Done.')
+        self.print_debug()
 
         # load extensions and run custom Python code
         self._update_environment()
