@@ -3,12 +3,15 @@
 -- {{ name.description }}
 -- ========================================================================== --
 
--- this file was auto-generated from the following template:
+-- NOTE: Please do not judge the power of StempelWerk by these
+-- NOTE: rudimentary templates.  I have worked with it for years
+-- NOTE: without coming even close to what is ultimately possible.
+
+-- This file has been auto-generated from the following template:
 -- 10-templates/00-stencils/20-sql_create_stored_procedure.sql.jinja
 
 
 CREATE OR ALTER PROCEDURE {{ table.schema }}.{{ table.procedure }}
-WITH EXECUTE AS CALLER
 AS
 BEGIN
     BEGIN TRY
@@ -105,8 +108,4 @@ BEGIN
         THROW;
     END CATCH
 END;
-GO
-
-ALTER AUTHORIZATION ON OBJECT::{{ table.schema }}.{{ table.procedure }} TO SCHEMA OWNER;
-GO
 {% endmacro %}

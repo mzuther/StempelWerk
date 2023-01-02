@@ -3,7 +3,11 @@
 -- {{ name.description }}
 -- ========================================================================== --
 
--- this file was auto-generated from the following template:
+-- NOTE: Please do not judge the power of StempelWerk by these
+-- NOTE: rudimentary templates.  I have worked with it for years
+-- NOTE: without coming even close to what is ultimately possible.
+
+-- This file has been auto-generated from the following template:
 -- 10-templates/00-stencils/10-sql_create_table.sql.jinja
 
 
@@ -37,7 +41,4 @@ CREATE TABLE {{ table.schema }}.{{ table.target }}
 {% endif %}
 {%- endfor %}
 );
-
-ALTER AUTHORIZATION ON OBJECT::{{ table.schema }}.{{ table.target }} TO SCHEMA OWNER;
-GO
 {% endmacro %}

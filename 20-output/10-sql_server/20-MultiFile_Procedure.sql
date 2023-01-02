@@ -1,13 +1,16 @@
 -- ========================================================================== --
--- demonstration of creating multiple files from a single template
+-- Demonstration of creating multiple files from a single template
 -- ========================================================================== --
 
--- this file was auto-generated from the following template:
+-- NOTE: Please do not judge the power of StempelWerk by these
+-- NOTE: rudimentary templates.  I have worked with it for years
+-- NOTE: without coming even close to what is ultimately possible.
+
+-- This file has been auto-generated from the following template:
 -- 10-templates/00-stencils/20-sql_create_stored_procedure.sql.jinja
 
 
 CREATE OR ALTER PROCEDURE DEMO.MultiFile_Procedure
-WITH EXECUTE AS CALLER
 AS
 BEGIN
     BEGIN TRY
@@ -108,7 +111,3 @@ BEGIN
         THROW;
     END CATCH
 END;
-GO
-
-ALTER AUTHORIZATION ON OBJECT::DEMO.MultiFile_Procedure TO SCHEMA OWNER;
-GO
