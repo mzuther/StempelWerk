@@ -100,7 +100,7 @@ class StempelWerk:
             default_factory=list)
         # ----------------------------------------
         last_run_file: str = '../.last_run'
-        file_separator: str = '============ SNIP HERE ============'
+        file_separator: str = '### File: '
         verbose: bool = False
 
         @staticmethod
@@ -119,6 +119,7 @@ class StempelWerk:
             self.template_dir = self.finalize_path(
                 self.root_dir, self.template_dir)
 
+            # FIXME: create output folder
             self.output_dir = self.finalize_path(
                 self.root_dir, self.output_dir)
 
@@ -390,7 +391,6 @@ class StempelWerk:
             newline = '\r\n'
 
         # Jinja2 encodes all strings in UTF-8
-        # FIXME: create output folder
         with open(output_filename, mode='w', encoding='utf-8',
                   newline=newline) as f:
             f.write(content)

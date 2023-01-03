@@ -182,7 +182,7 @@ after starting the system._
 
 ### `file_separator`
 
-**Default value: `============ SNIP HERE ============`**
+**Default value: `### File: `**
 
 Each time this string is encountered in the rendered ouput of a
 template, a new file is created. This allows you to create multiple
@@ -193,13 +193,14 @@ whitespace, path to the output file, a newline character (`\n`), and
 contents of the output file:
 
 ```text
-============ SNIP HERE ============
-spam/eggs.py
+### File: spam/eggs.py
 def spam():
     return 'eggs'
 ```
 
-_Please see example templates to learn how to use this feature._
+_Good file separators strike a balance between performance (brevity)
+and reliability (uniqueness). Please see the template examples to see
+them in action._
 
 ## Code of conduct
 
