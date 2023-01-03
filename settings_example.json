@@ -16,5 +16,6 @@
     "src.custom.add_tests"
   ],
   "last_run_file": "../.last_run",
-  "file_separator": "### File: "
+  "marker_new_file": "### New file:",
+  "marker_content": "### Content:"
 }

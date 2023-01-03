@@ -61,7 +61,7 @@ class StempelWerk:
     # ---------------------------------------------------------------------
 
     APPLICATION = 'StempelWerk'
-    VERSION = '0.7.2'
+    VERSION = '0.7.3'
 
     AUTHOR = 'Martin Zuther'
     LICENSE = 'BSD 3-Clause License'
@@ -100,7 +100,8 @@ class StempelWerk:
             default_factory=list)
         # ----------------------------------------
         last_run_file: str = '../.last_run'
-        file_separator: str = '### File: '
+        marker_new_file: str = '### New file:'
+        marker_content: str = '### Content:'
         verbose: bool = False
 
         @staticmethod
@@ -352,9 +353,9 @@ class StempelWerk:
 
             raise(err)
 
-        # split content of mutliple files at "file_separator"
+        # split content of multiple files
         split_contents = content_of_multiple_files.split(
-            self.settings.file_separator)
+            self.settings.marker_new_file)
 
         for content_of_single_file in split_contents:
             self._render_template_single(content_of_single_file)
@@ -363,16 +364,19 @@ class StempelWerk:
 
 
     def _render_template_single(self, content_of_single_file):
-        # content starts with file_separator, so first string is empty
-        # (or contains whitespace when a template is not well written)
+        # content starts with "marker_new_file", so first string is
+        # empty (or contains whitespace when a template is not well
+        # written)
         if not content_of_single_file.strip():
             return
 
-        # remove split artifacts
-        content_of_single_file = content_of_single_file.lstrip()
+        # extract path and content of output file
+        output_filename, content = content_of_single_file.split(
+            self.settings.marker_content, 1)
 
-        # extract and normalize file name
-        output_filename, content = content_of_single_file.split('\n', 1)
+        # FIXME: check validity of input
+        output_filename = output_filename.strip()
+        content = content.lstrip()
 
         output_filename = self.Settings.finalize_path(
             self.settings.output_dir, output_filename)

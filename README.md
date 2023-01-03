@@ -180,20 +180,21 @@ _If your operating system handles temporary directories correctly
 (e.g. `/tmp/`). This way, all template files would be rendered once
 after starting the system._
 
-### `file_separator`
+### `marker_new_file` and `marker_content`
 
-**Default value: `### File: `**
+**Default values: `### New file:` and `### Content:`**
 
-Each time this string is encountered in the rendered ouput of a
+Each time these strings are encountered in the rendered ouput of a
 template, a new file is created. This allows you to create multiple
 files from a single template.
 
-The code relies on the following order: file separator, optional
-whitespace, path to the output file, a newline character (`\n`), and
-contents of the output file:
+The code relies on the following order: new file marker, optional
+whitespace, path to the output file, optional whitespace, content
+marker, optional whitespace, and contents of the output file:
 
 ```text
-### File: spam/eggs.py
+### New file: spam/eggs.py
+### Content:
 def spam():
     return 'eggs'
 ```
