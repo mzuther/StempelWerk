@@ -68,16 +68,18 @@ class StempelWerk:
     COPYRIGHT = f'{ APPLICATION } v{ VERSION }    (c) 2020-2023 { AUTHOR }'
 
     @staticmethod
-    def display_version(verbose = 0):
-        print()
-
-        if verbosity >= 0:
+    def display_version(verbosity=0):
+        if verbosity < -1:
+            print(f'v{ StempelWerk.VERSION }', end=' ')
+        elif verbosity == -1:
+            print()
+            print(f'{ StempelWerk.APPLICATION } v{ StempelWerk.VERSION }')
+            print()
+        else:
+            print()
             print(f'[ { StempelWerk.COPYRIGHT } ]')
             print(f'[ Licensed under the { StempelWerk.LICENSE }           ]')
-        else:
-            print(f'{ StempelWerk.APPLICATION } v{ StempelWerk.VERSION }')
-
-        print()
+            print()
 
     # ---------------------------------------------------------------------
 
@@ -121,9 +123,6 @@ class StempelWerk:
 
 
         def __post_init__(self):
-            self.quiet = self.verbosity < 0
-            self.verbose = self.verbosity > 0
-
             # finalize paths
             self.template_dir = self.finalize_path(
                 self.root_dir, self.template_dir)
@@ -150,10 +149,8 @@ class StempelWerk:
         def print_error(self, message=''):
             StempelWerk._print_error(message)
 
-
         def print_debug(self, message=''):
-            if self.settings.verbose:
-                StempelWerk._print_debug(message)
+            StempelWerk._print_debug(self.settings.verbosity, message)
 
     # ---------------------------------------------------------------------
 
@@ -175,8 +172,9 @@ class StempelWerk:
 
 
     @staticmethod
-    def _print_debug(message=''):
-        StempelWerk._print_context('DEBUG', message)
+    def _print_debug(verbosity, message=''):
+        if verbosity > 0:
+            StempelWerk._print_context('DEBUG', message)
 
 
     def print_error(self, message=''):
@@ -184,8 +182,7 @@ class StempelWerk:
 
 
     def print_debug(self, message=''):
-        if self.settings.verbose:
-            self._print_debug(message)
+        self._print_debug(self.settings.verbosity, message)
 
 
     def load_settings(self, config_file_path, verbosity):
@@ -264,7 +261,7 @@ class StempelWerk:
             self.print_error('No stencils found.')
             self.print_error()
         # list all templates in cache
-        elif self.settings.verbose:
+        elif self.settings.verbosity > 0:
             self.print_debug(' ')
             self.print_debug('Available stencils:')
             self.print_debug(' ')
@@ -342,7 +339,9 @@ class StempelWerk:
         template_filename = os.path.relpath(
             template_filename, self.settings.template_dir)
 
-        if self.settings.quiet:
+        if self.settings.verbosity < -1:
+            print('.', end='')
+        elif self.settings.verbosity == -1:
             print('- {}'.format(template_filename))
         else:
             print('[ {} ]'.format(template_filename))
@@ -374,7 +373,7 @@ class StempelWerk:
         for content_of_single_file in split_contents:
             saved_files += self._render_template_single(content_of_single_file)
 
-        if not self.settings.quiet:
+        if self.settings.verbosity >= 0:
             print()
 
         return (processed_templates, saved_files)
@@ -400,7 +399,7 @@ class StempelWerk:
 
         _, file_extension = os.path.splitext(output_filename)
 
-        if not self.settings.quiet:
+        if self.settings.verbosity >= 0:
             print('--> {}'.format(os.path.relpath(
                 output_filename, self.settings.output_dir)))
 
@@ -479,21 +478,23 @@ class StempelWerk:
             time_per_template = processing_time / processed_templates
             time_per_file = processing_time / saved_files
 
-            if self.settings.quiet:
-                print()
-
             self.print_debug(f'Time per template file: { time_per_template }')
             self.print_debug(f'Time per output file:   { time_per_file }')
             self.print_debug()
 
-            if self.settings.quiet:
+            if self.settings.verbosity < -1:
+                print(f' { processing_time }', end=' ')
+                print(f'({ processed_templates } / { saved_files })')
+            elif self.settings.verbosity == -1:
+                print()
                 print(f'{ processing_time }', end=' ')
                 print(f'({ processed_templates } / { saved_files })')
+                print()
             else:
                 print(f'Total processing time: { processing_time }', end=' ')
                 print(f'({ processed_templates } templates =>', end=' ')
                 print(f'{ saved_files } files)')
-            print()
+                print()
 
 
 if __name__ == '__main__':
