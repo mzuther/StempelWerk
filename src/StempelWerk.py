@@ -61,17 +61,22 @@ class StempelWerk:
     # ---------------------------------------------------------------------
 
     APPLICATION = 'StempelWerk'
-    VERSION = '0.7.3'
+    VERSION = '0.7.4'
 
     AUTHOR = 'Martin Zuther'
     LICENSE = 'BSD 3-Clause License'
     COPYRIGHT = f'{ APPLICATION } v{ VERSION }    (c) 2020-2023 { AUTHOR }'
 
     @staticmethod
-    def display_version():
+    def display_version(verbose = 0):
         print()
-        print(f'[ { StempelWerk.COPYRIGHT } ]')
-        print(f'[ Licensed under the { StempelWerk.LICENSE }           ]')
+
+        if verbosity >= 0:
+            print(f'[ { StempelWerk.COPYRIGHT } ]')
+            print(f'[ Licensed under the { StempelWerk.LICENSE }           ]')
+        else:
+            print(f'{ StempelWerk.APPLICATION } v{ StempelWerk.VERSION }')
+
         print()
 
     # ---------------------------------------------------------------------
@@ -102,7 +107,7 @@ class StempelWerk:
         last_run_file: str = '../.last_run'
         marker_new_file: str = '### New file:'
         marker_content: str = '### Content:'
-        verbose: bool = False
+        verbosity: int = 0
 
         @staticmethod
         def finalize_path(root_dir, original_path):
@@ -116,6 +121,9 @@ class StempelWerk:
 
 
         def __post_init__(self):
+            self.quiet = self.verbosity < 0
+            self.verbose = self.verbosity > 0
+
             # finalize paths
             self.template_dir = self.finalize_path(
                 self.root_dir, self.template_dir)
@@ -149,9 +157,9 @@ class StempelWerk:
 
     # ---------------------------------------------------------------------
 
-    def __init__(self, config_file_path, verbose=False):
-        self.display_version()
-        self._load_settings(config_file_path, verbose)
+    def __init__(self, config_file_path, verbosity=False):
+        self.display_version(verbosity)
+        self.load_settings(config_file_path, verbosity)
 
 
     @staticmethod
@@ -180,7 +188,7 @@ class StempelWerk:
             self._print_debug(message)
 
 
-    def _load_settings(self, config_file_path, verbose):
+    def load_settings(self, config_file_path, verbosity):
         # all relative paths are based on the location of this file
         script_dir = os.path.dirname(os.path.abspath(__file__))
 
@@ -216,7 +224,7 @@ class StempelWerk:
         # add settings from command line (or overwrite if
         # specified in JSON)
         loaded_settings['root_dir'] = root_dir
-        loaded_settings['verbose'] = verbose
+        loaded_settings['verbosity'] = verbosity
 
         # here's where the magic happens: unpack JSON file into class
         self.settings = self.Settings(**loaded_settings)
@@ -334,7 +342,10 @@ class StempelWerk:
         template_filename = os.path.relpath(
             template_filename, self.settings.template_dir)
 
-        print('[ {} ]'.format(template_filename))
+        if self.settings.quiet:
+            print('- {}'.format(template_filename))
+        else:
+            print('[ {} ]'.format(template_filename))
 
         # Jinja2 cannot handle Windows paths
         if os.path.sep != '/':
@@ -362,7 +373,9 @@ class StempelWerk:
 
         for content_of_single_file in split_contents:
             saved_files += self._render_template_single(content_of_single_file)
-        print()
+
+        if not self.settings.quiet:
+            print()
 
         return (processed_templates, saved_files)
 
@@ -387,8 +400,9 @@ class StempelWerk:
 
         _, file_extension = os.path.splitext(output_filename)
 
-        print('--> {}'.format(os.path.relpath(
-            output_filename, self.settings.output_dir)))
+        if not self.settings.quiet:
+            print('--> {}'.format(os.path.relpath(
+                output_filename, self.settings.output_dir)))
 
         # use default line ending of system
         newline = None
@@ -465,13 +479,20 @@ class StempelWerk:
             time_per_template = processing_time / processed_templates
             time_per_file = processing_time / saved_files
 
+            if self.settings.quiet:
+                print()
+
             self.print_debug(f'Time per template file: { time_per_template }')
             self.print_debug(f'Time per output file:   { time_per_file }')
             self.print_debug()
 
-            print(f'Total processing time: { processing_time }', end=' ')
-            print(f'({ processed_templates } templates =>', end=' ')
-            print(f'{ saved_files } files)')
+            if self.settings.quiet:
+                print(f'{ processing_time }', end=' ')
+                print(f'({ processed_templates } / { saved_files })')
+            else:
+                print(f'Total processing time: { processing_time }', end=' ')
+                print(f'({ processed_templates } templates =>', end=' ')
+                print(f'{ saved_files } files)')
             print()
 
 
@@ -501,7 +522,15 @@ if __name__ == '__main__':
     cla = CommandLineArguments()
     process_only_modified = cla.get_option('--only-modified')
     verbose = cla.get_option('--verbose')
+    quiet = cla.get_option('--quiet')
+
+    verbosity = 0
+    if quiet:
+        verbosity = -1
+    elif verbose:
+        verbosity = 1
+
     config_file_path = cla.get_config_path()
 
-    sw = StempelWerk(config_file_path, verbose)
+    sw = StempelWerk(config_file_path, verbosity)
     sw.process_templates(process_only_modified)
