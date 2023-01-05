@@ -357,10 +357,14 @@ class StempelWerk:
         split_contents = content_of_multiple_files.split(
             self.settings.marker_new_file)
 
-        for content_of_single_file in split_contents:
-            self._render_template_single(content_of_single_file)
+        processed_templates = 1
+        saved_files = 0
 
+        for content_of_single_file in split_contents:
+            saved_files += self._render_template_single(content_of_single_file)
         print()
+
+        return (processed_templates, saved_files)
 
 
     def _render_template_single(self, content_of_single_file):
@@ -368,7 +372,7 @@ class StempelWerk:
         # empty (or contains whitespace when a template is not well
         # written)
         if not content_of_single_file.strip():
-            return
+            return 0
 
         # extract path and content of output file
         output_filename, content = content_of_single_file.split(
@@ -405,6 +409,8 @@ class StempelWerk:
                 mode = f.stat().st_mode
                 f.chmod(mode | stat.S_IXUSR)
 
+        return 1
+
 
     def process_templates(self, process_only_modified=False):
         start_of_processing = datetime.datetime.now()
@@ -435,8 +441,13 @@ class StempelWerk:
 
         # only save time of current run when files are processed
         if template_filenames:
+            processed_templates = 0
+            saved_files = 0
+
             for template_filename in template_filenames:
-                self.render_template(template_filename)
+                processed, saved = self.render_template(template_filename)
+                processed_templates += processed
+                saved_files += saved
 
             # save time of current run
             with open(self.settings.last_run_file, mode='w') as f:
@@ -451,7 +462,16 @@ class StempelWerk:
                 f.write(str(start_of_processing_timestamp))
 
             processing_time = datetime.datetime.now() - start_of_processing
-            print(f'Total processing time: { processing_time }')
+            time_per_template = processing_time / processed_templates
+            time_per_file = processing_time / saved_files
+
+            self.print_debug(f'Time per template file: { time_per_template }')
+            self.print_debug(f'Time per output file:   { time_per_file }')
+            self.print_debug()
+
+            print(f'Total processing time: { processing_time }', end=' ')
+            print(f'({ processed_templates } templates =>', end=' ')
+            print(f'{ saved_files } files)')
             print()
 
 
