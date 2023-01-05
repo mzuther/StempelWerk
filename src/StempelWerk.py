@@ -69,9 +69,7 @@ class StempelWerk:
 
     @staticmethod
     def display_version(verbosity=0):
-        if verbosity < -1:
-            print(f'v{ StempelWerk.VERSION }', end=' ')
-        elif verbosity == -1:
+        if verbosity < 0:
             print()
             print(f'{ StempelWerk.APPLICATION } v{ StempelWerk.VERSION }')
             print()
@@ -331,7 +329,8 @@ class StempelWerk:
             self.print_debug()
 
 
-    def render_template(self, template_filename):
+    def render_template(self, template_filename, processed_templates=0,
+                        saved_files=0):
         # create environment automatically
         if not hasattr(self, 'jinja_environment'):
             self.create_environment()
@@ -339,12 +338,17 @@ class StempelWerk:
         template_filename = os.path.relpath(
             template_filename, self.settings.template_dir)
 
+        processed_templates += 1
+
         if self.settings.verbosity < -1:
             print('.', end='')
-        elif self.settings.verbosity == -1:
+
+            if (processed_templates % 40) == 0:
+                print()
+            elif (processed_templates % 10) == 0:
+                print(' ', end='')
+        elif self.settings.verbosity >= -1:
             print('- {}'.format(template_filename))
-        else:
-            print('[ {} ]'.format(template_filename))
 
         # Jinja2 cannot handle Windows paths
         if os.path.sep != '/':
@@ -366,9 +370,6 @@ class StempelWerk:
         # split content of multiple files
         split_contents = content_of_multiple_files.split(
             self.settings.marker_new_file)
-
-        processed_templates = 1
-        saved_files = 0
 
         for content_of_single_file in split_contents:
             saved_files += self._render_template_single(content_of_single_file)
@@ -400,7 +401,7 @@ class StempelWerk:
         _, file_extension = os.path.splitext(output_filename)
 
         if self.settings.verbosity >= 0:
-            print('--> {}'.format(os.path.relpath(
+            print('  - {}'.format(os.path.relpath(
                 output_filename, self.settings.output_dir)))
 
         # use default line ending of system
@@ -454,13 +455,12 @@ class StempelWerk:
 
         # only save time of current run when files are processed
         if template_filenames:
-            processed_templates = 0
-            saved_files = 0
+            processed = 0
+            saved = 0
 
             for template_filename in template_filenames:
-                processed, saved = self.render_template(template_filename)
-                processed_templates += processed
-                saved_files += saved
+                processed, saved = self.render_template(template_filename,
+                                                        processed, saved)
 
             # save time of current run
             with open(self.settings.last_run_file, mode='w') as f:
@@ -475,25 +475,24 @@ class StempelWerk:
                 f.write(str(start_of_processing_timestamp))
 
             processing_time = datetime.datetime.now() - start_of_processing
-            time_per_template = processing_time / processed_templates
-            time_per_file = processing_time / saved_files
+            time_per_template = processing_time / processed
+            time_per_file = processing_time / saved
 
             self.print_debug(f'Time per template file: { time_per_template }')
             self.print_debug(f'Time per output file:   { time_per_file }')
             self.print_debug()
 
-            if self.settings.verbosity < -1:
-                print(f' { processing_time }', end=' ')
-                print(f'({ processed_templates } / { saved_files })')
-            elif self.settings.verbosity == -1:
+            if self.settings.verbosity < 0:
                 print()
-                print(f'{ processing_time }', end=' ')
-                print(f'({ processed_templates } / { saved_files })')
+
+                if self.settings.verbosity < -1 and (processed % 40) != 0:
+                    print()
+
+                print(f'{ processing_time } ({ processed } / { saved })')
                 print()
             else:
                 print(f'Total processing time: { processing_time }', end=' ')
-                print(f'({ processed_templates } templates =>', end=' ')
-                print(f'{ saved_files } files)')
+                print(f'({ processed } templates => { saved } files)')
                 print()
 
 
@@ -524,9 +523,12 @@ if __name__ == '__main__':
     process_only_modified = cla.get_option('--only-modified')
     verbose = cla.get_option('--verbose')
     quiet = cla.get_option('--quiet')
+    ultraquiet = cla.get_option('--ultraquiet')
 
     verbosity = 0
-    if quiet:
+    if ultraquiet:
+        verbosity = -2
+    elif quiet:
         verbosity = -1
     elif verbose:
         verbosity = 1

@@ -59,7 +59,7 @@ python3 -m pip install --user --upgrade "Jinja2>=2.1.0"
 Generate your code from templates by running the following command:
 
 ```bash
-python3 ./src/StempelWerk.py [--only-modified] [--quiet | --verbose] PATH_TO_SETTINGS_FILE
+python3 ./src/StempelWerk.py [--only-modified] [--ultraquiet | --quiet | --verbose] PATH_TO_SETTINGS_FILE
 ```
 
 Jinja is run with default options, with the exception that
@@ -81,10 +81,10 @@ times in a weird manner, and changes to master templates (called
 a case you can simply use StempelWerk without the `--only-modified`
 argument._
 
-### Command line argument `--quiet`
+### Command line argument `--ultraquiet` and `--quiet`
 
-Adding this command line argument will display less information.
-Great when working on slow consoles / VMs.
+Adding one of these command line arguments will display less
+information. Great when working on slow consoles / VMs.
 
 ### Command line argument `--verbose`
 
