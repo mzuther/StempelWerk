@@ -362,7 +362,22 @@ class StempelWerk:
         except (jinja2.exceptions.TemplateSyntaxError,
                 jinja2.exceptions.TemplateAssertionError) as err:
             self.print_error()
+
+            if self.settings.verbosity < -1:
+                self.print_error()
+                self.print_error(f'in file "{ template_filename }"')
+
             self.print_error(f'{ err.message } (line { err.lineno })')
+            self.print_error()
+
+            raise(err)
+
+        except Exception as err:
+            if self.settings.verbosity < -1:
+                self.print_error()
+                self.print_error()
+                self.print_error(f'in file "{ template_filename }"')
+
             self.print_error()
 
             raise(err)
