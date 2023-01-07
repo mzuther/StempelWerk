@@ -62,7 +62,7 @@ class StempelWerk:
     # ---------------------------------------------------------------------
 
     APPLICATION = 'StempelWerk'
-    VERSION = '0.7.5'
+    VERSION = '0.7.6'
     AUTHOR = 'Martin Zuther'
     DESCRIPTION = 'Automatic code generation from Jinja2 templates.'
     LICENSE = 'BSD 3-Clause License'
@@ -279,14 +279,16 @@ class StempelWerk:
 
 
     def load_settings(self, config_file_path, verbosity, process_only_modified):
-        # all relative paths are based on the location of this file
+        # all relative paths are based on the location of this file ...
         script_dir = os.path.dirname(os.path.abspath(__file__))
 
         root_dir = os.path.normpath(
             os.path.expanduser(script_dir))
 
+        # ... except for the path of the configuration file, which is
+        # relative to the current working directory
         config_file_path = self.Settings.finalize_path(
-            root_dir, config_file_path)
+            '', config_file_path)
 
         try:
             with open(config_file_path) as f:

@@ -59,7 +59,7 @@ python3 -m pip install --user --upgrade "Jinja2>=2.1.0"
 Generate your code from templates by running the following command:
 
 ```bash
-python3 ./src/StempelWerk.py [--only-modified] [--ultraquiet | --quiet | --verbose] PATH_TO_SETTINGS_FILE
+python3 ./src/StempelWerk.py [--only-modified] [--ultraquiet | --quiet | --verbose] CONFIG_FILE_PATH
 ```
 
 Jinja is run with default options, with the exception that
