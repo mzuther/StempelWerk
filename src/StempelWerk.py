@@ -62,7 +62,7 @@ class StempelWerk:
     # ---------------------------------------------------------------------
 
     APPLICATION = 'StempelWerk'
-    VERSION = '0.7.4'
+    VERSION = '0.7.5'
 
     AUTHOR = 'Martin Zuther'
     LICENSE = 'BSD 3-Clause License'
@@ -79,6 +79,33 @@ class StempelWerk:
             print(f'[ { StempelWerk.COPYRIGHT } ]')
             print(f'[ Licensed under the { StempelWerk.LICENSE }           ]')
             print()
+
+    # ---------------------------------------------------------------------
+
+    @staticmethod
+    def _print_context(context, message):
+        if message:
+            message = f'{ context }: { message }'
+        print(message)
+
+
+    @staticmethod
+    def _print_error(message=''):
+        StempelWerk._print_context('ERROR', message)
+
+
+    @staticmethod
+    def _print_debug(verbosity, message=''):
+        if verbosity > 0:
+            StempelWerk._print_context('DEBUG', message)
+
+
+    def print_error(self, message=''):
+        self._print_error(message)
+
+
+    def print_debug(self, message=''):
+        self._print_debug(self.settings.verbosity, message)
 
     # ---------------------------------------------------------------------
 
@@ -137,6 +164,30 @@ class StempelWerk:
 
     # ---------------------------------------------------------------------
 
+    # extremely primitive command line parsing
+    class CommandLineArguments:
+        def __init__(self, command_line_arguments):
+            self.cla = copy.copy(command_line_arguments)
+            del self.cla[0]
+
+        def get_option(self, option):
+            if option in self.cla:
+                self.cla.remove(option)
+                return True
+            return False
+
+        def get_config_path(self):
+            if len(self.cla) != 1:
+                StempelWerk._print_error()
+                StempelWerk._print_error('Please provide JSON settings file as'
+                                         'parameter.')
+                StempelWerk._print_error()
+                exit(1)
+                # highly sophisticated command line parsing
+            return self.cla.pop()
+
+    # ---------------------------------------------------------------------
+
     # Template class for customizing the Jinja environment
     class CustomCodeTemplate:  # noqa: E301
         def __init__(self, copy_of_settings):
@@ -155,35 +206,40 @@ class StempelWerk:
 
     # ---------------------------------------------------------------------
 
-    def __init__(self, config_file_path, verbosity, process_only_modified):
-        self.display_version(verbosity)
-        self.load_settings(config_file_path, verbosity, process_only_modified)
+    def __init__(self, command_line_arguments):
+        cla = self.parse_command_line(command_line_arguments)
+
+        self.display_version(cla['verbosity'])
+
+        self.load_settings(
+            cla['config_file_path'],
+            cla['verbosity'],
+            cla['process_only_modified'])
 
 
-    @staticmethod
-    def _print_context(context, message):
-        if message:
-            message = f'{ context }: { message }'
-        print(message)
+    def parse_command_line(self, command_line_arguments):
+        cla = self.CommandLineArguments(command_line_arguments)
 
+        process_only_modified = cla.get_option('--only-modified')
+        verbose = cla.get_option('--verbose')
+        quiet = cla.get_option('--quiet')
+        ultraquiet = cla.get_option('--ultraquiet')
 
-    @staticmethod
-    def _print_error(message=''):
-        StempelWerk._print_context('ERROR', message)
+        verbosity = 0
+        if ultraquiet:
+            verbosity = -2
+        elif quiet:
+            verbosity = -1
+        elif verbose:
+            verbosity = 1
 
+        config_file_path = cla.get_config_path()
 
-    @staticmethod
-    def _print_debug(verbosity, message=''):
-        if verbosity > 0:
-            StempelWerk._print_context('DEBUG', message)
-
-
-    def print_error(self, message=''):
-        self._print_error(message)
-
-
-    def print_debug(self, message=''):
-        self._print_debug(self.settings.verbosity, message)
+        return {
+            'config_file_path': config_file_path,
+            'verbosity': verbosity,
+            'process_only_modified': process_only_modified,
+        }
 
 
     def load_settings(self, config_file_path, verbosity, process_only_modified):
@@ -522,44 +578,5 @@ class StempelWerk:
 
 
 if __name__ == '__main__':
-    # extremely primitive command line parsing
-    class CommandLineArguments:
-        def __init__(self):
-            self.cla = copy.copy(sys.argv)
-            del self.cla[0]
-
-        def get_option(self, option):
-            if option in self.cla:
-                self.cla.remove(option)
-                return True
-            return False
-
-        def get_config_path(self):
-            if len(self.cla) != 1:
-                StempelWerk._print_error()
-                StempelWerk._print_error('Please provide JSON settings file as'
-                                         'parameter.')
-                StempelWerk._print_error()
-                exit(1)
-                # highly sophisticated command line parsing
-            return self.cla.pop()
-
-
-    cla = CommandLineArguments()
-    process_only_modified = cla.get_option('--only-modified')
-    verbose = cla.get_option('--verbose')
-    quiet = cla.get_option('--quiet')
-    ultraquiet = cla.get_option('--ultraquiet')
-
-    verbosity = 0
-    if ultraquiet:
-        verbosity = -2
-    elif quiet:
-        verbosity = -1
-    elif verbose:
-        verbosity = 1
-
-    config_file_path = cla.get_config_path()
-
-    sw = StempelWerk(config_file_path, verbosity, process_only_modified)
+    sw = StempelWerk(sys.argv)
     sw.process_templates()
