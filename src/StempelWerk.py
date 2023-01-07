@@ -97,6 +97,8 @@ class StempelWerk:
         stencil_dir_name: str
         included_file_extensions: list
         # ----------------------------------------
+        verbosity: int = 0
+        # ----------------------------------------
         jinja_options: list = dataclasses.field(
             default_factory=dict)
         jinja_extensions: list = dataclasses.field(
@@ -107,7 +109,6 @@ class StempelWerk:
         last_run_file: str = '../.last_run'
         marker_new_file: str = '### New file:'
         marker_content: str = '### Content:'
-        verbosity: int = 0
 
         @staticmethod
         def finalize_path(root_dir, original_path):
@@ -209,7 +210,8 @@ class StempelWerk:
             exit(1)
 
         except TypeError as err:
-            self.print_error(f'Did you provide all settings in "{ config_file_path }"?')
+            self.print_error('Did you provide all settings in'
+                             f'"{ config_file_path }"?')
             self.print_error(f'{ err }')
             self.print_error()
 
@@ -268,7 +270,8 @@ class StempelWerk:
                 self.print_debug(f'  - { stencil_filename }')
 
             self.print_debug(' ')
-            self.print_debug('  Use relative paths to access templates in sub-directories')
+            self.print_debug('  Use relative paths to access templates in'
+                             'sub-directories')
             self.print_debug('  (https://stackoverflow.com/a/9644828).')
             self.print_debug(' ')
 
@@ -503,11 +506,11 @@ class StempelWerk:
                 if self.settings.verbosity < -1 and (processed % 40) != 0:
                     print()
 
-                print(f'{ processing_time } ({ processed } / { saved })')
+                print(f'{ processed } => { saved } in { processing_time }')
                 print()
             else:
-                print(f'Total processing time: { processing_time }', end=' ')
-                print(f'({ processed } templates => { saved } files)')
+                print(f'TOTAL: { processed } templates => { saved } files',
+                      f'in { processing_time }')
                 print()
 
 
@@ -527,7 +530,8 @@ if __name__ == '__main__':
         def get_config_path(self):
             if len(self.cla) != 1:
                 StempelWerk._print_error()
-                StempelWerk._print_error('Please provide JSON settings file as parameter.')
+                StempelWerk._print_error('Please provide JSON settings file as'
+                                         'parameter.')
                 StempelWerk._print_error()
                 exit(1)
                 # highly sophisticated command line parsing
