@@ -63,29 +63,47 @@ class StempelWerk:
 
     APPLICATION = 'StempelWerk'
     VERSION = '0.7.5'
-
     AUTHOR = 'Martin Zuther'
+    DESCRIPTION = 'Automatic code generation from Jinja2 templates.'
     LICENSE = 'BSD 3-Clause License'
-    COPYRIGHT = f'{ APPLICATION } v{ VERSION }    (c) 2020-2023 { AUTHOR }'
+
+    APPLICATION_VERSION = f'{APPLICATION} v{VERSION}'
+    COPYRIGHT = f'{APPLICATION_VERSION:20} (c) 2020-2023 {AUTHOR}'
 
     @staticmethod
-    def display_version(verbosity=0):
+    def format_version(verbosity=0):
         if verbosity < 0:
-            print()
-            print(f'{ StempelWerk.APPLICATION } v{ StempelWerk.VERSION }')
-            print()
+            return StempelWerk.APPLICATION_VERSION
         else:
-            print()
-            print(f'[ { StempelWerk.COPYRIGHT } ]')
-            print(f'[ Licensed under the { StempelWerk.LICENSE }           ]')
-            print()
+            return (
+                StempelWerk.COPYRIGHT + '\n' +
+                f'Licensed under the {StempelWerk.LICENSE}'
+            )
+
+    @staticmethod
+    def format_description(verbosity=0):
+        return (
+            StempelWerk.format_version(verbosity) + '\n\n' +
+            StempelWerk.DESCRIPTION
+        )
+
+    def _display_version(self, verbosity=0):
+        version_message = self.format_version(verbosity)
+
+        print()
+        if verbosity < 0:
+            print(version_message)
+        else:
+            for line in version_message.split('\n'):
+                print(f'[ {line:<48} ]')
+        print()
 
     # ---------------------------------------------------------------------
 
     @staticmethod
     def _print_context(context, message):
         if message:
-            message = f'{ context }: { message }'
+            message = f'{context}: {message}'
         print(message)
 
 
@@ -209,7 +227,7 @@ class StempelWerk:
     def __init__(self, command_line_arguments):
         cla = self.parse_command_line(command_line_arguments)
 
-        self.display_version(cla['verbosity'])
+        self._display_version(cla['verbosity'])
 
         self.load_settings(
             cla['config_file_path'],
@@ -257,20 +275,20 @@ class StempelWerk:
                 loaded_settings = json.load(f)
 
         except FileNotFoundError:
-            self.print_error(f'File "{ config_file_path }" not found.')
+            self.print_error(f'File "{config_file_path}" not found.')
             self.print_error()
             exit(1)
 
         except json.decoder.JSONDecodeError as err:
-            self.print_error(f'File "{ config_file_path }" is broken:')
-            self.print_error(f'{ err }')
+            self.print_error(f'File "{config_file_path}" is broken:')
+            self.print_error(f'{err}')
             self.print_error()
             exit(1)
 
         except TypeError as err:
             self.print_error('Did you provide all settings in'
-                             f'"{ config_file_path }"?')
-            self.print_error(f'{ err }')
+                             f'"{config_file_path}"?')
+            self.print_error(f'{err}')
             self.print_error()
 
             # print traceback to help with debugging
@@ -326,7 +344,7 @@ class StempelWerk:
             self.print_debug(' ')
 
             for stencil_filename in stencil_filenames:
-                self.print_debug(f'  - { stencil_filename }')
+                self.print_debug(f'  - {stencil_filename}')
 
             self.print_debug(' ')
             self.print_debug('  Use relative paths to access templates in'
@@ -349,7 +367,7 @@ class StempelWerk:
             self.print_debug(' ')
 
             for extension in self.settings.jinja_extensions:
-                self.print_debug(f'  - { extension }')
+                self.print_debug(f'  - {extension}')
                 self.jinja_environment.add_extension(extension)
 
             self.print_debug(' ')
@@ -362,7 +380,7 @@ class StempelWerk:
             self.print_debug(' ')
 
             for module_name in self.settings.custom_modules:
-                self.print_debug(f'  [ { module_name } ]')
+                self.print_debug(f'  [ {module_name} ]')
 
                 # import code as module
                 module_spec = importlib.util.find_spec(
@@ -427,9 +445,9 @@ class StempelWerk:
 
             if self.settings.verbosity < -1:
                 self.print_error()
-                self.print_error(f'in file "{ template_filename }"')
+                self.print_error(f'in file "{template_filename}"')
 
-            self.print_error(f'{ err.message } (line { err.lineno })')
+            self.print_error(f'{err.message} (line {err.lineno})')
             self.print_error()
 
             raise(err)
@@ -438,7 +456,7 @@ class StempelWerk:
             if self.settings.verbosity < -1:
                 self.print_error()
                 self.print_error()
-                self.print_error(f'in file "{ template_filename }"')
+                self.print_error(f'in file "{template_filename}"')
 
             self.print_error()
 
@@ -559,8 +577,8 @@ class StempelWerk:
             time_per_template = processing_time / processed
             time_per_file = processing_time / saved
 
-            self.print_debug(f'Time per template file: { time_per_template }')
-            self.print_debug(f'Time per output file:   { time_per_file }')
+            self.print_debug(f'Time per template file: {time_per_template}')
+            self.print_debug(f'Time per output file:   {time_per_file}')
             self.print_debug()
 
             if self.settings.verbosity < 0:
@@ -569,11 +587,11 @@ class StempelWerk:
                 if self.settings.verbosity < -1 and (processed % 40) != 0:
                     print()
 
-                print(f'{ processed } => { saved } in { processing_time }')
+                print(f'{processed} => {saved} in {processing_time}')
                 print()
             else:
-                print(f'TOTAL: { processed } templates => { saved } files',
-                      f'in { processing_time }')
+                print(f'TOTAL: {processed} templates => {saved} files',
+                      f'in {processing_time}')
                 print()
 
 
