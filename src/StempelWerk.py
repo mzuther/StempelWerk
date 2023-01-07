@@ -41,6 +41,7 @@
 #
 # ----------------------------------------------------------------------------
 
+import argparse
 import copy
 import dataclasses
 import datetime
@@ -97,6 +98,7 @@ class StempelWerk:
         stencil_dir_name: str
         included_file_extensions: list
         # ----------------------------------------
+        process_only_modified: bool
         verbosity: int = 0
         # ----------------------------------------
         jinja_options: list = dataclasses.field(
@@ -153,9 +155,9 @@ class StempelWerk:
 
     # ---------------------------------------------------------------------
 
-    def __init__(self, config_file_path, verbosity=False):
+    def __init__(self, config_file_path, verbosity, process_only_modified):
         self.display_version(verbosity)
-        self.load_settings(config_file_path, verbosity)
+        self.load_settings(config_file_path, verbosity, process_only_modified)
 
 
     @staticmethod
@@ -184,7 +186,7 @@ class StempelWerk:
         self._print_debug(self.settings.verbosity, message)
 
 
-    def load_settings(self, config_file_path, verbosity):
+    def load_settings(self, config_file_path, verbosity, process_only_modified):
         # all relative paths are based on the location of this file
         script_dir = os.path.dirname(os.path.abspath(__file__))
 
@@ -222,6 +224,7 @@ class StempelWerk:
         # specified in JSON)
         loaded_settings['root_dir'] = root_dir
         loaded_settings['verbosity'] = verbosity
+        loaded_settings['process_only_modified'] = process_only_modified
 
         # here's where the magic happens: unpack JSON file into class
         self.settings = self.Settings(**loaded_settings)
@@ -390,7 +393,7 @@ class StempelWerk:
             self.settings.marker_new_file)
 
         for content_of_single_file in split_contents:
-            saved_files += self._render_template_single(content_of_single_file)
+            saved_files += self._render_to_single_file(content_of_single_file)
 
         if self.settings.verbosity >= 0:
             print()
@@ -398,7 +401,7 @@ class StempelWerk:
         return (processed_templates, saved_files)
 
 
-    def _render_template_single(self, content_of_single_file):
+    def _render_to_single_file(self, content_of_single_file):
         # content starts with "marker_new_file", so first string is
         # empty (or contains whitespace when a template is not well
         # written)
@@ -444,7 +447,11 @@ class StempelWerk:
         return 1
 
 
-    def process_templates(self, process_only_modified=False):
+    def process_templates(self, process_only_modified=None):
+        # use default if argument was not specified
+        if process_only_modified is None:
+            process_only_modified = self.settings.process_only_modified
+
         start_of_processing = datetime.datetime.now()
 
         dirwalk_inclusions = {
@@ -554,5 +561,5 @@ if __name__ == '__main__':
 
     config_file_path = cla.get_config_path()
 
-    sw = StempelWerk(config_file_path, verbosity)
-    sw.process_templates(process_only_modified)
+    sw = StempelWerk(config_file_path, verbosity, process_only_modified)
+    sw.process_templates()
