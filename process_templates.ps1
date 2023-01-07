@@ -1,2 +1,2 @@
 # process all templates
-python -m src.StempelWerk "../settings_example.json"
+& "$PSScriptRoot\stempelwerk.ps1" "../settings_example.json"

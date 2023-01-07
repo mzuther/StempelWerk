@@ -1,2 +1,2 @@
 # process only templates modified since the last run
-python -m src.StempelWerk --only-modified "../settings_example.json"
+& "$PSScriptRoot\stempelwerk.ps1" --only-modified "../settings_example.json"
