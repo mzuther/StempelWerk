@@ -22,22 +22,23 @@ StempelWerk has been created to prevent copy-and-paste errors and
 reduce tedious manual work. This can lead to a tremendous saving in
 development time and cost.
 
-_I have used StempelWerk in a professional project to generate most
-code (SQL) and even part of the documentation (Markdown). After nine
-months, I had saved over 100 hours of working time! In this figure,
-the overhead of writing stencils and moving existing code to templates
-has been taken into account, whereas the possible prevention of
-copy-and-paste bugs has not._
-
-Here are the main "selling points" of StempelWerk:
+Here are some more "selling points":
 
 - the template system is extremely lightweight and easy to understand
-- it can be introduced gradually and undertake quite complex tasks
-- it may be removed at any time by simply removing the template files
-  and editing the code by hand
-- Jinja's [Template Designer
+- templates can be introduced gradually, but also undertake complex
+  tasks
+- StempelWerk may be removed at any time - simply delete the
+  respective template file and edit the code by hand
+- Jinja is very mature and its [Template Designer
   Documentation](https://jinja.palletsprojects.com/en/3.1.x/templates/)
-  is of excellent quality
+  of excellent quality
+
+### Case study
+
+I have used StempelWerk in a professional project to generate most
+code (SQL) and even part of the documentation (Markdown). I offset
+time gained against time spent: after nine months, I had saved over
+100 hours of working time!
 
 ## Installation
 
@@ -59,11 +60,14 @@ python3 -m pip install --user --upgrade "Jinja2>=2.1.0"
 Generate your code from templates by running the following command:
 
 ```bash
-python3 ./src/StempelWerk.py [--only-modified] [--ultraquiet | --quiet | --verbose] CONFIG_FILE_PATH
+python3 -m src.StempelWerk [ARGUMENTS] CONFIG_FILE_PATH
 ```
 
-Jinja is run with default options, with the exception that
-`trim_blocks` is set to `True`.
+For help, simply call:
+
+```bash
+python3 -m src.StempelWerk --help
+```
 
 ### Command line argument `--only-modified`
 
@@ -72,14 +76,16 @@ specified template directory.
 
 When you use the command line argument `--only-modified`, however,
 StempelWerk tries to process only the template files that have changed
-since the last successful run. Use of this command line argument is
-highly discouraged in CI/CD pipelines!
+since the last successful run.
 
 _This logic is not infallible: some file systems update modification
 times in a weird manner, and changes to master templates (called
 "stencils" in StempelWerk) are currently not handled. However, in such
 a case you can simply use StempelWerk without the `--only-modified`
 argument._
+
+_Use of this command line argument is highly discouraged in CI/CD
+pipelines!_
 
 ### Command line argument `--ultraquiet` and `--quiet`
 
@@ -93,33 +99,42 @@ useful for debugging such as loaded templates and added extensions.
 
 ## Settings
 
-Settings for StempelWerk are provided in the form of a JSON file. The
-path to this file is specified as command line argument.
+Settings for StempelWerk are provided in the form of a JSON file (see
+`settings_example.json` for an example) . The path to this file is
+specified as command line argument and is relative to the current
+working directory.
 
-_All paths should be specified relative to the path of
-`StempelWerk.py`. For cross-platform compatibility, I recommend to use
-a forward slash as path separator on all systems:
-`/spam/eggs`. StempelWerk will handle all path separator conversions
-for you._
+_For cross-platform compatibility, I recommend to use a forward slash
+as path separator on all systems: `/spam/eggs`. StempelWerk will
+handle all path separator conversions for you._
+
+### `root_dir`
+
+Path to root directory. All other paths are relative to this
+directory. This keeps setting up paths simple, and allows you to call
+StempelWerk from anywhere.
 
 ### `template_dir`
 
-Path to root of template directory. This directory is scanned
-recursively and all files with an extension matching the setting
-`included_file_extensions` will be rendered using Jinja.
+Path to root of template directory, relative to `root_dir`. This
+directory is scanned recursively, and all files with an extension
+matching the setting `included_file_extensions` will be rendered using
+Jinja.
 
 ### `output_dir`
 
-Path to root of output directory. Rendered files will be saved in this
-directory.
+Path to root of output directory, relative to `root_dir`. Rendered
+files will be saved in this directory.
 
 ### `stencil_dir_name`
 
-Name of the directory that contains stencils (without slashes /
-backslashes). There may be one or more directories with this name, and
-all of them must be located somewhere under `template_dir`. This
-ensures that stencils are loaded into Jinja and can be referenced from
-templates at runtime.
+Name of the directory that contains stencils (master templates). The
+name must not contain slashes or backslashes.
+
+There may be one or more directories with this name, and all of them
+must be located somewhere under `template_dir`. This ensures that
+stencils are loaded into Jinja and can be referenced from templates at
+runtime.
 
 In addition, files in directories matching this name will not be
 rendered.
@@ -135,9 +150,8 @@ are considered to be templates and will be passed to Jinja.
 **Default value: {}**
 
 Dictionary containing [initialization
-parameters](https://jinja.palletsprojects.com/en/3.1.x/api/#jinja2.Environment)
-for the Jinja environment. Note: assigning a value to the key `loader`
-does not make sense and will also break StempelWerk.
+parameters](https://jinja.palletsprojects.com/api/#jinja2.Environment)
+for the Jinja environment.
 
 _Most default values work well for me, but I **always** enable
 [`trim_blocks`](https://jinja.palletsprojects.com/en/3.1.x/templates/#whitespace-control):_
@@ -159,8 +173,8 @@ environment.
 
 **Default value: []**
 
-List with Python modules containing a `CustomCode` class that inherits
-`StempelWerk.CustomCodeTemplate`.
+List of Python modules, each containing a `CustomCode` class that
+inherits `StempelWerk.CustomCodeTemplate`.
 
 After creating the Jinja environment and loading Jinja extensions,
 each module will be imported, an instance of `CustomCode` created and
@@ -175,10 +189,10 @@ all of your files and doing other mischief, so please be careful!_
 
 ### `last_run_file`
 
-**Default value: `../.last_run`**
+**Default value: `.last_run`**
 
 Path to the file in which the time of the last successful run will be
-stored.
+stored, relative to `root_dir`.
 
 _If your operating system handles temporary directories correctly
 (Windows does not), you could store this file in one of them
@@ -205,8 +219,8 @@ def spam():
 ```
 
 _Good file separators strike a balance between performance (brevity)
-and reliability (uniqueness). Please see the template examples to see
-them in action._
+and reliability (uniqueness). Please see the example files to see them
+in action._
 
 ## Code of conduct
 

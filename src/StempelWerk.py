@@ -62,7 +62,7 @@ class StempelWerk:
     # ---------------------------------------------------------------------
 
     APPLICATION = 'StempelWerk'
-    VERSION = '0.7.6'
+    VERSION = '0.7.7'
     AUTHOR = 'Martin Zuther'
     DESCRIPTION = 'Automatic code generation from Jinja2 templates.'
     LICENSE = 'BSD 3-Clause License'
@@ -153,7 +153,7 @@ class StempelWerk:
         custom_modules: list = dataclasses.field(
             default_factory=list)
         # ----------------------------------------
-        last_run_file: str = '../.last_run'
+        last_run_file: str = '.last_run'
         marker_new_file: str = '### New file:'
         marker_content: str = '### Content:'
 
@@ -162,16 +162,22 @@ class StempelWerk:
             original_path = original_path.strip()
 
             new_path = os.path.join(root_dir, original_path)
-            new_path = os.path.expanduser(new_path)
             new_path = os.path.normpath(new_path)
 
             return new_path
 
 
         def __post_init__(self):
-            # finalize paths
+            # root directory is relative to the location of this file
+            script_dir = os.path.dirname(os.path.abspath(__file__))
+
+            self.root_dir = self.finalize_path(
+                script_dir, self.root_dir)
+
+            # all other paths are relative to the root directory
             self.template_dir = self.finalize_path(
-                self.root_dir, self.template_dir)
+                self.root_dir,
+                self.template_dir)
 
             # FIXME: create output folder
             self.output_dir = self.finalize_path(
@@ -279,12 +285,6 @@ class StempelWerk:
 
 
     def load_settings(self, config_file_path, verbosity, process_only_modified):
-        # all relative paths are based on the location of this file ...
-        script_dir = os.path.dirname(os.path.abspath(__file__))
-
-        root_dir = os.path.normpath(
-            os.path.expanduser(script_dir))
-
         # ... except for the path of the configuration file, which is
         # relative to the current working directory
         config_file_path = self.Settings.finalize_path(
@@ -316,7 +316,6 @@ class StempelWerk:
 
         # add settings from command line (or overwrite if
         # specified in JSON)
-        loaded_settings['root_dir'] = root_dir
         loaded_settings['verbosity'] = verbosity
         loaded_settings['process_only_modified'] = process_only_modified
 
