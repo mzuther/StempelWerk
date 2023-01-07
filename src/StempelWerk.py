@@ -182,30 +182,6 @@ class StempelWerk:
 
     # ---------------------------------------------------------------------
 
-    # extremely primitive command line parsing
-    class CommandLineArguments:
-        def __init__(self, command_line_arguments):
-            self.cla = copy.copy(command_line_arguments)
-            del self.cla[0]
-
-        def get_option(self, option):
-            if option in self.cla:
-                self.cla.remove(option)
-                return True
-            return False
-
-        def get_config_path(self):
-            if len(self.cla) != 1:
-                StempelWerk._print_error()
-                StempelWerk._print_error('Please provide JSON settings file as'
-                                         'parameter.')
-                StempelWerk._print_error()
-                exit(1)
-                # highly sophisticated command line parsing
-            return self.cla.pop()
-
-    # ---------------------------------------------------------------------
-
     # Template class for customizing the Jinja environment
     class CustomCodeTemplate:  # noqa: E301
         def __init__(self, copy_of_settings):
@@ -225,39 +201,81 @@ class StempelWerk:
     # ---------------------------------------------------------------------
 
     def __init__(self, command_line_arguments):
-        cla = self.parse_command_line(command_line_arguments)
+        args = self.parse_command_line(command_line_arguments)
 
-        self._display_version(cla['verbosity'])
+        self._display_version(args.verbosity)
 
         self.load_settings(
-            cla['config_file_path'],
-            cla['verbosity'],
-            cla['process_only_modified'])
+            args.config_file_path,
+            args.verbosity,
+            args.process_only_modified)
 
 
     def parse_command_line(self, command_line_arguments):
-        cla = self.CommandLineArguments(command_line_arguments)
+        class HelpfulArgumentParser(argparse.ArgumentParser):
+            def exit(self, status=0, message=None):
+                if status:
+                    # display help on errors without showing usage message twice
+                    help_message = self.format_help()
+                    help_message = help_message.replace(self.format_usage(), '')
+                    print(help_message, file=sys.stderr)
 
-        process_only_modified = cla.get_option('--only-modified')
-        verbose = cla.get_option('--verbose')
-        quiet = cla.get_option('--quiet')
-        ultraquiet = cla.get_option('--ultraquiet')
+                # resume default processing
+                super().exit(status, message)
 
-        verbosity = 0
-        if ultraquiet:
-            verbosity = -2
-        elif quiet:
-            verbosity = -1
-        elif verbose:
-            verbosity = 1
+        parser = HelpfulArgumentParser(
+            description=self.format_description(),
+            formatter_class=argparse.RawDescriptionHelpFormatter)
 
-        config_file_path = cla.get_config_path()
+        parser.add_argument(
+            '-V',
+            '--version',
+            action='version',
+            version=self.APPLICATION_VERSION)
 
-        return {
-            'config_file_path': config_file_path,
-            'verbosity': verbosity,
-            'process_only_modified': process_only_modified,
-        }
+        parser.add_argument(
+            '-m',
+            '--only-modified',
+            action='store_true',
+            help='only process modified templates',
+            dest='process_only_modified')
+
+        verbosity_group = parser.add_mutually_exclusive_group()
+
+        verbosity_group.add_argument(
+            '-qq',
+            '--ultraquiet',
+            action='store_const',
+            const=-2,
+            default=0,
+            help='display minimal output',
+            dest='verbosity')
+
+        verbosity_group.add_argument(
+            '-q',
+            '--quiet',
+            action='store_const',
+            const=-1,
+            default=0,
+            help='display less output',
+            dest='verbosity')
+
+        verbosity_group.add_argument(
+            '-v',
+            '--verbose',
+            action='store_const',
+            const=1,
+            default=0,
+            help='display more output and include debug information',
+            dest='verbosity')
+
+        parser.add_argument(
+            'config_file_path',
+            help='path to JSON file containing configuration',
+            metavar='CONFIG_FILE')
+
+        args = parser.parse_args()
+        return args
 
 
     def load_settings(self, config_file_path, verbosity, process_only_modified):
