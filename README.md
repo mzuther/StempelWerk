@@ -101,7 +101,7 @@ useful for debugging such as loaded templates and added extensions.
 
 Settings for StempelWerk are provided in the form of a JSON file (see
 `settings_example.json` for an example) . The path to this file is
-specified as command line argument and is relative to the current
+specified as command line argument, and is relative to the current
 working directory.
 
 _For cross-platform compatibility, I recommend to use a forward slash

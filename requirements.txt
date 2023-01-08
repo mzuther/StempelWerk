@@ -1,0 +1,2 @@
+# "namespace()" was introduced in v2.1.0
+Jinja2>=2.1.0
