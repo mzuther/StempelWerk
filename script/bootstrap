@@ -22,12 +22,13 @@ if ! ("$PYTHON_PATH" --version | grep "^Python 3" > /dev/null); then
 fi
 
 
-if [ -e "./.venv" ]; then
+if [ -d "./.venv" ]; then
     echo "  Environment has already been set up."
-    echo "  Exiting."
+    echo "  Delete directory \"./.venv\" to start from scratch."
     echo
     exit 0
 fi
+
 
 echo "  Creating new environment ..."
 
@@ -42,10 +43,11 @@ if [ -f "requirements.txt" ]; then
     pip install -r "requirements.txt"
 
     echo
-    echo '  Storing installed versions in file "VERSIONS" ...'
+    echo '  Storing installed versions ...'
 
     pip freeze > "VERSIONS"
 fi
+
 
 echo "  Done."
 echo
