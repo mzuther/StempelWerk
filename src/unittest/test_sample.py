@@ -2,7 +2,7 @@ import pytest
 
 
 def inc(x):
-    return x + 1.0
+    return x + 1
 
 
 class TestSample:
