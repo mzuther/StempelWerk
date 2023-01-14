@@ -280,7 +280,8 @@ class StempelWerk:
             help='path to JSON file containing configuration',
             metavar='CONFIG_FILE')
 
-        args = parser.parse_args()
+        cla_without_scriptname = command_line_arguments[1:]
+        args = parser.parse_args(cla_without_scriptname)
         return args
 
 
