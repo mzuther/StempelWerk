@@ -1,9 +1,8 @@
 #! /bin/bash
 
 echo
-cd ./src/unittest/ || exit 1
 
-pytest "$@"
+python -m pytest "$@"
 EXIT_CODE=$?
 
 echo
