@@ -2,13 +2,17 @@ import pytest
 
 
 def inc(x):
-    return x + 1
+    return x + 1.0
 
 
 class TestSample:
     def test_increment_integer(self):
-        assert inc(3) == 4
+        result = inc(3)
+        assert result == 4
+        assert isinstance(result, int)
 
 
     def test_increment_float(self):
-        assert inc(3.14) == pytest.approx(4.14)
+        result = inc(3.14)
+        assert result == pytest.approx(4.14)
+        assert isinstance(result, float)
