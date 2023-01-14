@@ -1,0 +1,10 @@
+#! /bin/bash
+
+echo
+cd ./src/unittest/ || exit 1
+
+pytest "$@"
+EXIT_CODE=$?
+
+echo
+exit $EXIT_CODE
