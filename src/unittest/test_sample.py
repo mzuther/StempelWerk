@@ -2,7 +2,7 @@ import pytest
 
 
 def inc(x):
-    return x + 2
+    return x + 1
 
 
 def test_increment_integer():
