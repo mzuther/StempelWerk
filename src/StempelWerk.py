@@ -179,9 +179,18 @@ class StempelWerk:
                 self.root_dir,
                 self.template_dir)
 
-            # FIXME: create output folder
+            # automatically create template folder
+            #
+            # NOTE: "os.makedirs" expects normalized paths
+            os.makedirs(self.template_dir, exist_ok=True)
+
             self.output_dir = self.finalize_path(
                 self.root_dir, self.output_dir)
+
+            # automatically create output folder
+            #
+            # NOTE: "os.makedirs" expects normalized paths
+            os.makedirs(self.output_dir, exist_ok=True)
 
             self.last_run_file = self.finalize_path(
                 self.root_dir, self.last_run_file)
