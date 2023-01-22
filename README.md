@@ -69,6 +69,24 @@ For help, simply call:
 python3 -m src.StempelWerk --help
 ```
 
+### Command line argument `--globals`
+
+Path to a JSON file or a JSON-formatted string containing global
+variables.
+
+Jinja supports several approaches of loading global variables. In case
+it matters, StempelWerk loads globals when calling
+`jinja2.Environment.get_template`.
+
+_Personally, I am not fond of global variables. I do not want to be
+obstinate, however, so I provide a way of using them. But I **do**
+force you to be explicit when using globals by grouping them under the
+variable `globals`. So use `globals.spam` or `globals['spam']` to
+access the global variable `spam` you have defined._
+
+_For a simple demonstration of globals, please render the provided
+example templates with `--globals '{"NO_cast": true}'`._
+
 ### Command line argument `--only-modified`
 
 By default, StempelWerk renders all template files located in the

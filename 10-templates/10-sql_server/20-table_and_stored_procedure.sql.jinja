@@ -78,9 +78,15 @@
                 Load_Data.*,
                 -- -------------------------------------------------- --
                 Numeric_Column =
+{% if globals.NO_CAST %}
+                    2 *
+                    3.14159 *
+                    Integer_Column
+{% else %}
                     CAST(2 AS {{ common.DECIMAL }}) *
                     CAST(3.14159 AS {{ common.DECIMAL }}) *
                     CAST(Integer_Column AS {{ common.DECIMAL }})
+{% endif %}
             FROM
                 Load_Data
         )

@@ -62,7 +62,7 @@ class StempelWerk:
     # ---------------------------------------------------------------------
 
     APPLICATION = 'StempelWerk'
-    VERSION = '0.7.7'
+    VERSION = '0.8.0'
     AUTHOR = 'Martin Zuther'
     DESCRIPTION = 'Automatic code generation from Jinja2 templates.'
     LICENSE = 'BSD 3-Clause License'
@@ -222,6 +222,7 @@ class StempelWerk:
 
         self.load_settings(
             args.config_file_path,
+            args.global_namespace,
             args.verbosity,
             args.process_only_modified)
 
@@ -254,6 +255,14 @@ class StempelWerk:
             action='store_true',
             help='only process modified templates',
             dest='process_only_modified')
+
+        parser.add_argument(
+            '-g',
+            '--globals',
+            action='store',
+            help='string or file containing JSON-formatted global variables',
+            metavar='JSON',
+            dest='global_namespace')
 
         verbosity_group = parser.add_mutually_exclusive_group()
 
@@ -294,12 +303,14 @@ class StempelWerk:
         return args
 
 
-    def load_settings(self, config_file_path, verbosity, process_only_modified):
+    def load_settings(self, config_file_path, global_namespace,
+                      verbosity, process_only_modified):
         # ... except for the path of the configuration file, which is
         # relative to the current working directory
         config_file_path = self.Settings.finalize_path(
             '', config_file_path)
 
+        # parse config file
         try:
             with open(config_file_path) as f:
                 loaded_settings = json.load(f)
@@ -323,6 +334,30 @@ class StempelWerk:
 
             # print traceback to help with debugging
             raise err
+
+        # parse "Environment.globals"
+        #
+        # provide default "global_namespace"
+        if global_namespace is None:
+            global_namespace = '{}'
+        # try to load "global_namespace" from a file
+        elif os.path.isfile(global_namespace):
+            global_namespace_file_path = global_namespace
+            with open(global_namespace_file_path) as f:
+                global_namespace = f.read()
+
+        try:
+            # group global variables under key "globals" to
+            # explicitly mark them as globals in code
+            self.global_namespace = {
+                'globals': json.loads(global_namespace)
+            }
+
+        except json.decoder.JSONDecodeError as err:
+            self.print_error('Could not parse JSON with global variables:')
+            self.print_error(f'{err}')
+            self.print_error()
+            exit(1)
 
         # add settings from command line (or overwrite if
         # specified in JSON)
@@ -465,7 +500,10 @@ class StempelWerk:
 
         # render template
         try:
-            template = self.jinja_environment.get_template(template_filename)
+            template = self.jinja_environment.get_template(
+                template_filename,
+                globals=self.global_namespace)
+
             content_of_multiple_files = template.render()
 
         except (jinja2.exceptions.TemplateSyntaxError,
