@@ -353,11 +353,7 @@ class StempelWerk:
         else:
             global_namespace = self.load_json_file(global_namespace)
 
-        # group global variables under key "globals" to explicitly
-        # mark them as globals in code
-        self.global_namespace = {
-            'globals': global_namespace
-        }
+        self.global_namespace = global_namespace
 
         # add settings from command line (or overwrite if
         # specified in JSON)
@@ -498,15 +494,20 @@ class StempelWerk:
         if os.path.sep != '/':
             template_filename = template_filename.replace(os.path.sep, '/')
 
+        current_global_namespace = self.global_namespace
+
+        # add provided global variables, overwriting existing entries
+        if global_namespace:
+            current_global_namespace.update(global_namespace)
+
+        # group global variables under key "globals" to explicitly
+        # mark them as globals in code
+        current_global_namespace = {
+            'globals': current_global_namespace
+        }
+
         # render template
         try:
-            current_global_namespace = self.global_namespace
-
-            # add provided global variables, overwriting existing entries
-            if global_namespace:
-                current_global_namespace['globals'].update(
-                    global_namespace)
-
             template = self.jinja_environment.get_template(
                 template_filename,
                 globals=current_global_namespace)
