@@ -71,8 +71,8 @@ python3 -m src.StempelWerk --help
 
 ### Command line argument `--globals`
 
-Path to a JSON file or a JSON-formatted string containing global
-variables.
+Path to a JSON file or a JSON-formatted string containing a dictionary
+of global variables: `{"NO_CAST": false}`.
 
 Jinja supports several approaches of loading global variables. In case
 it matters, StempelWerk loads globals when calling

@@ -303,6 +303,34 @@ class StempelWerk:
         return args
 
 
+    def load_json_file(self, json_file_path):
+        try:
+            with open(json_file_path) as f:
+                result = json.load(f)
+
+        except FileNotFoundError:
+            self.print_error(f'File "{json_file_path}" not found.')
+            self.print_error()
+            exit(1)
+
+        except json.decoder.JSONDecodeError as err:
+            self.print_error(f'File "{json_file_path}" is broken:')
+            self.print_error(f'{err}')
+            self.print_error()
+            exit(1)
+
+        except TypeError as err:
+            self.print_error('Did you provide all settings in'
+                             f'"{json_file_path}"?')
+            self.print_error(f'{err}')
+            self.print_error()
+
+            # print traceback to help with debugging
+            raise err
+
+        return result
+
+
     def load_settings(self, config_file_path, global_namespace,
                       verbosity, process_only_modified):
         # ... except for the path of the configuration file, which is
@@ -311,53 +339,25 @@ class StempelWerk:
             '', config_file_path)
 
         # parse config file
-        try:
-            with open(config_file_path) as f:
-                loaded_settings = json.load(f)
+        loaded_settings = self.load_json_file(config_file_path)
 
-        except FileNotFoundError:
-            self.print_error(f'File "{config_file_path}" not found.')
-            self.print_error()
-            exit(1)
-
-        except json.decoder.JSONDecodeError as err:
-            self.print_error(f'File "{config_file_path}" is broken:')
-            self.print_error(f'{err}')
-            self.print_error()
-            exit(1)
-
-        except TypeError as err:
-            self.print_error('Did you provide all settings in'
-                             f'"{config_file_path}"?')
-            self.print_error(f'{err}')
-            self.print_error()
-
-            # print traceback to help with debugging
-            raise err
-
-        # parse "Environment.globals"
+        # parse global variables for Jinja environment
         #
-        # provide default "global_namespace"
+        # provide default global namespace
         if global_namespace is None:
-            global_namespace = '{}'
-        # try to load "global_namespace" from a file
-        elif os.path.isfile(global_namespace):
-            global_namespace_file_path = global_namespace
-            with open(global_namespace_file_path) as f:
-                global_namespace = f.read()
+            global_namespace = {}
+        # parse JSON-formatted dictionary
+        elif global_namespace.strip().startswith('{'):
+            global_namespace = json.loads(global_namespace)
+        # load JSON file
+        else:
+            global_namespace = self.load_json_file(global_namespace)
 
-        try:
-            # group global variables under key "globals" to
-            # explicitly mark them as globals in code
-            self.global_namespace = {
-                'globals': json.loads(global_namespace)
-            }
-
-        except json.decoder.JSONDecodeError as err:
-            self.print_error('Could not parse JSON with global variables:')
-            self.print_error(f'{err}')
-            self.print_error()
-            exit(1)
+        # group global variables under key "globals" to explicitly
+        # mark them as globals in code
+        self.global_namespace = {
+            'globals': global_namespace
+        }
 
         # add settings from command line (or overwrite if
         # specified in JSON)
