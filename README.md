@@ -81,8 +81,9 @@ it matters, StempelWerk loads globals when calling
 _Personally, I am not fond of global variables. I do not want to be
 obstinate, however, so I provide a way of using them. But I **do**
 force you to be explicit when using globals by grouping them under the
-variable `globals`. So use `globals.spam` or `globals['spam']` to
-access the global variable `spam` you have defined._
+variable `globals`. So you'll have to use `globals.spam` or
+`globals['spam']` to access the global variable `spam` you have
+defined._
 
 _For a simple demonstration of globals, please render the provided
 example templates with `--globals '{"NO_cast": true}'`._
