@@ -27,6 +27,23 @@ class TestMona:
             raise pytest.fail(f'raised unwanted exception {exception}')
 
 
+    def assert_autocreated_paths(self, config, pre_check):
+        root_dir = config['root_dir']
+        autocreated_paths = ['template_dir', 'output_dir']
+
+        for dir_key in autocreated_paths:
+            dir_path = os.path.join(root_dir, config[dir_key])
+            # directories that should be autocreated do not exist yet
+            if pre_check:
+                assert not os.path.isdir(dir_path), \
+                    f'directory "{dir_path}" already exists'
+            # directories were autocreated
+            else:
+                assert os.path.isdir(dir_path), \
+                    f'directory "{dir_path}" was not created'
+
+    # ------------------------------------------------------------------------
+
     def create_config(self, custom_config, output_path, filename):
         config_path = os.path.join(output_path, filename)
         config = {
@@ -47,16 +64,19 @@ class TestMona:
 
         return config_path
 
+    # ------------------------------------------------------------------------
 
     def run(self, config_path):
         argv = [sys.argv[0], config_path]
-        StempelWerk(argv)
+        sw = StempelWerk(argv)
+        sw.process_templates()
 
 
     def run_with_config(self, config, output_path, filename='settings.json'):
         config_path = self.create_config(config, output_path, filename)
         self.run(config_path)
 
+    # ------------------------------------------------------------------------
 
     # Mona is an inquisitive developer and loves to try new things.
     # She found StempelWerk on GitHub, cloned it and wants to get her
@@ -92,25 +112,44 @@ class TestMona:
     # templates.
     def test_autocreation_of_directories(self, tmp_path):
         config = {}
+
         config_path = self.create_config(
             config, tmp_path, 'settings_unique.json')
 
         with open(config_path, mode='r') as f:
             config = json.load(f)
-        root_dir = config['root_dir']
-
-        # directories that should be autocreated do not exist yet
-        for dir_key in ['template_dir', 'output_dir']:
-            dir_path = os.path.join(root_dir, config[dir_key])
-            assert not os.path.isdir(dir_path), \
-                f'directory "{dir_path}" already exists'
 
         # implicitly check that StempelWerk runs without any templates
         with self.does_not_raise(SystemExit):
+            self.assert_autocreated_paths(config, pre_check=True)
             self.run(config_path)
+            self.assert_autocreated_paths(config, pre_check=False)
 
-        # directories were autocreated
-        for dir_path in ['template_dir', 'output_dir']:
-            dir_path = os.path.join(root_dir, config[dir_key])
-            assert os.path.isdir(dir_path), \
-                f'directory "{dir_path}" was not created'
+
+    # Mona finally reads (a small part of) the documentation.  She
+    # dreams of leaving the DOS ecosystem behind, so she verfifies
+    # that paths can really be specified in a cross-platform way.  She
+    # also dislikes trailing path separators (if DOS does not need
+    # them, why should any other OS?) and stubbornly removes them.
+    # StempelWerk just smiles and keeps on working as before.
+    def test_path_separators(self, tmp_path):
+        # common path separator can be used (cross-platform support)
+        tmp_path = str(tmp_path).replace(os.sep, '/')
+
+        # paths without trailing path separator are functional
+        config = {
+            'template_dir': 'templates',
+            'output_dir': 'output'
+        }
+
+        config_path = self.create_config(
+            config, tmp_path, 'settings.json')
+
+        with open(config_path, mode='r') as f:
+            config = json.load(f)
+
+        # implicitly check that StempelWerk runs without any templates
+        with self.does_not_raise(SystemExit):
+            self.assert_autocreated_paths(config, pre_check=True)
+            self.run(config_path)
+            self.assert_autocreated_paths(config, pre_check=False)
