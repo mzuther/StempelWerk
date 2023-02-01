@@ -4,7 +4,7 @@
   "output_dir": "20-output/",
   "stencil_dir_name": "00-stencils",
   "included_file_extensions": [
-    "*.sql.jinja"
+    "*.jinja"
   ],
   "jinja_options": {
     "trim_blocks": true

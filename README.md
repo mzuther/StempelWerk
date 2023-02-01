@@ -147,16 +147,19 @@ files will be saved in this directory.
 
 ### `stencil_dir_name`
 
+**Default value: None**
+
 Name of the directory that contains stencils (master templates). The
 name must not contain slashes or backslashes.
 
-There may be one or more directories with this name, and all of them
+Files in directories matching this name will not be rendered. If this
+setting is specified and no stencils are found, StempelWerk will exit
+with an error.
+
+_There may be one or more directories with this name, and all of them
 must be located somewhere under `template_dir`. This ensures that
 stencils are loaded into Jinja and can be referenced from templates at
-runtime.
-
-In addition, files in directories matching this name will not be
-rendered.
+runtime._
 
 ### `included_file_extensions`
 

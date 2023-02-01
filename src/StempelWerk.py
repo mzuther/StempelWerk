@@ -62,7 +62,7 @@ class StempelWerk:
     # ---------------------------------------------------------------------
 
     APPLICATION = 'StempelWerk'
-    VERSION = '0.8.1'
+    VERSION = '0.8.2'
     AUTHOR = 'Martin Zuther'
     DESCRIPTION = 'Automatic code generation from Jinja2 templates.'
     LICENSE = 'BSD 3-Clause License'
@@ -140,10 +140,10 @@ class StempelWerk:
         root_dir: str
         template_dir: str
         output_dir: str
-        stencil_dir_name: str
         included_file_extensions: list
+        stencil_dir_name: str = ''
         # ----------------------------------------
-        process_only_modified: bool
+        process_only_modified: bool = False
         verbosity: int = 0
         # ----------------------------------------
         jinja_options: list = dataclasses.field(
@@ -391,14 +391,15 @@ class StempelWerk:
             if self.settings.stencil_dir_name in path_components:
                 stencil_filenames.append(stencil_filename)
 
-        # display warning and continue processing (some people might
-        # not want to use stencils)
-        if not stencil_filenames:
+        # check whether stencil directories contain any stencils
+        if self.settings.stencil_dir_name and not stencil_filenames:
             self.print_error()
             self.print_error('No stencils found.')
             self.print_error()
+            exit(1)
+
         # list all templates in cache
-        elif self.settings.verbosity > 0:
+        if self.settings.verbosity > 0:
             self.print_debug(' ')
             self.print_debug('Available stencils:')
             self.print_debug(' ')
@@ -550,15 +551,25 @@ class StempelWerk:
         return (processed_templates, saved_files)
 
 
-    def _render_to_single_file(self, content_of_single_file):
+    def _render_to_single_file(self, content_raw):
         # content starts with "marker_new_file", so first string is
         # empty (or contains whitespace when a template is not well
         # written)
-        if not content_of_single_file.strip():
+        if not content_raw.strip():
             return 0
 
+        # catch problems with file separation markers early
+        if (content_raw.count(self.settings.marker_new_file) != 0) or \
+           (content_raw.count(self.settings.marker_content) != 1):
+            self.print_error(
+                'there was a problem with splitting the output into files,')
+            self.print_error(
+                'check "marker_new_file", "marker_content" and your templates.')
+            self.print_error()
+            exit(1)
+
         # extract path and content of output file
-        output_filename, content = content_of_single_file.split(
+        output_filename, content = content_raw.split(
             self.settings.marker_content, 1)
 
         # FIXME: check validity of input

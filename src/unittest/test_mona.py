@@ -9,8 +9,11 @@
 # they have as much fun reading these tests as I had in writing them!
 
 import contextlib
+import difflib
+import filecmp
 import json
 import os
+import shutil
 import sys
 
 import pytest
@@ -48,12 +51,14 @@ class TestMona:
         config_path = os.path.join(output_path, filename)
         config = {
             'root_dir': str(output_path),
-            'template_dir': 'templates/',
-            'output_dir': 'output/',
-            'stencil_dir_name': 'stencils',
+            'template_dir': '10-templates/',
+            'output_dir': '20-output/',
             'included_file_extensions': [
                 '*.jinja'
             ],
+            'jinja_options': {
+                'trim_blocks': True,
+            },
         }
 
         # update config with custom settings
@@ -63,6 +68,57 @@ class TestMona:
             json.dump(config, f, ensure_ascii=False, indent=2)
 
         return config_path
+
+
+    def copy_directory_tree(self, config, source_path):
+        destination_path = config['root_dir']
+        shutil.copytree(source_path, destination_path,
+                        dirs_exist_ok=True)
+
+
+    def compare_directories(self, config):
+        root_dir = config['root_dir']
+        output_path = os.path.join(root_dir, config['output_dir'])
+        expected_path = os.path.join(root_dir, '30-expected')
+
+        comparator = filecmp.dircmp(expected_path, output_path)
+
+        assert not comparator.left_only, \
+            f'these files were not generated: { comparator.left_only }'
+        assert not comparator.right_only, \
+            f'unexpected files were generated: { comparator.right_only }'
+
+        assert not comparator.common_funny, \
+            f'could not process these files: { comparator.common_funny }'
+        assert not comparator.funny_files, \
+            f'could not compare these files: { comparator.funny_files }'
+
+        if comparator.diff_files:
+            # only print first differing file
+            differing_file_path = comparator.diff_files[0]
+
+            path_expected = os.path.join(expected_path, differing_file_path)
+            with open(path_expected, mode='r') as f:
+                expected_contents = f.readlines()
+
+            path_real = os.path.join(output_path, differing_file_path)
+            with open(path_real, mode='r') as f:
+                real_contents = f.readlines()
+
+            result = difflib.unified_diff(
+                expected_contents,
+                real_contents,
+                fromfile=path_expected,
+                tofile=path_real)
+
+            print('------------------------------------------------------')
+            print()
+            print('Difference between expected output and result:')
+            print()
+            sys.stdout.writelines(result)
+            print()
+
+            assert False, 'Found differing files.'
 
     # ------------------------------------------------------------------------
 
@@ -75,6 +131,20 @@ class TestMona:
     def run_with_config(self, config, output_path, filename='settings.json'):
         config_path = self.create_config(config, output_path, filename)
         self.run(config_path)
+
+
+    def run_and_compare(self, config_path, unit_test_path):
+        unit_test_path = os.path.join('./src/unittest/mona/', unit_test_path)
+
+        with open(config_path, mode='r') as f:
+            config = json.load(f)
+
+            print('Configuration:')
+            print(json.dumps(config, ensure_ascii=False, indent=2))
+
+        self.copy_directory_tree(config, unit_test_path)
+        self.run(config_path)
+        self.compare_directories(config)
 
     # ------------------------------------------------------------------------
 
@@ -153,3 +223,98 @@ class TestMona:
             self.assert_autocreated_paths(config, pre_check=True)
             self.run(config_path)
             self.assert_autocreated_paths(config, pre_check=False)
+
+    # ------------------------------------------------------------------------
+
+    # Mona decides to finally write a template.  She rather likes the
+    # alphabet and comes up with a brainy scheme of printing multiples
+    # of her favorite characters without touching the keyboard.  It works!
+    def test_render_notrim(self, tmp_path):
+        # assert that StempelWerk can change Jinja options
+        config = {
+            'jinja_options': {
+                'trim_blocks': False,
+            },
+        }
+
+        config_path = self.create_config(
+            config, tmp_path, 'settings.json')
+
+        unit_test_path = '1_template_1_notrim'
+        self.run_and_compare(config_path, unit_test_path)
+
+
+    # Mona decides that she will try enabling "trim_blocks".  After
+    # seeing the results, she concurs with the author of StempelWerk
+    # that this option should always be enabled.
+    def test_render_trim(self, tmp_path):
+        # "trim_blocks" is set to "True" by default in "create_config"
+        config = {}
+
+        config_path = self.create_config(
+            config, tmp_path, 'settings.json')
+
+        unit_test_path = '1_template_2_trim'
+        self.run_and_compare(config_path, unit_test_path)
+
+
+    # The real power of templates lies in preventing DRY ("do not
+    # repeat yourself").  Accordingly, Mona writes a template that
+    # creates two files, but shares their settings and macros.
+    def test_render_splitfile(self, tmp_path):
+        config = {
+            'root_dir': str(tmp_path),
+            'included_file_extensions': [
+                '*.txt.jinja',
+            ],
+        }
+
+        config_path = self.create_config(
+            config, tmp_path, 'settings.json')
+
+        unit_test_path = '1_template_3_splitfile'
+
+        # assert indirectly that the template file "ignored.jinja" is
+        # ignored and not processed
+        self.run_and_compare(config_path, unit_test_path)
+
+
+    # Mona loves Wikipedia and articles on programming languages
+    # (https://en.wikipedia.org/wiki/Esoteric_programming_language).
+    # She wants to have her very own article and creates "MonaTalk".
+    # Variables are declared by prepending "###", so she is happy that
+    # StempelWerk allows her to redefine file separators.
+    #
+    # ### Hello: world
+    #
+    # However, Mona forgot that file separators need to be changed in
+    # the configuration.  So she is greeted by a nice error message.
+    def test_render_file_separator_code_only(self, tmp_path):
+        config = {}
+
+        config_path = self.create_config(
+            config, tmp_path, 'settings.json')
+
+        unit_test_path = '1_template_4_file_separator'
+        with pytest.raises(SystemExit):
+            self.run_and_compare(config_path, unit_test_path)
+
+
+    # After updating the configuration, Mona gets the output she is
+    # looking for.
+    #
+    # Meanwhile, Mona's article on Wikipedia was deleted based on the
+    # far-fetched argument that MonaTalk is only Turing-complete on
+    # Fridays.  Mona is now looking for a good lawyer to get the
+    # article back.  Good luck with that!
+    def test_render_file_separator(self, tmp_path):
+        config = {
+            'marker_new_file': 'START_FILE',
+            'marker_content': 'START_CONTENT'
+        }
+
+        config_path = self.create_config(
+            config, tmp_path, 'settings.json')
+
+        unit_test_path = '1_template_4_file_separator'
+        self.run_and_compare(config_path, unit_test_path)
