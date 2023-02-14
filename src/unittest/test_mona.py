@@ -263,7 +263,8 @@ class TestMona:
     # creates two files, but shares their settings and macros.
     def test_render_splitfile(self, tmp_path):
         config = {
-            'root_dir': str(tmp_path),
+            # assert that a subdirectory under "tmp_path" also works
+            'root_dir': os.path.join(str(tmp_path), "DRY"),
             'included_file_extensions': [
                 '*.txt.jinja',
             ],
@@ -317,4 +318,77 @@ class TestMona:
             config, tmp_path, 'settings.json')
 
         unit_test_path = '1_template_4_file_separator'
+        self.run_and_compare(config_path, unit_test_path)
+
+
+    # Mona changes the default name of the stencil directory, but forgets to
+    # update the settings file. StempelWerk fails, but displays a helpful error
+    # message.
+    def test_render_missing_stencil(self, tmp_path):
+        config = {
+            'template_dir': '10-templates/',
+            'output_dir': '20-output/',
+            'stencil_dir_name': 'stencils',
+        }
+
+        config_path = self.create_config(
+            config, tmp_path, 'settings.json')
+
+        unit_test_path = '1_template_5_with_stencil'
+        with pytest.raises(SystemExit):
+            self.run_and_compare(config_path, unit_test_path)
+
+
+    # After updating the settings file, StempelWerk runs just fine.
+    def test_render_with_stencil(self, tmp_path):
+        config = {
+            'template_dir': '10-templates/',
+            'output_dir': '20-output/',
+            'stencil_dir_name': '00-stencils',
+        }
+
+        config_path = self.create_config(
+            config, tmp_path, 'settings.json')
+
+        unit_test_path = '1_template_5_with_stencil'
+        self.run_and_compare(config_path, unit_test_path)
+
+
+    # Mona wants to create different files using different stencils. StempelWerk
+    # just yawns and goes back to sleep.
+    def test_render_multiple_stencils(self, tmp_path):
+        config = {
+            'stencil_dir_name': 'stencils',
+        }
+
+        config_path = self.create_config(
+            config, tmp_path, 'settings.json')
+
+        unit_test_path = '1_template_6_multiple_stencils'
+        self.run_and_compare(config_path, unit_test_path)
+
+
+    # After playing around with a single template, Mona is excited that
+    # StempelWerk can process multiple templates. In a single run!!!
+    def test_render_multi_no_stencil(self, tmp_path):
+        config = {}
+
+        config_path = self.create_config(
+            config, tmp_path, 'settings.json')
+
+        unit_test_path = '2_templates_1_no_stencil'
+        self.run_and_compare(config_path, unit_test_path)
+
+
+    # When the excitement has worn off, she verifies that common template code
+    # can be reused by moving it into a stencil.
+    def test_render_multi_with_stencil(self, tmp_path):
+        config = {
+            'stencil_dir_name': 'stencils',
+        }
+
+        config_path = self.create_config(
+            config, tmp_path, 'settings.json')
+
+        unit_test_path = '2_templates_2_with_stencil'
         self.run_and_compare(config_path, unit_test_path)
