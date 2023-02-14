@@ -25,11 +25,11 @@ development time and cost.
 Here are some more "selling points":
 
 - the template system is extremely lightweight and easy to understand
-- templates can be introduced gradually, but also undertake complex
-  tasks
+- templates can be introduced gradually
 - StempelWerk may be removed at any time - simply delete the
   respective template file and edit the code by hand
-- Jinja is very mature and its [Template Designer
+- templates can undertake surprisingly complex tasks, and StempelWerk can be extended using Python
+- the template language Jinja2 is very mature and its [Template Designer
   Documentation](https://jinja.palletsprojects.com/en/3.1.x/templates/)
   of excellent quality
 
@@ -42,7 +42,7 @@ time gained against time spent: after nine months, I had saved over
 
 ## Installation
 
-StempelWerk was developed using Python v3.8, so an older version might
+StempelWerk was developed using Python v3.10, so an older version might
 not work.
 
 Run the following lines - possibly in a virtual environment - to
@@ -51,7 +51,7 @@ upgrade `pip` and install the dependencies:
 ```bash
 python3 -m pip install --user --upgrade pip
 
-# "namespace()" was introduced in v2.1.0
+# the "namespace()" function was introduced in v2.1.0
 python3 -m pip install --user --upgrade "Jinja2>=2.1.0"
 ```
 
