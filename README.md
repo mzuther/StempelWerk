@@ -161,6 +161,18 @@ must be located somewhere under `template_dir`. This ensures that
 stencils are loaded into Jinja and can be referenced from templates at
 runtime._
 
+### `create_directories`
+
+**Default value: False**
+
+StempelWerk automatically creates `template_dir` and `output_dir`. When this
+option is set to yes, all missing directories will be created to ensure that
+rendered files can be written.
+
+_Depending on your use case, automatically creating directories for output files
+may be just awkward or a full-blown security issue. This option is therefore
+disabled by default, and it is encouraged to leave it that way._
+
 ### `included_file_extensions`
 
 List containing file extensions (e.g. `*.sql.jinja`). Only files with

@@ -62,7 +62,7 @@ class StempelWerk:
     # ---------------------------------------------------------------------
 
     APPLICATION = 'StempelWerk'
-    VERSION = '0.8.2'
+    VERSION = '0.8.3'
     AUTHOR = 'Martin Zuther'
     DESCRIPTION = 'Automatic code generation from Jinja2 templates.'
     LICENSE = 'BSD 3-Clause License'
@@ -143,6 +143,7 @@ class StempelWerk:
         included_file_extensions: list
         stencil_dir_name: str = ''
         # ----------------------------------------
+        create_directories: bool = False
         process_only_modified: bool = False
         verbosity: int = 0
         # ----------------------------------------
@@ -578,6 +579,20 @@ class StempelWerk:
 
         output_filename = self.Settings.finalize_path(
             self.settings.output_dir, output_filename)
+        output_directory = os.path.dirname(output_filename)
+
+        if not os.path.exists(output_directory):
+            if self.settings.create_directories:
+                os.makedirs(output_directory)
+                if self.settings.verbosity >= 0:
+                    print(f'  - created directory "{output_directory}"')
+            else:
+                self.print_error(
+                    f'directory "{output_directory}"')
+                self.print_error(
+                    'does not exist.')
+                self.print_error()
+                exit(1)
 
         _, file_extension = os.path.splitext(output_filename)
 

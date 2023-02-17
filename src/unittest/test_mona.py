@@ -368,6 +368,49 @@ class TestMona:
         self.run_and_compare(config_path, unit_test_path)
 
 
+    # Mona tries to render a file into a subdirectory of the output directory.
+    # StempelWerk expects subdirectories to already exist and thus exits with an
+    # error message.
+    def test_render_create_subdirectories_1(self, tmp_path):
+        config = {}
+
+        config_path = self.create_config(
+            config, tmp_path, 'settings.json')
+
+        unit_test_path = '1_template_7_create_subdirs'
+        with pytest.raises(SystemExit):
+            self.run_and_compare(config_path, unit_test_path)
+
+
+    # When Mona creates the subdirectory before running StempelWerk, everything
+    # works as expected.
+    def test_render_create_subdirectories_2(self, tmp_path):
+        config = {}
+
+        config_path = self.create_config(
+            config, tmp_path, 'settings.json')
+
+        # create output subdirectory by hand
+        os.makedirs(os.path.join(tmp_path, "20-output/other_name"))
+
+        unit_test_path = '1_template_7_create_subdirs'
+        self.run_and_compare(config_path, unit_test_path)
+
+
+    # Enabling the automatic creation of missing directories works just as well,
+    # at the price of incuding a security risk.
+    def test_render_create_subdirectories_3(self, tmp_path):
+        config = {
+            'create_directories': True
+        }
+
+        config_path = self.create_config(
+            config, tmp_path, 'settings.json')
+
+        unit_test_path = '1_template_7_create_subdirs'
+        self.run_and_compare(config_path, unit_test_path)
+
+
     # After playing around with a single template, Mona is excited that
     # StempelWerk can process multiple templates. In a single run!!!
     def test_render_multi_no_stencil(self, tmp_path):
