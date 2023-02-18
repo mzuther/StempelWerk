@@ -52,12 +52,22 @@ class TestMona:
             'root_dir': str(output_path),
             'template_dir': '10-templates/',
             'output_dir': '20-output/',
+            # ----------------------------------------
             'included_file_extensions': [
                 '*.jinja'
             ],
+            'stencil_dir_name': '',
+            'create_directories': False,
+            # ----------------------------------------
             'jinja_options': {
                 'trim_blocks': True,
             },
+            'jinja_extensions': [],
+            'custom_modules': [],
+            # ----------------------------------------
+            'last_run_file': '.last_run',
+            'marker_new_file': '### New file:',
+            'marker_content': '### Content:'
         }
 
         # update config with custom settings
@@ -283,7 +293,7 @@ class TestMona:
     # but shares their settings and macros.
     def test_render_splitfile(self, tmp_path):
         # assert that a subdirectory under "tmp_path" also works
-        root_dir = os.path.join(str(tmp_path), "DRY")
+        root_dir = os.path.join(str(tmp_path), 'DRY')
 
         config = {
             'root_dir': root_dir,
@@ -302,7 +312,7 @@ class TestMona:
         self.run_and_compare(config_path, unit_test_path)
 
         assert os.path.isfile(
-            os.path.join(root_dir, "30-expected/ab.txt")
+            os.path.join(root_dir, '30-expected/ab.txt')
         )
 
 
@@ -412,7 +422,7 @@ class TestMona:
             config, tmp_path, 'settings.json')
 
         # create output subdirectory by hand
-        os.makedirs(os.path.join(tmp_path, "20-output/other_name"))
+        os.makedirs(os.path.join(tmp_path, '20-output/other_name'))
 
         unit_test_path = '1_template_7_create_subdirs'
         self.run_and_compare(config_path, unit_test_path)

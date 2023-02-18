@@ -140,10 +140,11 @@ class StempelWerk:
         root_dir: str
         template_dir: str
         output_dir: str
+        # ----------------------------------------
         included_file_extensions: list
         stencil_dir_name: str = ''
-        # ----------------------------------------
         create_directories: bool = False
+        # ----------------------------------------
         process_only_modified: bool = False
         verbosity: int = 0
         # ----------------------------------------
