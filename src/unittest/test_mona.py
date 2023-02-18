@@ -1,12 +1,11 @@
-# The story, all names, characters, and incidents portrayed in this
-# test are fictitious.  No identification with actual persons (living
-# or deceased), places, buildings, and products is intended or should
-# be inferred.
+# The story, all names, characters, and incidents portrayed in this test are
+# fictitious. No identification with actual persons (living or deceased),
+# places, buildings, and products is intended or should be inferred.
 #
-# In other words: I have great and helpful colleagues with a lot of
-# humour.  In order to make writing these tests more fun, I have used
-# their names, but all personality traits have been made up.  I hope
-# they have as much fun reading these tests as I had in writing them!
+# In other words: I have great and helpful colleagues with a lot of humour. In
+# order to make writing these tests more fun, I have used their names, but all
+# personality traits have been made up. I hope they have as much fun reading
+# these tests as I had in writing them!
 
 import contextlib
 import difflib
@@ -148,13 +147,12 @@ class TestMona:
 
     # ------------------------------------------------------------------------
 
-    # Mona is an inquisitive developer and loves to try new things.
-    # She found StempelWerk on GitHub, cloned it and wants to get her
-    # hands dirty.
+    # Mona is an inquisitive developer and loves to try new things. She found
+    # StempelWerk on GitHub, cloned it and wants to get her hands dirty.
     #
-    # Reading manuals is for beginners, so Mona starts StempelWerk.
-    # It immediately fails because she did not provide a configuration
-    # file.  But she gets a nice error message to that regard.
+    # Reading manuals is for beginners, so Mona starts StempelWerk. It
+    # immediately fails because she did not provide a configuration file. But
+    # she gets a nice error message to that regard.
     def test_error_on_missing_config(self, capsys):
         with pytest.raises(SystemExit):
             argv = [sys.argv[0]]
@@ -165,8 +163,8 @@ class TestMona:
         assert error_message in captured.err
 
 
-    # Mona adds a config path to the command line, but forgets to
-    # create the file.  Thankfully, she gets another error message.
+    # Mona adds a config path to the command line, but forgets to create the
+    # file. Thankfully, she gets another error message.
     def test_error_on_missing_config_2(self, capsys):
         with pytest.raises(SystemExit):
             self.run('./settings.json')
@@ -175,11 +173,10 @@ class TestMona:
         assert 'not found' in captured.out
 
 
-    # After creating a config file, Mona is impressed that StempelWerk
-    # saves her some work by automatically creating the template and
-    # output directories.  She is also pleased that she is able to
-    # concentrate on the task and does not have to provide any
-    # templates.
+    # After creating a config file, Mona is impressed that StempelWerk saves her
+    # some work by automatically creating the template and output directories.
+    # She is also pleased that she is able to concentrate on the task and does
+    # not have to provide any templates.
     def test_autocreation_of_directories(self, tmp_path):
         config = {}
 
@@ -196,13 +193,36 @@ class TestMona:
             self.assert_autocreated_paths(config, pre_check=False)
 
 
-    # Mona finally reads (a small part of) the documentation.  She
-    # dreams of leaving the DOS ecosystem behind, so she verfifies
-    # that paths can really be specified in a cross-platform way.  She
-    # also dislikes trailing path separators (if DOS does not need
-    # them, why should any other OS?) and stubbornly removes them.
-    # StempelWerk just smiles and keeps on working as before.
+    # Mona finally reads (a small part of) the documentation. She dreams of
+    # leaving the DOS ecosystem behind, so she verfifies that paths can really
+    # be specified in a cross-platform way.
     def test_path_separators(self, tmp_path):
+        # common path separator can be used (cross-platform support)
+        tmp_path = str(tmp_path).replace(os.sep, '/')
+
+        # paths without trailing path separator are functional
+        config = {
+            'template_dir': 'templates/',
+            'output_dir': 'output/'
+        }
+
+        config_path = self.create_config(
+            config, tmp_path, 'settings.json')
+
+        with open(config_path, mode='r') as f:
+            config = json.load(f)
+
+        # implicitly check that StempelWerk runs without any templates
+        with self.does_not_raise(SystemExit):
+            self.assert_autocreated_paths(config, pre_check=True)
+            self.run(config_path)
+            self.assert_autocreated_paths(config, pre_check=False)
+
+
+    # She also dislikes trailing path separators (if DOS does not need them, why
+    # should any other OS?) and stubbornly removes them. StempelWerk just smiles
+    # and keeps on working as before.
+    def test_path_separators_trailing(self, tmp_path):
         # common path separator can be used (cross-platform support)
         tmp_path = str(tmp_path).replace(os.sep, '/')
 
@@ -226,9 +246,9 @@ class TestMona:
 
     # ------------------------------------------------------------------------
 
-    # Mona decides to finally write a template.  She rather likes the
-    # alphabet and comes up with a brainy scheme of printing multiples
-    # of her favorite characters without touching the keyboard.  It works!
+    # Mona decides to finally write a template. She rather likes the alphabet
+    # and comes up with a brainy scheme of printing multiples of her favorite
+    # characters without touching the keyboard. It works!
     def test_render_notrim(self, tmp_path):
         # assert that StempelWerk can change Jinja options
         config = {
@@ -244,9 +264,9 @@ class TestMona:
         self.run_and_compare(config_path, unit_test_path)
 
 
-    # Mona decides that she will try enabling "trim_blocks".  After
-    # seeing the results, she concurs with the author of StempelWerk
-    # that this option should always be enabled.
+    # Mona decides that she will try enabling "trim_blocks". After seeing the
+    # results, she concurs with the author of StempelWerk that this option
+    # should always be enabled.
     def test_render_trim(self, tmp_path):
         # "trim_blocks" is set to "True" by default in "create_config"
         config = {}
@@ -258,13 +278,15 @@ class TestMona:
         self.run_and_compare(config_path, unit_test_path)
 
 
-    # The real power of templates lies in preventing DRY ("do not
-    # repeat yourself").  Accordingly, Mona writes a template that
-    # creates two files, but shares their settings and macros.
+    # The real power of templates lies in preventing DRY ("do not repeat
+    # yourself"). Accordingly, Mona writes a template that creates two files,
+    # but shares their settings and macros.
     def test_render_splitfile(self, tmp_path):
+        # assert that a subdirectory under "tmp_path" also works
+        root_dir = os.path.join(str(tmp_path), "DRY")
+
         config = {
-            # assert that a subdirectory under "tmp_path" also works
-            'root_dir': os.path.join(str(tmp_path), "DRY"),
+            'root_dir': root_dir,
             'included_file_extensions': [
                 '*.txt.jinja',
             ],
@@ -279,17 +301,21 @@ class TestMona:
         # ignored and not processed
         self.run_and_compare(config_path, unit_test_path)
 
+        assert os.path.isfile(
+            os.path.join(root_dir, "30-expected/ab.txt")
+        )
+
 
     # Mona loves Wikipedia and articles on programming languages
-    # (https://en.wikipedia.org/wiki/Esoteric_programming_language).
-    # She wants to have her very own article and creates "MonaTalk".
-    # Variables are declared by prepending "###", so she is happy that
-    # StempelWerk allows her to redefine file separators.
+    # (https://en.wikipedia.org/wiki/Esoteric_programming_language). She wants
+    # to have her very own article and creates "MonaTalk". Variables are
+    # declared by prepending "###", so she is happy that StempelWerk allows her
+    # to redefine file separators.
     #
     # ### Hello: world
     #
-    # However, Mona forgot that file separators need to be changed in
-    # the configuration.  So she is greeted by a nice error message.
+    # However, Mona forgot that file separators need to be changed in the
+    # configuration. So she is greeted by a nice error message.
     def test_render_file_separator_code_only(self, tmp_path):
         config = {}
 
@@ -301,13 +327,12 @@ class TestMona:
             self.run_and_compare(config_path, unit_test_path)
 
 
-    # After updating the configuration, Mona gets the output she is
-    # looking for.
+    # After updating the configuration, Mona gets the output she is looking for.
     #
     # Meanwhile, Mona's article on Wikipedia was deleted based on the
-    # far-fetched argument that MonaTalk is only Turing-complete on
-    # Fridays.  Mona is now looking for a good lawyer to get the
-    # article back.  Good luck with that!
+    # far-fetched argument that MonaTalk is only Turing-complete on Fridays.
+    # Mona is now looking for a good lawyer to get the article back. Good luck
+    # with that!
     def test_render_file_separator(self, tmp_path):
         config = {
             'marker_new_file': 'START_FILE',
@@ -326,8 +351,6 @@ class TestMona:
     # message.
     def test_render_missing_stencil(self, tmp_path):
         config = {
-            'template_dir': '10-templates/',
-            'output_dir': '20-output/',
             'stencil_dir_name': 'stencils',
         }
 
@@ -342,8 +365,6 @@ class TestMona:
     # After updating the settings file, StempelWerk runs just fine.
     def test_render_with_stencil(self, tmp_path):
         config = {
-            'template_dir': '10-templates/',
-            'output_dir': '20-output/',
             'stencil_dir_name': '00-stencils',
         }
 
