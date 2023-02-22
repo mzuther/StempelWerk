@@ -472,8 +472,7 @@ class StempelWerk:
             self.print_debug()
 
 
-    def render_template(self, template_filename, global_namespace=None,
-                        processed_templates=0, saved_files=0):
+    def render_template(self, template_filename, global_namespace=None):
         # create environment automatically
         if not hasattr(self, 'jinja_environment'):
             self.create_environment()
@@ -481,7 +480,8 @@ class StempelWerk:
         template_filename = os.path.relpath(
             template_filename, self.settings.template_dir)
 
-        processed_templates += 1
+        processed_templates = 1
+        saved_files = 0
 
         if self.settings.verbosity < -1:
             print('.', end='')
@@ -655,14 +655,17 @@ class StempelWerk:
                                      included=dirwalk_inclusions,
                                      modified_after=modified_after)
 
-        # only save time of current run when files are processed
-        if template_filenames:
-            processed = 0
-            saved = 0
+        processed_templates = 0
+        saved_files = 0
 
+        # only save time of _templates current run when files are processed
+        if template_filenames:
             for template_filename in template_filenames:
                 processed, saved = self.render_template(
-                    template_filename, global_namespace, processed, saved)
+                    template_filename, global_namespace)
+
+                processed_templates += processed
+                saved_files += saved
 
             # save time of current run
             with open(self.settings.last_run_file, mode='w') as f:
@@ -677,8 +680,8 @@ class StempelWerk:
                 f.write(str(start_of_processing_timestamp))
 
             processing_time = datetime.datetime.now() - start_of_processing
-            time_per_template = processing_time / processed
-            time_per_file = processing_time / saved
+            time_per_template = processing_time / processed_templates
+            time_per_file = processing_time / saved_files
 
             self.print_debug(f'Time per template file: {time_per_template}')
             self.print_debug(f'Time per output file:   {time_per_file}')
@@ -687,15 +690,19 @@ class StempelWerk:
             if self.settings.verbosity < 0:
                 print()
 
-                if self.settings.verbosity < -1 and (processed % 40) != 0:
+                if self.settings.verbosity < -1 and \
+                        (processed_templates % 40) != 0:
                     print()
 
-                print(f'{processed} => {saved} in {processing_time}')
+                print(f'{processed_templates } =>',
+                      f'{saved_files} in {processing_time}')
                 print()
             else:
-                print(f'TOTAL: {processed} templates => {saved} files',
-                      f'in {processing_time}')
+                print(f'TOTAL: {processed_templates } templates =>',
+                      f'{saved_files} files in {processing_time}')
                 print()
+
+        return (processed_templates, saved_files)
 
 
 if __name__ == '__main__':
