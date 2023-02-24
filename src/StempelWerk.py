@@ -617,12 +617,7 @@ class StempelWerk:
         return 1
 
 
-    def process_templates(self, process_only_modified=None,
-                          global_namespace=None):
-        # use default if argument was not specified
-        if process_only_modified is None:
-            process_only_modified = self.settings.process_only_modified
-
+    def process_templates(self, global_namespace=None):
         start_of_processing = datetime.datetime.now()
 
         dirwalk_inclusions = {
@@ -635,7 +630,7 @@ class StempelWerk:
         }
 
         modified_after = None
-        if process_only_modified:
+        if self.settings.process_only_modified:
             # get time of last run
             try:
                 with open(self.settings.last_run_file) as f:
