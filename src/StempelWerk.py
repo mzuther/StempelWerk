@@ -221,12 +221,7 @@ class StempelWerk:
         args = self.parse_command_line(command_line_arguments)
 
         self._display_version(args.verbosity)
-
-        self.load_settings(
-            args.config_file_path,
-            args.global_namespace,
-            args.verbosity,
-            args.process_only_modified)
+        self.load_settings(args)
 
 
     def parse_command_line(self, command_line_arguments):
@@ -333,12 +328,11 @@ class StempelWerk:
         return result
 
 
-    def load_settings(self, config_file_path, global_namespace,
-                      verbosity, process_only_modified):
+    def load_settings(self, args):
         # ... except for the path of the configuration file, which is
         # relative to the current working directory
         config_file_path = self.Settings.finalize_path(
-            '', config_file_path)
+            '', args.config_file_path)
 
         # parse config file
         loaded_settings = self.load_json_file(config_file_path)
@@ -346,21 +340,21 @@ class StempelWerk:
         # parse global variables for Jinja environment
         #
         # provide default global namespace
-        if global_namespace is None:
-            global_namespace = {}
+        if args.global_namespace is None:
+            self.global_namespace = {}
         # parse JSON-formatted dictionary
-        elif global_namespace.strip().startswith('{'):
-            global_namespace = json.loads(global_namespace)
+        elif args.global_namespace.strip().startswith('{'):
+            self.global_namespace = json.loads(
+                args.global_namespace)
         # load JSON file
         else:
-            global_namespace = self.load_json_file(global_namespace)
-
-        self.global_namespace = global_namespace
+            self.global_namespace = self.load_json_file(
+                args.global_namespace)
 
         # add settings from command line (or overwrite if
         # specified in JSON)
-        loaded_settings['verbosity'] = verbosity
-        loaded_settings['process_only_modified'] = process_only_modified
+        loaded_settings['verbosity'] = args.verbosity
+        loaded_settings['process_only_modified'] = args.process_only_modified
 
         # here's where the magic happens: unpack JSON file into class
         self.settings = self.Settings(**loaded_settings)
