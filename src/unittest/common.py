@@ -122,9 +122,20 @@ class TestCommon:
 
     # ------------------------------------------------------------------------
 
-    def run(self, config_path):
-        argv = [sys.argv[0], config_path]
-        sw = StempelWerk(argv)
+    def run(self, config_path=None, only_updated=False):
+        script_path = sys.argv[0]
+        command_line_arguments = [script_path]
+
+        # allow testing for missing configuration on command line
+        if config_path:
+            command_line_arguments.append(config_path)
+
+        if only_updated:
+            command_line_arguments.append('--only-modified')
+
+        args = StempelWerk.parse_command_line(command_line_arguments)
+        sw = StempelWerk(args)
+
         sw.process_templates()
 
 

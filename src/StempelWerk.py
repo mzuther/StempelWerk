@@ -62,7 +62,7 @@ class StempelWerk:
     # ---------------------------------------------------------------------
 
     APPLICATION = 'StempelWerk'
-    VERSION = '0.8.3'
+    VERSION = '0.8.4'
     AUTHOR = 'Martin Zuther'
     DESCRIPTION = 'Automatic code generation from Jinja2 templates.'
     LICENSE = 'BSD 3-Clause License'
@@ -145,9 +145,6 @@ class StempelWerk:
         stencil_dir_name: str = ''
         create_directories: bool = False
         # ----------------------------------------
-        process_only_modified: bool = False
-        verbosity: int = 0
-        # ----------------------------------------
         jinja_options: list = dataclasses.field(
             default_factory=dict)
         jinja_extensions: list = dataclasses.field(
@@ -156,6 +153,7 @@ class StempelWerk:
             default_factory=list)
         # ----------------------------------------
         last_run_file: str = '.last_run'
+        verbosity: int = 0
         marker_new_file: str = '### New file:'
         marker_content: str = '### Content:'
 
@@ -217,14 +215,13 @@ class StempelWerk:
 
     # ---------------------------------------------------------------------
 
-    def __init__(self, command_line_arguments):
-        args = self.parse_command_line(command_line_arguments)
-
+    def __init__(self, args):
         self._display_version(args.verbosity)
         self.load_settings(args)
 
 
-    def parse_command_line(self, command_line_arguments):
+    @staticmethod
+    def parse_command_line(command_line_arguments):
         class HelpfulArgumentParser(argparse.ArgumentParser):
             def exit(self, status=0, message=None):
                 if status:
@@ -237,14 +234,14 @@ class StempelWerk:
                 super().exit(status, message)
 
         parser = HelpfulArgumentParser(
-            description=self.format_description(),
+            description=StempelWerk.format_description(),
             formatter_class=argparse.RawDescriptionHelpFormatter)
 
         parser.add_argument(
             '-V',
             '--version',
             action='version',
-            version=self.APPLICATION_VERSION)
+            version=StempelWerk.APPLICATION_VERSION)
 
         parser.add_argument(
             '-m',
@@ -354,7 +351,6 @@ class StempelWerk:
         # add settings from command line (or overwrite if
         # specified in JSON)
         loaded_settings['verbosity'] = args.verbosity
-        loaded_settings['process_only_modified'] = args.process_only_modified
 
         # here's where the magic happens: unpack JSON file into class
         self.settings = self.Settings(**loaded_settings)
@@ -617,7 +613,8 @@ class StempelWerk:
         return 1
 
 
-    def process_templates(self, global_namespace=None):
+    def process_templates(self, process_only_modified=False,
+                          global_namespace=None):
         start_of_processing = datetime.datetime.now()
 
         dirwalk_inclusions = {
@@ -630,7 +627,7 @@ class StempelWerk:
         }
 
         modified_after = None
-        if self.settings.process_only_modified:
+        if process_only_modified:
             # get time of last run
             try:
                 with open(self.settings.last_run_file) as f:
@@ -695,11 +692,14 @@ class StempelWerk:
 
 
 if __name__ == '__main__':
-    sw = StempelWerk(sys.argv)
+    command_line_arguments = sys.argv
+
+    args = StempelWerk.parse_command_line(command_line_arguments)
+    sw = StempelWerk(args)
 
     # if you want to modify the global namespace programmatically,
     # here is the right place to do so; this will extend / overwrite
     # the global variables specified on the command line
     global_namespace = {}
 
-    sw.process_templates(global_namespace=global_namespace)
+    sw.process_templates(args.process_only_modified, global_namespace)

@@ -25,8 +25,7 @@ class TestMona(TestCommon):
     # she gets a nice error message to that regard.
     def test_error_on_missing_config(self, capsys):
         with pytest.raises(SystemExit):
-            argv = [sys.argv[0]]
-            StempelWerk(argv)
+            self.run(None)
 
         error_message = 'the following arguments are required: CONFIG_FILE'
         captured = capsys.readouterr()
