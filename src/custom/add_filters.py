@@ -2,8 +2,8 @@ from src.StempelWerk import StempelWerk
 
 
 class CustomCode(StempelWerk.CustomCodeTemplate):
-    def __init__(self, copy_of_settings):
-        super().__init__(copy_of_settings)
+    def __init__(self, copy_of_settings, printer):
+        super().__init__(copy_of_settings, printer)
 
 
     def _display_environment_change(self, new, old, display_type):

@@ -100,30 +100,24 @@ class StempelWerk:
 
     # ---------------------------------------------------------------------
 
-    @staticmethod
-    def _print_context(context, message):
-        if message:
-            message = f'{context}: {message}'
-        print(message)
+    class LinePrinter:
+        def __init__(self, verbosity):
+            self.verbosity = verbosity
 
 
-    @staticmethod
-    def _print_error(message=''):
-        StempelWerk._print_context('ERROR', message)
+        def _print_context(self, context, message):
+            if message:
+                message = f'{context}: {message}'
+            print(message)
 
 
-    @staticmethod
-    def _print_debug(verbosity, message=''):
-        if verbosity > 0:
-            StempelWerk._print_context('DEBUG', message)
+        def error(self, message=''):
+            self._print_context('ERROR', message)
 
 
-    def print_error(self, message=''):
-        self._print_error(message)
-
-
-    def print_debug(self, message=''):
-        self._print_debug(self.settings.verbosity, message)
+        def debug(self, message=''):
+            if self.verbosity > 0:
+                self._print_context('DEBUG', message)
 
     # ---------------------------------------------------------------------
 
@@ -153,7 +147,6 @@ class StempelWerk:
             default_factory=list)
         # ----------------------------------------
         last_run_file: str = '.last_run'
-        verbosity: int = 0
         marker_new_file: str = '### New file:'
         marker_content: str = '### Content:'
 
@@ -199,24 +192,28 @@ class StempelWerk:
 
     # Template class for customizing the Jinja environment
     class CustomCodeTemplate:  # noqa: E301
-        def __init__(self, copy_of_settings):
+        def __init__(self, copy_of_settings, printer):
             # this is only a copy; changing this variable does *not*
             # change the settings of StempelWerk
             self.settings = copy_of_settings
+            self.printer = printer
 
         def update_environment(self, jinja_environment):
             return jinja_environment
 
         def print_error(self, message=''):
-            StempelWerk._print_error(message)
+            self.printer.error(message)
 
         def print_debug(self, message=''):
-            StempelWerk._print_debug(self.settings.verbosity, message)
+            self.printer.debug(message)
 
     # ---------------------------------------------------------------------
 
-    def __init__(self, args):
-        self._display_version(args.verbosity)
+    def __init__(self, args, verbosity=0):
+        self.verbosity = verbosity
+        self.printer = self.LinePrinter(verbosity)
+
+        self._display_version(self.verbosity)
         self.load_settings(args)
 
 
@@ -303,21 +300,21 @@ class StempelWerk:
                 result = json.load(f)
 
         except FileNotFoundError:
-            self.print_error(f'File "{json_file_path}" not found.')
-            self.print_error()
+            self.printer.error(f'File "{json_file_path}" not found.')
+            self.printer.error()
             exit(1)
 
         except json.decoder.JSONDecodeError as err:
-            self.print_error(f'File "{json_file_path}" is broken:')
-            self.print_error(f'{err}')
-            self.print_error()
+            self.printer.error(f'File "{json_file_path}" is broken:')
+            self.printer.error(f'{err}')
+            self.printer.error()
             exit(1)
 
         except TypeError as err:
-            self.print_error('Did you provide all settings in'
-                             f'"{json_file_path}"?')
-            self.print_error(f'{err}')
-            self.print_error()
+            self.printer.error('Did you provide all settings in'
+                               f'"{json_file_path}"?')
+            self.printer.error(f'{err}')
+            self.printer.error()
 
             # print traceback to help with debugging
             raise err
@@ -348,16 +345,12 @@ class StempelWerk:
             self.global_namespace = self.load_json_file(
                 args.global_namespace)
 
-        # add settings from command line (or overwrite if
-        # specified in JSON)
-        loaded_settings['verbosity'] = args.verbosity
-
         # here's where the magic happens: unpack JSON file into class
         self.settings = self.Settings(**loaded_settings)
 
 
     def create_environment(self):
-        self.print_debug('Loading templates ...')
+        self.printer.debug('Loading templates ...')
 
         # NOTE: Jinja loads templates from sub-directories;
         # NOTE: stencils will also be included
@@ -372,9 +365,9 @@ class StempelWerk:
         template_filenames = self.jinja_environment.list_templates()
 
         if not template_filenames:
-            self.print_error()
-            self.print_error('No templates found.')
-            self.print_error()
+            self.printer.error()
+            self.printer.error('No templates found.')
+            self.printer.error()
             exit(1)
 
         stencil_filenames = []
@@ -385,28 +378,28 @@ class StempelWerk:
 
         # check whether stencil directories contain any stencils
         if self.settings.stencil_dir_name and not stencil_filenames:
-            self.print_error()
-            self.print_error('No stencils found.')
-            self.print_error()
+            self.printer.error()
+            self.printer.error('No stencils found.')
+            self.printer.error()
             exit(1)
 
         # list all templates in cache
-        if self.settings.verbosity > 0:
-            self.print_debug(' ')
-            self.print_debug('Available stencils:')
-            self.print_debug(' ')
+        if self.verbosity > 0:
+            self.printer.debug(' ')
+            self.printer.debug('Available stencils:')
+            self.printer.debug(' ')
 
             for stencil_filename in stencil_filenames:
-                self.print_debug(f'  - {stencil_filename}')
+                self.printer.debug(f'  - {stencil_filename}')
 
-            self.print_debug(' ')
-            self.print_debug('  Use relative paths to access templates in'
-                             'sub-directories')
-            self.print_debug('  (https://stackoverflow.com/a/9644828).')
-            self.print_debug(' ')
+            self.printer.debug(' ')
+            self.printer.debug('  Use relative paths to access templates in'
+                               'sub-directories')
+            self.printer.debug('  (https://stackoverflow.com/a/9644828).')
+            self.printer.debug(' ')
 
-        self.print_debug('Done.')
-        self.print_debug()
+        self.printer.debug('Done.')
+        self.printer.debug()
 
         # load extensions and run custom Python code
         self._update_environment()
@@ -416,24 +409,24 @@ class StempelWerk:
         # load Jinja extensions first so they can be referenced in custom
         # Python code
         if self.settings.jinja_extensions:
-            self.print_debug('Loading extensions:')
-            self.print_debug(' ')
+            self.printer.debug('Loading extensions:')
+            self.printer.debug(' ')
 
             for extension in self.settings.jinja_extensions:
-                self.print_debug(f'  - {extension}')
+                self.printer.debug(f'  - {extension}')
                 self.jinja_environment.add_extension(extension)
 
-            self.print_debug(' ')
-            self.print_debug('Done.')
-            self.print_debug()
+            self.printer.debug(' ')
+            self.printer.debug('Done.')
+            self.printer.debug()
 
         # run custom Python code
         if self.settings.custom_modules:
-            self.print_debug('Loading custom modules:')
-            self.print_debug(' ')
+            self.printer.debug('Loading custom modules:')
+            self.printer.debug(' ')
 
             for module_name in self.settings.custom_modules:
-                self.print_debug(f'  [ {module_name} ]')
+                self.printer.debug(f'  [ {module_name} ]')
 
                 # import code as module
                 module_spec = importlib.util.find_spec(
@@ -447,19 +440,20 @@ class StempelWerk:
 
                 # prevent changes to settings
                 custom_code = imported_module.CustomCode(
-                    copy.deepcopy(self.settings))
+                    copy.deepcopy(self.settings),
+                    self.printer)
 
-                self.print_debug('  - Updating environment ...')
+                self.printer.debug('  - Updating environment ...')
 
                 # execute custom code and store updated Jinja environment
                 self.jinja_environment = custom_code.update_environment(
                     self.jinja_environment)
 
-                self.print_debug('  - Done.')
-                self.print_debug(' ')
+                self.printer.debug('  - Done.')
+                self.printer.debug(' ')
 
-            self.print_debug('Done.')
-            self.print_debug()
+            self.printer.debug('Done.')
+            self.printer.debug()
 
 
     def render_template(self, template_filename, global_namespace=None):
@@ -473,14 +467,14 @@ class StempelWerk:
         processed_templates = 1
         saved_files = 0
 
-        if self.settings.verbosity < -1:
+        if self.verbosity < -1:
             print('.', end='')
 
             if (processed_templates % 40) == 0:
                 print()
             elif (processed_templates % 10) == 0:
                 print(' ', end='')
-        elif self.settings.verbosity >= -1:
+        elif self.verbosity >= -1:
             print('- {}'.format(template_filename))
 
         # Jinja2 cannot handle Windows paths
@@ -509,24 +503,24 @@ class StempelWerk:
 
         except (jinja2.exceptions.TemplateSyntaxError,
                 jinja2.exceptions.TemplateAssertionError) as err:
-            self.print_error()
+            self.printer.error()
 
-            if self.settings.verbosity < -1:
-                self.print_error()
-                self.print_error(f'in file "{template_filename}"')
+            if self.verbosity < -1:
+                self.printer.error()
+                self.printer.error(f'in file "{template_filename}"')
 
-            self.print_error(f'{err.message} (line {err.lineno})')
-            self.print_error()
+            self.printer.error(f'{err.message} (line {err.lineno})')
+            self.printer.error()
 
             raise(err)
 
         except Exception as err:
-            if self.settings.verbosity < -1:
-                self.print_error()
-                self.print_error()
-                self.print_error(f'in file "{template_filename}"')
+            if self.verbosity < -1:
+                self.printer.error()
+                self.printer.error()
+                self.printer.error(f'in file "{template_filename}"')
 
-            self.print_error()
+            self.printer.error()
 
             raise(err)
 
@@ -537,7 +531,7 @@ class StempelWerk:
         for content_of_single_file in split_contents:
             saved_files += self._render_to_single_file(content_of_single_file)
 
-        if self.settings.verbosity >= 0:
+        if self.verbosity >= 0:
             print()
 
         return (processed_templates, saved_files)
@@ -553,11 +547,11 @@ class StempelWerk:
         # catch problems with file separation markers early
         if (content_raw.count(self.settings.marker_new_file) != 0) or \
            (content_raw.count(self.settings.marker_content) != 1):
-            self.print_error(
+            self.printer.error(
                 'there was a problem with splitting the output into files,')
-            self.print_error(
+            self.printer.error(
                 'check "marker_new_file", "marker_content" and your templates.')
-            self.print_error()
+            self.printer.error()
             exit(1)
 
         # extract path and content of output file
@@ -575,19 +569,19 @@ class StempelWerk:
         if not os.path.exists(output_directory):
             if self.settings.create_directories:
                 os.makedirs(output_directory)
-                if self.settings.verbosity >= 0:
+                if self.verbosity >= 0:
                     print(f'  - created directory "{output_directory}"')
             else:
-                self.print_error(
+                self.printer.error(
                     f'directory "{output_directory}"')
-                self.print_error(
+                self.printer.error(
                     'does not exist.')
-                self.print_error()
+                self.printer.error()
                 exit(1)
 
         _, file_extension = os.path.splitext(output_filename)
 
-        if self.settings.verbosity >= 0:
+        if self.verbosity >= 0:
             print('  - {}'.format(os.path.relpath(
                 output_filename, self.settings.output_dir)))
 
@@ -669,15 +663,14 @@ class StempelWerk:
             time_per_template = processing_time / processed_templates
             time_per_file = processing_time / saved_files
 
-            self.print_debug(f'Time per template file: {time_per_template}')
-            self.print_debug(f'Time per output file:   {time_per_file}')
-            self.print_debug()
+            self.printer.debug(f'Time per template file: {time_per_template}')
+            self.printer.debug(f'Time per output file:   {time_per_file}')
+            self.printer.debug()
 
-            if self.settings.verbosity < 0:
+            if self.verbosity < 0:
                 print()
 
-                if self.settings.verbosity < -1 and \
-                        (processed_templates % 40) != 0:
+                if self.verbosity < -1 and (processed_templates % 40) != 0:
                     print()
 
                 print(f'{processed_templates } =>',
@@ -695,7 +688,7 @@ if __name__ == '__main__':
     command_line_arguments = sys.argv
 
     args = StempelWerk.parse_command_line(command_line_arguments)
-    sw = StempelWerk(args)
+    sw = StempelWerk(args, args.verbosity)
 
     # if you want to modify the global namespace programmatically,
     # here is the right place to do so; this will extend / overwrite
