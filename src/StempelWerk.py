@@ -139,6 +139,8 @@ class StempelWerk:
         stencil_dir_name: str = ''
         create_directories: bool = False
         # ----------------------------------------
+        global_namespace: list = dataclasses.field(
+            default_factory=dict)
         jinja_options: list = dataclasses.field(
             default_factory=dict)
         jinja_extensions: list = dataclasses.field(
@@ -149,6 +151,7 @@ class StempelWerk:
         last_run_file: str = '.last_run'
         marker_new_file: str = '### New file:'
         marker_content: str = '### Content:'
+
 
         @staticmethod
         def finalize_path(root_dir, original_path):
@@ -209,144 +212,157 @@ class StempelWerk:
 
     # ---------------------------------------------------------------------
 
-    def __init__(self, args, verbosity=0):
+    class CommandLineParser:
+        @property
+        def parser(self):
+            class HelpfulArgumentParser(argparse.ArgumentParser):
+                def exit(self, status=0, message=None):
+                    if status:
+                        # display help on errors without showing usage message
+                        # twice
+                        help_message = self.format_help()
+                        help_message = help_message.replace(
+                            self.format_usage(),
+                            '')
+                        print(help_message, file=sys.stderr)
+
+                    # resume default processing
+                    super().exit(status, message)
+
+            parser = HelpfulArgumentParser(
+                description=StempelWerk.format_description(),
+                formatter_class=argparse.RawDescriptionHelpFormatter)
+
+            parser.add_argument(
+                '-V',
+                '--version',
+                action='version',
+                version=StempelWerk.APPLICATION_VERSION)
+
+            parser.add_argument(
+                '-m',
+                '--only-modified',
+                action='store_true',
+                help='only process modified templates',
+                dest='process_only_modified')
+
+            parser.add_argument(
+                '-g',
+                '--globals',
+                action='store',
+                help='string or file containing JSON-formatted global variables',
+                metavar='JSON',
+                dest='global_namespace')
+
+            verbosity_group = parser.add_mutually_exclusive_group()
+
+            verbosity_group.add_argument(
+                '-qq',
+                '--ultraquiet',
+                action='store_const',
+                const=-2,
+                default=0,
+                help='display minimal output',
+                dest='verbosity')
+
+            verbosity_group.add_argument(
+                '-q',
+                '--quiet',
+                action='store_const',
+                const=-1,
+                default=0,
+                help='display less output',
+                dest='verbosity')
+
+            verbosity_group.add_argument(
+                '-v',
+                '--verbose',
+                action='store_const',
+                const=1,
+                default=0,
+                help='display more output and include debug information',
+                dest='verbosity')
+
+            parser.add_argument(
+                'config_file_path',
+                help='path to JSON file containing configuration',
+                metavar='CONFIG_FILE')
+
+            return parser
+
+
+        def __init__(self, command_line_arguments):
+            cla_without_scriptname = command_line_arguments[1:]
+            args = self.parser.parse_args(cla_without_scriptname)
+
+            self.printer = StempelWerk.LinePrinter(args.verbosity)
+
+            # all paths are relative to the root directory, except for the path
+            # of the configuration file, which is relative to the current
+            # working directory
+            config_file_path = StempelWerk.Settings.finalize_path(
+                '', args.config_file_path)
+
+            # parse config file
+            loaded_settings = self.load_json_file(config_file_path)
+
+            # parse global variables for Jinja environment
+            #
+            # provide default global namespace
+            if args.global_namespace is None:
+                loaded_settings['global_namespace'] = {}
+            # parse JSON-formatted dictionary
+            elif args.global_namespace.strip().startswith('{'):
+                loaded_settings['global_namespace'] = json.loads(
+                    args.global_namespace)
+            # load JSON file
+            else:
+                loaded_settings['global_namespace'] = self.load_json_file(
+                    args.global_namespace)
+
+            # here's where the magic happens: unpack JSON file into class
+            self.settings = StempelWerk.Settings(**loaded_settings)
+
+            # store settings that may be overwritten at runtime separately
+            self.process_only_modified = args.process_only_modified
+            self.verbosity = args.verbosity
+
+
+        def load_json_file(self, json_file_path):
+            try:
+                with open(json_file_path) as f:
+                    result = json.load(f)
+
+            except FileNotFoundError:
+                self.printer.error(f'File "{json_file_path}" not found.')
+                self.printer.error()
+                exit(1)
+
+            except json.decoder.JSONDecodeError as err:
+                self.printer.error(f'File "{json_file_path}" is broken:')
+                self.printer.error(f'{err}')
+                self.printer.error()
+                exit(1)
+
+            except TypeError as err:
+                self.printer.error('Did you provide all settings in'
+                                   f'"{json_file_path}"?')
+                self.printer.error(f'{err}')
+                self.printer.error()
+
+                # print traceback to help with debugging
+                raise err
+
+            return result
+
+    # ---------------------------------------------------------------------
+
+    def __init__(self, settings, verbosity=0):
+        self.settings = settings
+
         self.verbosity = verbosity
-        self.printer = self.LinePrinter(verbosity)
-
+        self.printer = self.LinePrinter(self.verbosity)
         self._display_version(self.verbosity)
-        self.load_settings(args)
-
-
-    @staticmethod
-    def parse_command_line(command_line_arguments):
-        class HelpfulArgumentParser(argparse.ArgumentParser):
-            def exit(self, status=0, message=None):
-                if status:
-                    # display help on errors without showing usage message twice
-                    help_message = self.format_help()
-                    help_message = help_message.replace(self.format_usage(), '')
-                    print(help_message, file=sys.stderr)
-
-                # resume default processing
-                super().exit(status, message)
-
-        parser = HelpfulArgumentParser(
-            description=StempelWerk.format_description(),
-            formatter_class=argparse.RawDescriptionHelpFormatter)
-
-        parser.add_argument(
-            '-V',
-            '--version',
-            action='version',
-            version=StempelWerk.APPLICATION_VERSION)
-
-        parser.add_argument(
-            '-m',
-            '--only-modified',
-            action='store_true',
-            help='only process modified templates',
-            dest='process_only_modified')
-
-        parser.add_argument(
-            '-g',
-            '--globals',
-            action='store',
-            help='string or file containing JSON-formatted global variables',
-            metavar='JSON',
-            dest='global_namespace')
-
-        verbosity_group = parser.add_mutually_exclusive_group()
-
-        verbosity_group.add_argument(
-            '-qq',
-            '--ultraquiet',
-            action='store_const',
-            const=-2,
-            default=0,
-            help='display minimal output',
-            dest='verbosity')
-
-        verbosity_group.add_argument(
-            '-q',
-            '--quiet',
-            action='store_const',
-            const=-1,
-            default=0,
-            help='display less output',
-            dest='verbosity')
-
-        verbosity_group.add_argument(
-            '-v',
-            '--verbose',
-            action='store_const',
-            const=1,
-            default=0,
-            help='display more output and include debug information',
-            dest='verbosity')
-
-        parser.add_argument(
-            'config_file_path',
-            help='path to JSON file containing configuration',
-            metavar='CONFIG_FILE')
-
-        cla_without_scriptname = command_line_arguments[1:]
-        args = parser.parse_args(cla_without_scriptname)
-        return args
-
-
-    def load_json_file(self, json_file_path):
-        try:
-            with open(json_file_path) as f:
-                result = json.load(f)
-
-        except FileNotFoundError:
-            self.printer.error(f'File "{json_file_path}" not found.')
-            self.printer.error()
-            exit(1)
-
-        except json.decoder.JSONDecodeError as err:
-            self.printer.error(f'File "{json_file_path}" is broken:')
-            self.printer.error(f'{err}')
-            self.printer.error()
-            exit(1)
-
-        except TypeError as err:
-            self.printer.error('Did you provide all settings in'
-                               f'"{json_file_path}"?')
-            self.printer.error(f'{err}')
-            self.printer.error()
-
-            # print traceback to help with debugging
-            raise err
-
-        return result
-
-
-    def load_settings(self, args):
-        # ... except for the path of the configuration file, which is
-        # relative to the current working directory
-        config_file_path = self.Settings.finalize_path(
-            '', args.config_file_path)
-
-        # parse config file
-        loaded_settings = self.load_json_file(config_file_path)
-
-        # parse global variables for Jinja environment
-        #
-        # provide default global namespace
-        if args.global_namespace is None:
-            self.global_namespace = {}
-        # parse JSON-formatted dictionary
-        elif args.global_namespace.strip().startswith('{'):
-            self.global_namespace = json.loads(
-                args.global_namespace)
-        # load JSON file
-        else:
-            self.global_namespace = self.load_json_file(
-                args.global_namespace)
-
-        # here's where the magic happens: unpack JSON file into class
-        self.settings = self.Settings(**loaded_settings)
 
 
     def create_environment(self):
@@ -481,7 +497,7 @@ class StempelWerk:
         if os.path.sep != '/':
             template_filename = template_filename.replace(os.path.sep, '/')
 
-        current_global_namespace = self.global_namespace
+        current_global_namespace = self.settings.global_namespace
 
         # add provided global variables, overwriting existing entries
         if global_namespace:
@@ -686,13 +702,14 @@ class StempelWerk:
 
 if __name__ == '__main__':
     command_line_arguments = sys.argv
+    parsed_args = StempelWerk.CommandLineParser(command_line_arguments)
 
-    args = StempelWerk.parse_command_line(command_line_arguments)
-    sw = StempelWerk(args, args.verbosity)
+    sw = StempelWerk(parsed_args.settings, parsed_args.verbosity)
 
     # if you want to modify the global namespace programmatically,
     # here is the right place to do so; this will extend / overwrite
     # the global variables specified on the command line
-    global_namespace = {}
+    additional_global_namespace = {}
 
-    sw.process_templates(args.process_only_modified, global_namespace)
+    sw.process_templates(parsed_args.process_only_modified,
+                         additional_global_namespace)

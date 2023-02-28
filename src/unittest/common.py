@@ -122,7 +122,7 @@ class TestCommon:
 
     # ------------------------------------------------------------------------
 
-    def run(self, config_path=None, only_updated=False):
+    def run(self, config_path=None, process_only_modified=False):
         script_path = sys.argv[0]
         command_line_arguments = [script_path]
 
@@ -130,13 +130,13 @@ class TestCommon:
         if config_path:
             command_line_arguments.append(config_path)
 
-        if only_updated:
+        if process_only_modified:
             command_line_arguments.append('--only-modified')
 
-        args = StempelWerk.parse_command_line(command_line_arguments)
-        sw = StempelWerk(args)
+        parsed_args = StempelWerk.CommandLineParser(command_line_arguments)
+        sw = StempelWerk(parsed_args.settings, parsed_args.verbosity)
 
-        sw.process_templates()
+        sw.process_templates(parsed_args.process_only_modified)
 
 
     def run_with_config(self, config, output_path, filename='settings.json'):
