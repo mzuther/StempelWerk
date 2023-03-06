@@ -3,9 +3,9 @@
 # places, buildings, and products is intended or should be inferred.
 #
 # In other words: I have great and helpful colleagues with a lot of humour. In
-# order to make writing these tests more fun, I have used their names, but all
-# personality traits have been made up. I hope they have as much fun reading
-# these tests as I had in writing them!
+# order to make writing these tests more fun, I have used their (obfuscated)
+# names, but all personality traits have been made up. I hope they have as much
+# fun reading these tests as I had in writing them!
 
 import json
 import os
@@ -16,10 +16,10 @@ from src.StempelWerk import StempelWerk
 from src.unittest.common import TestCommon
 
 
-class TestMona(TestCommon):
+class TestManu(TestCommon):
     def run_and_compare(self, config_path, unit_test_directory):
         unit_test_path = os.path.join(
-            './src/unittest/mona/',
+            './src/unittest/manu/',
             unit_test_directory)
 
         return super().run_and_compare(
@@ -27,10 +27,10 @@ class TestMona(TestCommon):
             unit_test_path)
 
 
-    # Mona is an inquisitive developer and loves to try new things. She found
+    # Manu is an inquisitive developer and loves to try new things. She found
     # StempelWerk on GitHub, cloned it and wants to get her hands dirty.
     #
-    # Reading manuals is for beginners, so Mona starts StempelWerk. It
+    # Reading manuals is for beginners, so Manu starts StempelWerk. It
     # immediately fails because she did not provide a configuration file. But
     # she gets a nice error message to that regard.
     def test_error_on_missing_config(self, capsys):
@@ -42,7 +42,7 @@ class TestMona(TestCommon):
         assert error_message in captured.err
 
 
-    # Mona adds a config path to the command line, but forgets to create the
+    # Manu adds a config path to the command line, but forgets to create the
     # file. Thankfully, she gets another error message.
     def test_error_on_missing_config_2(self, capsys):
         with pytest.raises(SystemExit):
@@ -52,7 +52,7 @@ class TestMona(TestCommon):
         assert 'not found' in captured.out
 
 
-    # After creating a config file, Mona is impressed that StempelWerk saves her
+    # After creating a config file, Manu is impressed that StempelWerk saves her
     # some work by automatically creating the template and output directories.
     # She is also pleased that she is able to concentrate on the task and does
     # not have to provide any templates.
@@ -72,7 +72,7 @@ class TestMona(TestCommon):
             self.assert_autocreated_paths(config, pre_check=False)
 
 
-    # Mona finally reads (a small part of) the documentation. She dreams of
+    # Manu finally reads (a small part of) the documentation. She dreams of
     # leaving the DOS ecosystem behind, so she verfifies that paths can really
     # be specified in a cross-platform way.
     def test_path_separators(self, tmp_path):
@@ -125,7 +125,7 @@ class TestMona(TestCommon):
 
     # ------------------------------------------------------------------------
 
-    # Mona decides to finally write a template. She rather likes the alphabet
+    # Manu decides to finally write a template. She rather likes the alphabet
     # and comes up with a brainy scheme of printing multiples of her favorite
     # characters without touching the keyboard. It works!
     def test_render_notrim(self, tmp_path):
@@ -143,7 +143,7 @@ class TestMona(TestCommon):
         self.run_and_compare(config_path, unit_test_directory)
 
 
-    # Mona decides that she will try enabling "trim_blocks". After seeing the
+    # Manu decides that she will try enabling "trim_blocks". After seeing the
     # results, she concurs with the author of StempelWerk that this option
     # should always be enabled.
     def test_render_trim(self, tmp_path):
@@ -158,7 +158,7 @@ class TestMona(TestCommon):
 
 
     # The real power of templates lies in preventing DRY ("do not repeat
-    # yourself"). Accordingly, Mona writes a template that creates two files,
+    # yourself"). Accordingly, Manu writes a template that creates two files,
     # but shares their settings and macros.
     def test_render_splitfile(self, tmp_path):
         # assert that a subdirectory under "tmp_path" also works
@@ -185,15 +185,15 @@ class TestMona(TestCommon):
         )
 
 
-    # Mona loves Wikipedia and articles on programming languages
+    # Manu loves Wikipedia and articles on programming languages
     # (https://en.wikipedia.org/wiki/Esoteric_programming_language). She wants
-    # to have her very own article and creates "MonaTalk". Variables are
+    # to have her very own article and creates "ManuTalk". Variables are
     # declared by prepending "###", so she is happy that StempelWerk allows her
     # to redefine file separators.
     #
     # ### Hello: world
     #
-    # However, Mona forgot that file separators need to be changed in the
+    # However, Manu forgot that file separators need to be changed in the
     # configuration. So she is greeted by a nice error message.
     def test_render_file_separator_code_only(self, tmp_path):
         config = {}
@@ -206,11 +206,11 @@ class TestMona(TestCommon):
             self.run_and_compare(config_path, unit_test_directory)
 
 
-    # After updating the configuration, Mona gets the output she is looking for.
+    # After updating the configuration, Manu gets the output she is looking for.
     #
-    # Meanwhile, Mona's article on Wikipedia was deleted based on the
-    # far-fetched argument that MonaTalk is only Turing-complete on Fridays.
-    # Mona is now looking for a good lawyer to get the article back. Good luck
+    # Meanwhile, Manu's article on Wikipedia was deleted based on the
+    # far-fetched argument that ManuTalk is only Turing-complete on Fridays.
+    # Manu is now looking for a good lawyer to get the article back. Good luck
     # with that!
     def test_render_file_separator(self, tmp_path):
         config = {
@@ -225,7 +225,7 @@ class TestMona(TestCommon):
         self.run_and_compare(config_path, unit_test_directory)
 
 
-    # Mona changes the default name of the stencil directory, but forgets to
+    # Manu changes the default name of the stencil directory, but forgets to
     # update the settings file. StempelWerk fails, but displays a helpful error
     # message.
     def test_render_missing_stencil(self, tmp_path):
@@ -254,7 +254,7 @@ class TestMona(TestCommon):
         self.run_and_compare(config_path, unit_test_directory)
 
 
-    # Mona wants to create different files using different stencils. StempelWerk
+    # Manu wants to create different files using different stencils. StempelWerk
     # just yawns and goes back to sleep.
     def test_render_multiple_stencils(self, tmp_path):
         config = {
@@ -268,7 +268,7 @@ class TestMona(TestCommon):
         self.run_and_compare(config_path, unit_test_directory)
 
 
-    # Mona tries to render a file into a subdirectory of the output directory.
+    # Manu tries to render a file into a subdirectory of the output directory.
     # StempelWerk expects subdirectories to already exist and thus exits with an
     # error message.
     def test_render_create_subdirectories_1(self, tmp_path):
@@ -282,7 +282,7 @@ class TestMona(TestCommon):
             self.run_and_compare(config_path, unit_test_directory)
 
 
-    # When Mona creates the subdirectory before running StempelWerk, everything
+    # When Manu creates the subdirectory before running StempelWerk, everything
     # works as expected.
     def test_render_create_subdirectories_2(self, tmp_path):
         config = {}
@@ -311,7 +311,7 @@ class TestMona(TestCommon):
         self.run_and_compare(config_path, unit_test_directory)
 
 
-    # After playing around with a single template, Mona is excited that
+    # After playing around with a single template, Manu is excited that
     # StempelWerk can process multiple templates. In a single run!!!
     def test_render_multi_no_stencil(self, tmp_path):
         config = {}

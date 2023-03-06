@@ -3,9 +3,9 @@
 # places, buildings, and products is intended or should be inferred.
 #
 # In other words: I have great and helpful colleagues with a lot of humour. In
-# order to make writing these tests more fun, I have used their names, but all
-# personality traits have been made up. I hope they have as much fun reading
-# these tests as I had in writing them!
+# order to make writing these tests more fun, I have used their (obfuscated)
+# names, but all personality traits have been made up. I hope they have as much
+# fun reading these tests as I had in writing them!
 
 import json
 import os
