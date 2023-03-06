@@ -17,6 +17,16 @@ from src.unittest.common import TestCommon
 
 
 class TestMona(TestCommon):
+    def run_and_compare(self, config_path, unit_test_directory):
+        unit_test_path = os.path.join(
+            './src/unittest/mona/',
+            unit_test_directory)
+
+        return super().run_and_compare(
+            config_path,
+            unit_test_path)
+
+
     # Mona is an inquisitive developer and loves to try new things. She found
     # StempelWerk on GitHub, cloned it and wants to get her hands dirty.
     #
@@ -129,8 +139,8 @@ class TestMona(TestCommon):
         config_path = self.create_config(
             config, tmp_path, 'settings.json')
 
-        unit_test_path = '1_template_1_notrim'
-        self.run_and_compare(config_path, unit_test_path)
+        unit_test_directory = '1_template_1_notrim'
+        self.run_and_compare(config_path, unit_test_directory)
 
 
     # Mona decides that she will try enabling "trim_blocks". After seeing the
@@ -143,8 +153,8 @@ class TestMona(TestCommon):
         config_path = self.create_config(
             config, tmp_path, 'settings.json')
 
-        unit_test_path = '1_template_2_trim'
-        self.run_and_compare(config_path, unit_test_path)
+        unit_test_directory = '1_template_2_trim'
+        self.run_and_compare(config_path, unit_test_directory)
 
 
     # The real power of templates lies in preventing DRY ("do not repeat
@@ -164,11 +174,11 @@ class TestMona(TestCommon):
         config_path = self.create_config(
             config, tmp_path, 'settings.json')
 
-        unit_test_path = '1_template_3_splitfile'
+        unit_test_directory = '1_template_3_splitfile'
 
         # assert indirectly that the template file "ignored.jinja" is
         # ignored and not processed
-        self.run_and_compare(config_path, unit_test_path)
+        self.run_and_compare(config_path, unit_test_directory)
 
         assert os.path.isfile(
             os.path.join(root_dir, '30-expected/ab.txt')
@@ -191,9 +201,9 @@ class TestMona(TestCommon):
         config_path = self.create_config(
             config, tmp_path, 'settings.json')
 
-        unit_test_path = '1_template_4_file_separator'
+        unit_test_directory = '1_template_4_file_separator'
         with pytest.raises(SystemExit):
-            self.run_and_compare(config_path, unit_test_path)
+            self.run_and_compare(config_path, unit_test_directory)
 
 
     # After updating the configuration, Mona gets the output she is looking for.
@@ -211,8 +221,8 @@ class TestMona(TestCommon):
         config_path = self.create_config(
             config, tmp_path, 'settings.json')
 
-        unit_test_path = '1_template_4_file_separator'
-        self.run_and_compare(config_path, unit_test_path)
+        unit_test_directory = '1_template_4_file_separator'
+        self.run_and_compare(config_path, unit_test_directory)
 
 
     # Mona changes the default name of the stencil directory, but forgets to
@@ -226,9 +236,9 @@ class TestMona(TestCommon):
         config_path = self.create_config(
             config, tmp_path, 'settings.json')
 
-        unit_test_path = '1_template_5_with_stencil'
+        unit_test_directory = '1_template_5_with_stencil'
         with pytest.raises(SystemExit):
-            self.run_and_compare(config_path, unit_test_path)
+            self.run_and_compare(config_path, unit_test_directory)
 
 
     # After updating the settings file, StempelWerk runs just fine.
@@ -240,8 +250,8 @@ class TestMona(TestCommon):
         config_path = self.create_config(
             config, tmp_path, 'settings.json')
 
-        unit_test_path = '1_template_5_with_stencil'
-        self.run_and_compare(config_path, unit_test_path)
+        unit_test_directory = '1_template_5_with_stencil'
+        self.run_and_compare(config_path, unit_test_directory)
 
 
     # Mona wants to create different files using different stencils. StempelWerk
@@ -254,8 +264,8 @@ class TestMona(TestCommon):
         config_path = self.create_config(
             config, tmp_path, 'settings.json')
 
-        unit_test_path = '1_template_6_multiple_stencils'
-        self.run_and_compare(config_path, unit_test_path)
+        unit_test_directory = '1_template_6_multiple_stencils'
+        self.run_and_compare(config_path, unit_test_directory)
 
 
     # Mona tries to render a file into a subdirectory of the output directory.
@@ -267,9 +277,9 @@ class TestMona(TestCommon):
         config_path = self.create_config(
             config, tmp_path, 'settings.json')
 
-        unit_test_path = '1_template_7_create_subdirs'
+        unit_test_directory = '1_template_7_create_subdirs'
         with pytest.raises(SystemExit):
-            self.run_and_compare(config_path, unit_test_path)
+            self.run_and_compare(config_path, unit_test_directory)
 
 
     # When Mona creates the subdirectory before running StempelWerk, everything
@@ -283,8 +293,8 @@ class TestMona(TestCommon):
         # create output subdirectory by hand
         os.makedirs(os.path.join(tmp_path, '20-output/other_name'))
 
-        unit_test_path = '1_template_7_create_subdirs'
-        self.run_and_compare(config_path, unit_test_path)
+        unit_test_directory = '1_template_7_create_subdirs'
+        self.run_and_compare(config_path, unit_test_directory)
 
 
     # Enabling the automatic creation of missing directories works just as well,
@@ -297,8 +307,8 @@ class TestMona(TestCommon):
         config_path = self.create_config(
             config, tmp_path, 'settings.json')
 
-        unit_test_path = '1_template_7_create_subdirs'
-        self.run_and_compare(config_path, unit_test_path)
+        unit_test_directory = '1_template_7_create_subdirs'
+        self.run_and_compare(config_path, unit_test_directory)
 
 
     # After playing around with a single template, Mona is excited that
@@ -309,8 +319,8 @@ class TestMona(TestCommon):
         config_path = self.create_config(
             config, tmp_path, 'settings.json')
 
-        unit_test_path = '2_templates_1_no_stencil'
-        self.run_and_compare(config_path, unit_test_path)
+        unit_test_directory = '2_templates_1_no_stencil'
+        self.run_and_compare(config_path, unit_test_directory)
 
 
     # When the excitement has worn off, she verifies that common template code
@@ -323,5 +333,5 @@ class TestMona(TestCommon):
         config_path = self.create_config(
             config, tmp_path, 'settings.json')
 
-        unit_test_path = '2_templates_2_with_stencil'
-        self.run_and_compare(config_path, unit_test_path)
+        unit_test_directory = '2_templates_2_with_stencil'
+        self.run_and_compare(config_path, unit_test_directory)

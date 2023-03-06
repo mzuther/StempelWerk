@@ -145,8 +145,6 @@ class TestCommon:
 
 
     def run_and_compare(self, config_path, unit_test_path):
-        unit_test_path = os.path.join('./src/unittest/mona/', unit_test_path)
-
         with open(config_path, mode='r') as f:
             config = json.load(f)
 
