@@ -9,10 +9,8 @@
 
 import json
 import os
-import sys
 
 import pytest
-from src.StempelWerk import StempelWerk
 from src.unittest.common import TestCommon
 
 

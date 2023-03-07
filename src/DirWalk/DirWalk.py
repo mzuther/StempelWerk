@@ -47,12 +47,14 @@ import os
 import sys
 
 
-def dirwalk_recurse(root_directory, directories_first, include_directories,
-                    follow_symlinks, included, modified_after):
+def dirwalk_recurse(root_directory, directories_first,
+                    include_directories, follow_symlinks,
+                    included, modified_after):
     directories = []
     files = []
 
-    # "os.scandir" minimizes system calls (including the retrieval of timestamps)
+    # "os.scandir" minimizes system calls (including the retrieval of
+    # timestamps)
     with os.scandir(root_directory) as paths_in_directory:
         for current_path in paths_in_directory:
             path_name = current_path.name
@@ -65,8 +67,10 @@ def dirwalk_recurse(root_directory, directories_first, include_directories,
                 is_included = True
 
                 # exclude directories
-                if is_included and included.get('excluded_directory_names', []):
-                    is_included = path_basename not in included['excluded_directory_names']
+                if is_included and included.get(
+                        'excluded_directory_names', []):
+                    is_included = path_basename not in \
+                        included['excluded_directory_names']
 
                 if is_included:
                     directories.append(path_relname)
@@ -76,7 +80,8 @@ def dirwalk_recurse(root_directory, directories_first, include_directories,
 
                 # exclude files
                 if is_included and included.get('excluded_file_names', []):
-                    is_included = path_basename not in included['excluded_file_names']
+                    is_included = path_basename not in \
+                        included['excluded_file_names']
 
                 # only include some file extensions
                 if is_included and included.get('included_file_extensions', []):
@@ -151,9 +156,11 @@ def dirwalk(root_directory, directories_first=True, include_directories=False,
 if __name__ == '__main__':
     if len(sys.argv) < 2:
         print()
-        print('MONSTER:   ME WANT EAT DIRECTORIES.  PLEASE SHOW PLACE.  THEN ME START EAT.')
+        print('MONSTER:   ME WANT EAT DIRECTORIES.  PLEASE SHOW PLACE.  '
+              'THEN ME START EAT.')
         print()
-        print('engineer:  please provide the root directory as first parameter.')
+        print('engineer:  please provide the root directory as first '
+              'parameter.')
         print()
 
         exit(1)
