@@ -117,7 +117,6 @@ class TestMascara(TestCommon):
         assert saved_files == 2
 
 
-
     # She updates a template and checks whether a partial run updates the
     # respective output file.
     def test_process_only_modified_2(self, tmp_path):
@@ -171,6 +170,62 @@ class TestMascara(TestCommon):
         # partial run updates output files of changed templates
         saved_files = convenience_run(partial_run=True, matching=True)
         assert saved_files == 1
+
+
+    # Mascara also checks whether updating a stencil changes any output files in
+    # a partial run. It does not.
+    def test_process_only_modified_3(self, tmp_path):
+
+        def convenience_run(partial_run, matching):
+            _, saved_files = self.run(
+                config_path,
+                process_only_modified=partial_run)
+
+            if matching:
+                self.compare_directories(config)
+            else:
+                with pytest.raises(AssertionError):
+                    self.compare_directories(config)
+
+            return saved_files
+
+
+        def update_file(partial_file_path):
+            input_path = os.path.join(tmp_path, partial_file_path)
+            output_path = input_path.replace('_updated', '')
+
+            shutil.copyfile(input_path, output_path)
+
+        # ---------------------------------------------------------------------
+
+        config = {
+            'stencil_dir_name': 'stencils',
+        }
+
+        config_path = self.create_config(
+            config, tmp_path, 'settings.json')
+
+        unit_test_directory = '1_process_only_modified_3'
+
+        with open(config_path, mode='r') as f:
+            config = json.load(f)
+
+        # set up StempelWerk and execute full run
+        _, saved_files = self.run_and_compare(config_path, unit_test_directory)
+        assert saved_files == 2
+
+        update_file('10-templates_updated/stencils/common.jinja')
+
+        # partial run does not check for changed stencils
+        saved_files = convenience_run(partial_run=True, matching=True)
+        assert saved_files == 0
+
+        update_file('30-expected_updated/ab.txt')
+        update_file('30-expected_updated/cd.txt')
+
+        # full run applies changed stencils
+        saved_files = convenience_run(partial_run=False, matching=True)
+        assert saved_files == 2
 
 
     # Mascara wants to get become more proficient in Python [ahem] and checks
