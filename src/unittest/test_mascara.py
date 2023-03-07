@@ -9,15 +9,16 @@
 
 import json
 import os
+import shutil
 
 import pytest
 from src.unittest.common import TestCommon
 
 
-class TestNitram(TestCommon):
+class TestMascara(TestCommon):
     def run_and_compare(self, config_path, unit_test_directory):
         unit_test_path = os.path.join(
-            './src/unittest/nitram/',
+            './src/unittest/mascara/',
             unit_test_directory)
 
         return super().run_and_compare(
@@ -25,6 +26,13 @@ class TestNitram(TestCommon):
             unit_test_path)
 
 
+    # Mascara is a front-end developer wanting to learn coding. From her
+    # previous experience, she thinks that getting an existing Python
+    # application to do what she wants is already coding. She's a good tester,
+    # so we'll let someone else break the bad news to her ...
+    #
+    # After getting StempelWerk to run (congrats!), Mascara randomly deletes and
+    # changes files and checks whether the application restores the files.
     def test_process_only_modified_1(self, tmp_path):
 
         def convenience_run(partial_run, matching):
@@ -102,6 +110,58 @@ class TestNitram(TestCommon):
 
 
 
+    # She updates a template and checks whether a partial run updates the
+    # respective output file.
+    def test_process_only_modified_2(self, tmp_path):
+
+        def convenience_run(partial_run, matching):
+            self.run(
+                config_path,
+                process_only_modified=partial_run)
+
+            if matching:
+                self.compare_directories(config)
+            else:
+                with pytest.raises(AssertionError):
+                    self.compare_directories(config)
+
+
+        def update_file(partial_file_path):
+            input_path = os.path.join(tmp_path, partial_file_path)
+            output_path = input_path.replace('_updated', '')
+
+            shutil.copyfile(input_path, output_path)
+
+        # ---------------------------------------------------------------------
+
+        config = {
+            'stencil_dir_name': 'stencils',
+        }
+
+        config_path = self.create_config(
+            config, tmp_path, 'settings.json')
+
+        unit_test_directory = '1_process_only_modified_2'
+
+        with open(config_path, mode='r') as f:
+            config = json.load(f)
+
+        # set up StempelWerk and execute full run
+        self.run_and_compare(config_path, unit_test_directory)
+
+        update_file('30-expected_updated/ab.txt')
+
+        # partial run does not update changed files
+        convenience_run(partial_run=True, matching=False)
+
+        update_file('10-templates_updated/ab.jinja')
+
+        # partial run updates output files of changed templates
+        convenience_run(partial_run=True, matching=True)
+
+
+    # Mascara wants to get become more proficient in Python [ahem] and checks
+    # whether StempelWerk is really as lean as its developer promises.
     def test_lean_template_removal(self, tmp_path):
 
         def convenience_run(partial_run, matching):
