@@ -136,12 +136,12 @@ class TestCommon:
         parsed_args = StempelWerk.CommandLineParser(command_line_arguments)
         sw = StempelWerk(parsed_args.settings, parsed_args.verbosity)
 
-        sw.process_templates(parsed_args.process_only_modified)
+        return sw.process_templates(parsed_args.process_only_modified)
 
 
     def run_with_config(self, config, output_path, filename='settings.json'):
         config_path = self.create_config(config, output_path, filename)
-        self.run(config_path)
+        return self.run(config_path)
 
 
     def run_and_compare(self, config_path, unit_test_path):
@@ -152,5 +152,7 @@ class TestCommon:
             print(json.dumps(config, ensure_ascii=False, indent=2))
 
         self.copy_directory_tree(config, unit_test_path)
-        self.run(config_path)
+        result = self.run(config_path)
         self.compare_directories(config)
+
+        return result

@@ -36,7 +36,7 @@ class TestMascara(TestCommon):
     def test_process_only_modified_1(self, tmp_path):
 
         def convenience_run(partial_run, matching):
-            self.run(
+            _, saved_files = self.run(
                 config_path,
                 process_only_modified=partial_run)
 
@@ -45,6 +45,8 @@ class TestMascara(TestCommon):
             else:
                 with pytest.raises(AssertionError):
                     self.compare_directories(config)
+
+            return saved_files
 
 
         def remove_file(partial_file_path):
@@ -87,26 +89,32 @@ class TestMascara(TestCommon):
             config = json.load(f)
 
         # set up StempelWerk and execute full run
-        self.run_and_compare(config_path, unit_test_directory)
+        _, saved_files = self.run_and_compare(config_path, unit_test_directory)
+        assert saved_files == 2
 
         # full run renders all files unconditonally
         remove_file('20-output/ab.txt')
         modify_file('20-output/cd.txt')
-        convenience_run(partial_run=False, matching=True)
+        saved_files = convenience_run(partial_run=False, matching=True)
+        assert saved_files == 2
 
         # partial run leaves deleted output file alone
         remove_file('20-output/cd.txt')
-        convenience_run(partial_run=True, matching=False)
+        saved_files = convenience_run(partial_run=True, matching=False)
+        assert saved_files == 0
 
         # full run re-creates all output files
-        convenience_run(partial_run=False, matching=True)
+        saved_files = convenience_run(partial_run=False, matching=True)
+        assert saved_files == 2
 
         # partial run does not render externally modified output file
         modify_file('20-output/ab.txt')
-        convenience_run(partial_run=True, matching=False)
+        saved_files = convenience_run(partial_run=True, matching=False)
+        assert saved_files == 0
 
         # full run also renders externally modified output files
-        convenience_run(partial_run=False, matching=True)
+        saved_files = convenience_run(partial_run=False, matching=True)
+        assert saved_files == 2
 
 
 
@@ -115,7 +123,7 @@ class TestMascara(TestCommon):
     def test_process_only_modified_2(self, tmp_path):
 
         def convenience_run(partial_run, matching):
-            self.run(
+            _, saved_files = self.run(
                 config_path,
                 process_only_modified=partial_run)
 
@@ -124,6 +132,8 @@ class TestMascara(TestCommon):
             else:
                 with pytest.raises(AssertionError):
                     self.compare_directories(config)
+
+            return saved_files
 
 
         def update_file(partial_file_path):
@@ -147,17 +157,20 @@ class TestMascara(TestCommon):
             config = json.load(f)
 
         # set up StempelWerk and execute full run
-        self.run_and_compare(config_path, unit_test_directory)
+        _, saved_files = self.run_and_compare(config_path, unit_test_directory)
+        assert saved_files == 2
 
         update_file('30-expected_updated/ab.txt')
 
         # partial run does not update changed files
-        convenience_run(partial_run=True, matching=False)
+        saved_files = convenience_run(partial_run=True, matching=False)
+        assert saved_files == 0
 
         update_file('10-templates_updated/ab.jinja')
 
         # partial run updates output files of changed templates
-        convenience_run(partial_run=True, matching=True)
+        saved_files = convenience_run(partial_run=True, matching=True)
+        assert saved_files == 1
 
 
     # Mascara wants to get become more proficient in Python [ahem] and checks
@@ -165,7 +178,7 @@ class TestMascara(TestCommon):
     def test_lean_template_removal(self, tmp_path):
 
         def convenience_run(partial_run, matching):
-            self.run(
+            _, saved_files = self.run(
                 config_path,
                 process_only_modified=partial_run)
 
@@ -174,6 +187,8 @@ class TestMascara(TestCommon):
             else:
                 with pytest.raises(AssertionError):
                     self.compare_directories(config)
+
+            return saved_files
 
 
         def remove_file(partial_file_path):
@@ -195,8 +210,10 @@ class TestMascara(TestCommon):
             config = json.load(f)
 
         # set up StempelWerk and execute full run
-        self.run_and_compare(config_path, unit_test_directory)
+        _, saved_files = self.run_and_compare(config_path, unit_test_directory)
+        assert saved_files == 2
 
         # deleting a template leaves the output file alone
         remove_file('10-templates/ab.jinja')
-        convenience_run(partial_run=False, matching=True)
+        saved_files = convenience_run(partial_run=False, matching=True)
+        assert saved_files == 1
