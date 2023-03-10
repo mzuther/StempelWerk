@@ -122,29 +122,44 @@ class TestCommon:
 
     # ------------------------------------------------------------------------
 
-    def run(self, config_path=None, process_only_modified=False):
+    def init_stempelwerk(self, config_path=None, global_namespace=None,
+                         process_only_modified=False):
         script_path = sys.argv[0]
         command_line_arguments = [script_path]
+
+        if global_namespace:
+            command_line_arguments.append('--globals')
+            command_line_arguments.append(global_namespace)
+
+        if process_only_modified:
+            command_line_arguments.append('--only-modified')
 
         # allow testing for missing configuration on command line
         if config_path:
             command_line_arguments.append(config_path)
 
-        if process_only_modified:
-            command_line_arguments.append('--only-modified')
-
         parsed_args = StempelWerk.CommandLineParser(command_line_arguments)
-        sw = StempelWerk(parsed_args.settings, parsed_args.verbosity)
+        instance = StempelWerk(parsed_args.settings, parsed_args.verbosity)
 
-        return sw.process_templates(parsed_args.process_only_modified)
-
-
-    def run_with_config(self, config, output_path, filename='settings.json'):
-        config_path = self.create_config(config, output_path, filename)
-        return self.run(config_path)
+        return instance, parsed_args
 
 
-    def run_and_compare(self, config_path, unit_test_path):
+    def run(self, config_path=None, global_namespace=None,
+            process_only_modified=False):
+        instance, parsed_args = self.init_stempelwerk(
+            config_path, global_namespace, process_only_modified)
+
+        assert parsed_args.process_only_modified == \
+            process_only_modified
+
+        results = instance.process_templates(process_only_modified)
+        results['instance'] = instance
+
+        return results
+
+
+    def run_with_config_file(self, config_path, unit_test_path,
+                             global_namespace=None):
         with open(config_path, mode='r') as f:
             config = json.load(f)
 
@@ -152,7 +167,19 @@ class TestCommon:
             print(json.dumps(config, ensure_ascii=False, indent=2))
 
         self.copy_directory_tree(config, unit_test_path)
-        result = self.run(config_path)
-        self.compare_directories(config)
 
-        return result
+        results = self.run(config_path, global_namespace)
+        results['configuration'] = config
+
+        return results
+
+
+    def run_and_compare(self, config_path, unit_test_path,
+                        global_namespace=None):
+        results = self.run_with_config_file(
+            config_path, unit_test_path, global_namespace)
+
+        self.compare_directories(
+            results['configuration'])
+
+        return results

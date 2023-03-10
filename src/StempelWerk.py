@@ -550,7 +550,10 @@ class StempelWerk:
         if self.verbosity >= 0:
             print()
 
-        return (processed_templates, saved_files)
+        return {
+            'processed_templates': processed_templates,
+            'saved_files': saved_files
+        }
 
 
     def _render_to_single_file(self, content_raw):
@@ -657,11 +660,11 @@ class StempelWerk:
         # only save time of _templates current run when files are processed
         if template_filenames:
             for template_filename in template_filenames:
-                processed, saved = self.render_template(
+                results = self.render_template(
                     template_filename, global_namespace)
 
-                processed_templates += processed
-                saved_files += saved
+                processed_templates += results['processed_templates']
+                saved_files += results['saved_files']
 
             # save time of current run
             with open(self.settings.last_run_file, mode='w') as f:
@@ -697,7 +700,10 @@ class StempelWerk:
                       f'{saved_files} files in {processing_time}')
                 print()
 
-        return (processed_templates, saved_files)
+        return {
+            'processed_templates': processed_templates,
+            'saved_files': saved_files
+        }
 
 
 if __name__ == '__main__':

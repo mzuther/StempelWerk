@@ -7,7 +7,6 @@
 # names, but all personality traits have been made up. I hope they have as much
 # fun reading these tests as I had in writing them!
 
-import json
 import os
 import shutil
 
@@ -16,15 +15,18 @@ from src.unittest.common import TestCommon
 
 
 class TestMascara(TestCommon):
-    def run_and_compare(self, config_path, unit_test_directory):
+    def run_with_config_file(self, config_path, unit_test_directory,
+                             global_namespace=None):
         unit_test_path = os.path.join(
             './src/unittest/mascara/',
             unit_test_directory)
 
-        return super().run_and_compare(
+        return super().run_with_config_file(
             config_path,
-            unit_test_path)
+            unit_test_path,
+            global_namespace=global_namespace)
 
+    # ---------------------------------------------------------------------
 
     # Mascara is a front-end developer wanting to learn coding. From her
     # previous experience, she thinks that getting an existing Python
@@ -36,7 +38,7 @@ class TestMascara(TestCommon):
     def test_process_only_modified_1(self, tmp_path):
 
         def convenience_run(partial_run, matching):
-            _, saved_files = self.run(
+            results = self.run(
                 config_path,
                 process_only_modified=partial_run)
 
@@ -46,7 +48,7 @@ class TestMascara(TestCommon):
                 with pytest.raises(AssertionError):
                     self.compare_directories(config)
 
-            return saved_files
+            return results
 
 
         def remove_file(partial_file_path):
@@ -76,6 +78,8 @@ class TestMascara(TestCommon):
 
         # ---------------------------------------------------------------------
 
+        unit_test_directory = '1_process_only_modified_1'
+
         config = {
             'stencil_dir_name': 'stencils',
         }
@@ -83,38 +87,34 @@ class TestMascara(TestCommon):
         config_path = self.create_config(
             config, tmp_path, 'settings.json')
 
-        unit_test_directory = '1_process_only_modified_1'
-
-        with open(config_path, mode='r') as f:
-            config = json.load(f)
-
         # set up StempelWerk and execute full run
-        _, saved_files = self.run_and_compare(config_path, unit_test_directory)
-        assert saved_files == 2
+        results = self.run_and_compare(config_path, unit_test_directory)
+        config = results['configuration']
+        assert results['saved_files'] == 2
 
         # full run renders all files unconditonally
         remove_file('20-output/ab.txt')
         modify_file('20-output/cd.txt')
-        saved_files = convenience_run(partial_run=False, matching=True)
-        assert saved_files == 2
+        results = convenience_run(partial_run=False, matching=True)
+        assert results['saved_files'] == 2
 
         # partial run leaves deleted output file alone
         remove_file('20-output/cd.txt')
-        saved_files = convenience_run(partial_run=True, matching=False)
-        assert saved_files == 0
+        results = convenience_run(partial_run=True, matching=False)
+        assert results['saved_files'] == 0
 
         # full run re-creates all output files
-        saved_files = convenience_run(partial_run=False, matching=True)
-        assert saved_files == 2
+        results = convenience_run(partial_run=False, matching=True)
+        assert results['saved_files'] == 2
 
         # partial run does not render externally modified output file
         modify_file('20-output/ab.txt')
-        saved_files = convenience_run(partial_run=True, matching=False)
-        assert saved_files == 0
+        results = convenience_run(partial_run=True, matching=False)
+        assert results['saved_files'] == 0
 
         # full run also renders externally modified output files
-        saved_files = convenience_run(partial_run=False, matching=True)
-        assert saved_files == 2
+        results = convenience_run(partial_run=False, matching=True)
+        assert results['saved_files'] == 2
 
 
     # She updates a template and checks whether a partial run updates the
@@ -122,7 +122,7 @@ class TestMascara(TestCommon):
     def test_process_only_modified_2(self, tmp_path):
 
         def convenience_run(partial_run, matching):
-            _, saved_files = self.run(
+            results = self.run(
                 config_path,
                 process_only_modified=partial_run)
 
@@ -132,7 +132,7 @@ class TestMascara(TestCommon):
                 with pytest.raises(AssertionError):
                     self.compare_directories(config)
 
-            return saved_files
+            return results
 
 
         def update_file(partial_file_path):
@@ -143,6 +143,8 @@ class TestMascara(TestCommon):
 
         # ---------------------------------------------------------------------
 
+        unit_test_directory = '1_process_only_modified_2'
+
         config = {
             'stencil_dir_name': 'stencils',
         }
@@ -150,34 +152,30 @@ class TestMascara(TestCommon):
         config_path = self.create_config(
             config, tmp_path, 'settings.json')
 
-        unit_test_directory = '1_process_only_modified_2'
-
-        with open(config_path, mode='r') as f:
-            config = json.load(f)
-
         # set up StempelWerk and execute full run
-        _, saved_files = self.run_and_compare(config_path, unit_test_directory)
-        assert saved_files == 2
+        results = self.run_and_compare(config_path, unit_test_directory)
+        config = results['configuration']
+        assert results['saved_files'] == 2
 
         update_file('30-expected_updated/ab.txt')
 
         # partial run does not update changed files
-        saved_files = convenience_run(partial_run=True, matching=False)
-        assert saved_files == 0
+        results = convenience_run(partial_run=True, matching=False)
+        assert results['saved_files'] == 0
 
         update_file('10-templates_updated/ab.jinja')
 
         # partial run updates output files of changed templates
-        saved_files = convenience_run(partial_run=True, matching=True)
-        assert saved_files == 1
+        results = convenience_run(partial_run=True, matching=True)
+        assert results['saved_files'] == 1
 
 
-    # Mascara also checks whether updating a stencil changes any output files in
-    # a partial run. It does not.
+    # Having the genes of a real tester, Mascara checks whether updating a
+    # stencil changes any output files in a partial run.
     def test_process_only_modified_3(self, tmp_path):
 
         def convenience_run(partial_run, matching):
-            _, saved_files = self.run(
+            results = self.run(
                 config_path,
                 process_only_modified=partial_run)
 
@@ -187,7 +185,7 @@ class TestMascara(TestCommon):
                 with pytest.raises(AssertionError):
                     self.compare_directories(config)
 
-            return saved_files
+            return results
 
 
         def update_file(partial_file_path):
@@ -198,6 +196,8 @@ class TestMascara(TestCommon):
 
         # ---------------------------------------------------------------------
 
+        unit_test_directory = '1_process_only_modified_3'
+
         config = {
             'stencil_dir_name': 'stencils',
         }
@@ -205,27 +205,23 @@ class TestMascara(TestCommon):
         config_path = self.create_config(
             config, tmp_path, 'settings.json')
 
-        unit_test_directory = '1_process_only_modified_3'
-
-        with open(config_path, mode='r') as f:
-            config = json.load(f)
-
         # set up StempelWerk and execute full run
-        _, saved_files = self.run_and_compare(config_path, unit_test_directory)
-        assert saved_files == 2
+        results = self.run_and_compare(config_path, unit_test_directory)
+        config = results['configuration']
+        assert results['saved_files'] == 2
 
         update_file('10-templates_updated/stencils/common.jinja')
 
         # partial run does not check for changed stencils
-        saved_files = convenience_run(partial_run=True, matching=True)
-        assert saved_files == 0
+        results = convenience_run(partial_run=True, matching=True)
+        assert results['saved_files'] == 0
 
         update_file('30-expected_updated/ab.txt')
         update_file('30-expected_updated/cd.txt')
 
         # full run applies changed stencils
-        saved_files = convenience_run(partial_run=False, matching=True)
-        assert saved_files == 2
+        results = convenience_run(partial_run=False, matching=True)
+        assert results['saved_files'] == 2
 
 
     # Mascara wants to get become more proficient in Python [ahem] and checks
@@ -233,7 +229,7 @@ class TestMascara(TestCommon):
     def test_lean_template_removal(self, tmp_path):
 
         def convenience_run(partial_run, matching):
-            _, saved_files = self.run(
+            results = self.run(
                 config_path,
                 process_only_modified=partial_run)
 
@@ -243,7 +239,7 @@ class TestMascara(TestCommon):
                 with pytest.raises(AssertionError):
                     self.compare_directories(config)
 
-            return saved_files
+            return results
 
 
         def remove_file(partial_file_path):
@@ -252,6 +248,8 @@ class TestMascara(TestCommon):
 
         # ---------------------------------------------------------------------
 
+        unit_test_directory = '1_process_only_modified_1'
+
         config = {
             'stencil_dir_name': 'stencils',
         }
@@ -259,16 +257,12 @@ class TestMascara(TestCommon):
         config_path = self.create_config(
             config, tmp_path, 'settings.json')
 
-        unit_test_directory = '1_process_only_modified_1'
-
-        with open(config_path, mode='r') as f:
-            config = json.load(f)
-
         # set up StempelWerk and execute full run
-        _, saved_files = self.run_and_compare(config_path, unit_test_directory)
-        assert saved_files == 2
+        results = self.run_and_compare(config_path, unit_test_directory)
+        config = results['configuration']
+        assert results['saved_files'] == 2
 
         # deleting a template leaves the output file alone
         remove_file('10-templates/ab.jinja')
-        saved_files = convenience_run(partial_run=False, matching=True)
-        assert saved_files == 1
+        results = convenience_run(partial_run=False, matching=True)
+        assert results['saved_files'] == 1
