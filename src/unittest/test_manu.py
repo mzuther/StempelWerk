@@ -322,6 +322,48 @@ class TestManu(TestCommon):
         self.run_and_compare(config_path, unit_test_directory)
 
 
+    # Manu is intrigued: different operating systems store text files with
+    # different newline characters. Time to have some fun!
+    def test_render_file_endings_1(self, tmp_path):
+        unit_test_directory = '1_template_8_file_endings'
+
+        config = {
+            'create_directories': True,
+            'newline': '\n'
+        }
+
+        config_path = self.create_config(
+            config, tmp_path, 'settings.json')
+
+        self.run_and_compare(config_path, unit_test_directory)
+
+
+    # Can StempelWerk's newline logic be turned on its head? Yes, ma'am!
+    def test_render_file_endings_2(self, tmp_path):
+        unit_test_directory = '1_template_8_file_endings'
+
+        config = {
+            'create_directories': True,
+            # invert logic, part 1
+            'newline': '\r\n'
+        }
+
+        config_path = self.create_config(
+            config, tmp_path, 'settings.json')
+
+        results = self.run_with_config_file(config_path, unit_test_directory)
+        instance = results['instance']
+
+        instance.newline_exceptions = {
+            # invert logic, part 2
+            '.txt': '\n',
+        }
+
+        instance.process_templates()
+        self.compare_directories(
+            results['configuration'])
+
+
     # After playing around with a single template, Manu is excited that
     # StempelWerk can process multiple templates. In a single run!!!
     def test_render_multi_no_stencil(self, tmp_path):

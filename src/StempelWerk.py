@@ -62,7 +62,7 @@ class StempelWerk:
     # ---------------------------------------------------------------------
 
     APPLICATION = 'StempelWerk'
-    VERSION = '0.8.5'
+    VERSION = '0.8.6'
     AUTHOR = 'Martin Zuther'
     DESCRIPTION = 'Automatic code generation from Jinja2 templates.'
     LICENSE = 'BSD 3-Clause License'
@@ -151,6 +151,7 @@ class StempelWerk:
         last_run_file: str = '.last_run'
         marker_new_file: str = '### New file:'
         marker_content: str = '### Content:'
+        newline: str = None
 
 
         @staticmethod
@@ -363,6 +364,14 @@ class StempelWerk:
         self.verbosity = verbosity
         self.printer = self.LinePrinter(self.verbosity)
         self._display_version(self.verbosity)
+
+        self.newline_exceptions = {
+            # ensure Batch files use Windows newlines, otherwise seemingly
+            # random lines will be executed
+            '.bat': '\r\n',
+            '.ps1': '\r\n',
+            '.sh': '\n',
+        }
 
 
     def create_environment(self):
@@ -604,13 +613,10 @@ class StempelWerk:
             print('  - {}'.format(os.path.relpath(
                 output_filename, self.settings.output_dir)))
 
-        # use default line ending of system
-        newline = None
-
-        # but ensure Batch files use Windows line endings, otherwise
-        # seemingly random lines will be executed
-        if file_extension == '.bat':
-            newline = '\r\n'
+        # use default newline character unless there is an exception
+        newline = self.newline_exceptions.get(
+            file_extension,
+            self.settings.newline)
 
         # Jinja2 encodes all strings in UTF-8
         with open(output_filename, mode='w', encoding='utf-8',
