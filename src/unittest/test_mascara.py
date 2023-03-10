@@ -266,3 +266,76 @@ class TestMascara(TestCommon):
         remove_file('10-templates/ab.jinja')
         results = convenience_run(partial_run=False, matching=True)
         assert results['saved_files'] == 1
+
+
+    # After having become a Python goddess, she wants to start a hacking career.
+    # And what do hackers do? Delete files. Yes! YES!!!
+    #
+    # "rm -rf /proc/" looks tempting, but Mascara wants to show off her Python
+    # skills. She thus deletes a file that StempelWerk creates during runtime.
+    # With little effect - StempelWerk just creates it again. No! NO!!!
+    def test_last_run_file(self, tmp_path):
+
+        def convenience_run(partial_run, matching):
+            results = self.run(
+                config_path,
+                process_only_modified=partial_run)
+
+            if matching:
+                self.compare_directories(config)
+            else:
+                with pytest.raises(AssertionError):
+                    self.compare_directories(config)
+
+            return results
+
+
+        def file_exists(partial_file_path):
+            file_path = os.path.join(tmp_path, partial_file_path)
+            if not os.path.isfile(file_path):
+                raise FileNotFoundError(file_path)
+
+
+        def remove_file(partial_file_path):
+            output_path = os.path.join(tmp_path, partial_file_path)
+            os.remove(output_path)
+
+        # ---------------------------------------------------------------------
+
+        unit_test_directory = '1_process_only_modified_1'
+
+        last_run_file = 'mascara.HACK'
+
+        config = {
+            'stencil_dir_name': 'stencils',
+            'last_run_file': last_run_file,
+        }
+
+        config_path = self.create_config(
+            config, tmp_path, 'settings.json')
+
+        with pytest.raises(FileNotFoundError):
+            file_exists(last_run_file)
+
+        # set up StempelWerk and execute full run
+        results = self.run_and_compare(config_path, unit_test_directory)
+        config = results['configuration']
+        assert results['saved_files'] == 2
+
+        # "last_run_file" is created
+        file_exists(last_run_file)
+
+        # partial run finds "last_run_file" and does not render any files
+        results = convenience_run(partial_run=True, matching=True)
+        assert results['saved_files'] == 0
+
+        # "last_run_file" is not deleted accidentally
+        file_exists(last_run_file)
+
+        # partial run becomes full run when "last_run_file" is missing
+        remove_file(last_run_file)
+        results = convenience_run(partial_run=True, matching=True)
+        assert results['saved_files'] == 2
+
+        # "last_run_file" is re-created
+        file_exists(last_run_file)
