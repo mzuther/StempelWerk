@@ -156,9 +156,10 @@ class StempelWerk:
 
         @staticmethod
         def finalize_path(root_dir, original_path):
+            root_dir = pathlib.Path(root_dir)
             original_path = original_path.strip()
 
-            new_path = os.path.join(root_dir, original_path)
+            new_path = root_dir / original_path
             new_path = os.path.normpath(new_path)
 
             return new_path
@@ -166,7 +167,8 @@ class StempelWerk:
 
         def __post_init__(self):
             # root directory is relative to the location of this file
-            script_dir = os.path.dirname(os.path.abspath(__file__))
+            script_dir = pathlib.Path(
+                os.path.dirname(os.path.abspath(__file__)))
 
             self.root_dir = self.finalize_path(
                 script_dir, self.root_dir)

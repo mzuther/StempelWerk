@@ -8,6 +8,7 @@
 # fun reading these tests as I had in writing them!
 
 import os
+import pathlib
 
 import pytest
 from src.unittest.common import TestCommon
@@ -16,7 +17,7 @@ from src.unittest.common import TestCommon
 class TestTinTin(TestCommon):
     @property
     def resource_base_path(self):
-        return './src/unittest/tintin/'
+        return pathlib.Path('./src/unittest/tintin/')
 
 
     # Tin Tin lead a double life: he was both developer and a chairman of the
@@ -76,13 +77,13 @@ class TestTinTin(TestCommon):
     def test_jinja_extension(self, tmp_path):
 
         def file_exists(partial_file_path):
-            file_path = os.path.join(tmp_path, partial_file_path)
+            file_path = tmp_path / partial_file_path
             if not os.path.isfile(file_path):
                 raise FileNotFoundError(file_path)
 
 
         def remove_file(partial_file_path):
-            output_path = os.path.join(tmp_path, partial_file_path)
+            output_path = tmp_path / partial_file_path
             os.remove(output_path)
 
         # ---------------------------------------------------------------------
@@ -109,7 +110,7 @@ class TestTinTin(TestCommon):
 
         file_exists(debug_file)
 
-        with open(os.path.join(tmp_path, debug_file)) as f:
+        with open(tmp_path / debug_file) as f:
             debug_output = f.read()
             print(debug_output)
 

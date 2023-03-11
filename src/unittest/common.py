@@ -3,6 +3,7 @@ import difflib
 import filecmp
 import json
 import os
+import pathlib
 import shutil
 import sys
 
@@ -21,11 +22,11 @@ class TestCommon:
 
 
     def assert_autocreated_paths(self, config, pre_check):
-        root_dir = config['root_dir']
+        root_dir = pathlib.Path(config['root_dir'])
         autocreated_paths = ['template_dir', 'output_dir']
 
         for dir_key in autocreated_paths:
-            dir_path = os.path.join(root_dir, config[dir_key])
+            dir_path = root_dir / config[dir_key]
             # directories that should be autocreated do not exist yet
             if pre_check:
                 assert not os.path.isdir(dir_path), \
@@ -38,7 +39,9 @@ class TestCommon:
     # ------------------------------------------------------------------------
 
     def create_config(self, custom_config, output_path, filename):
-        config_path = os.path.join(output_path, filename)
+        output_path = pathlib.Path(output_path)
+        config_path = output_path / filename
+
         config = {
             'root_dir': str(output_path),
             'template_dir': '10-templates/',
@@ -77,9 +80,9 @@ class TestCommon:
 
 
     def compare_directories(self, config):
-        root_dir = config['root_dir']
-        output_path = os.path.join(root_dir, config['output_dir'])
-        expected_path = os.path.join(root_dir, '30-expected')
+        root_dir = pathlib.Path(config['root_dir'])
+        output_path = root_dir / config['output_dir']
+        expected_path = root_dir / '30-expected'
 
         comparator = filecmp.dircmp(expected_path, output_path)
 
@@ -97,19 +100,19 @@ class TestCommon:
             # only print first differing file
             differing_file_path = comparator.diff_files[0]
 
-            path_expected = os.path.join(expected_path, differing_file_path)
+            path_expected = expected_path / differing_file_path
             with open(path_expected, mode='r') as f:
                 expected_contents = f.readlines()
 
-            path_real = os.path.join(output_path, differing_file_path)
+            path_real = output_path / differing_file_path
             with open(path_real, mode='r') as f:
                 real_contents = f.readlines()
 
             result = difflib.unified_diff(
                 expected_contents,
                 real_contents,
-                fromfile=path_expected,
-                tofile=path_real)
+                fromfile=str(path_expected),
+                tofile=str(path_real))
 
             print('------------------------------------------------------')
             print()
@@ -136,7 +139,7 @@ class TestCommon:
 
         # allow testing for missing configuration on command line
         if config_path:
-            command_line_arguments.append(config_path)
+            command_line_arguments.append(str(config_path))
 
         parsed_args = StempelWerk.CommandLineParser(command_line_arguments)
         instance = StempelWerk(parsed_args.settings, parsed_args.verbosity)
@@ -160,9 +163,7 @@ class TestCommon:
 
     def run_with_config_file(self, config_path, resource_directory,
                              global_namespace=None):
-        resource_path = os.path.join(
-            self.resource_base_path,
-            resource_directory)
+        resource_path = self.resource_base_path / resource_directory
 
         with open(config_path, mode='r') as f:
             config = json.load(f)

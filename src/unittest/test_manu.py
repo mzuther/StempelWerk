@@ -8,6 +8,7 @@
 # fun reading these tests as I had in writing them!
 
 import json
+import pathlib
 import os
 
 import pytest
@@ -17,7 +18,7 @@ from src.unittest.common import TestCommon
 class TestManu(TestCommon):
     @property
     def resource_base_path(self):
-        return './src/unittest/manu/'
+        return pathlib.Path('./src/unittest/manu/')
 
 
     # Manu is an inquisitive developer and loves to try new things. She found
@@ -159,10 +160,10 @@ class TestManu(TestCommon):
         resource_directory = '1_template_3_splitfile'
 
         # assert that a subdirectory under "tmp_path" also works
-        root_dir = os.path.join(str(tmp_path), 'DRY')
+        root_dir = tmp_path / 'DRY'
 
         config = {
-            'root_dir': root_dir,
+            'root_dir': str(root_dir),
             'included_file_extensions': [
                 '*.txt.jinja',
             ],
@@ -176,7 +177,7 @@ class TestManu(TestCommon):
         self.run_and_compare(config_path, resource_directory)
 
         assert os.path.isfile(
-            os.path.join(root_dir, '30-expected/ab.txt')
+            root_dir / '30-expected/ab.txt'
         )
 
 
@@ -294,7 +295,7 @@ class TestManu(TestCommon):
             config, tmp_path, 'settings.json')
 
         # create output subdirectory by hand
-        os.makedirs(os.path.join(tmp_path, '20-output/other_name'))
+        os.makedirs(tmp_path / '20-output/other_name')
 
         self.run_and_compare(config_path, resource_directory)
 

@@ -8,6 +8,7 @@
 # fun reading these tests as I had in writing them!
 
 import os
+import pathlib
 import shutil
 
 import pytest
@@ -17,7 +18,7 @@ from src.unittest.common import TestCommon
 class TestMascara(TestCommon):
     @property
     def resource_base_path(self):
-        return './src/unittest/mascara/'
+        return pathlib.Path('./src/unittest/mascara/')
 
 
     # Mascara is a front-end developer wanting to learn coding. From her
@@ -44,7 +45,7 @@ class TestMascara(TestCommon):
 
 
         def remove_file(partial_file_path):
-            output_path = os.path.join(tmp_path, partial_file_path)
+            output_path = tmp_path / partial_file_path
             os.remove(output_path)
 
             # assert deletion
@@ -53,7 +54,7 @@ class TestMascara(TestCommon):
 
 
         def modify_file(partial_file_path):
-            output_path = os.path.join(tmp_path, partial_file_path)
+            output_path = tmp_path / partial_file_path
 
             with open(output_path, 'r') as f:
                 contents = f.readlines()
@@ -128,8 +129,9 @@ class TestMascara(TestCommon):
 
 
         def update_file(partial_file_path):
-            input_path = os.path.join(tmp_path, partial_file_path)
-            output_path = input_path.replace('_updated', '')
+            input_path = tmp_path / partial_file_path
+            output_path = pathlib.Path(
+                str(input_path).replace('_updated', ''))
 
             shutil.copyfile(input_path, output_path)
 
@@ -181,8 +183,9 @@ class TestMascara(TestCommon):
 
 
         def update_file(partial_file_path):
-            input_path = os.path.join(tmp_path, partial_file_path)
-            output_path = input_path.replace('_updated', '')
+            input_path = tmp_path / partial_file_path
+            output_path = pathlib.Path(
+                str(input_path).replace('_updated', ''))
 
             shutil.copyfile(input_path, output_path)
 
@@ -235,7 +238,7 @@ class TestMascara(TestCommon):
 
 
         def remove_file(partial_file_path):
-            output_path = os.path.join(tmp_path, partial_file_path)
+            output_path = tmp_path / partial_file_path
             os.remove(output_path)
 
         # ---------------------------------------------------------------------
@@ -283,13 +286,13 @@ class TestMascara(TestCommon):
 
 
         def file_exists(partial_file_path):
-            file_path = os.path.join(tmp_path, partial_file_path)
+            file_path = tmp_path / partial_file_path
             if not os.path.isfile(file_path):
                 raise FileNotFoundError(file_path)
 
 
         def remove_file(partial_file_path):
-            output_path = os.path.join(tmp_path, partial_file_path)
+            output_path = tmp_path / partial_file_path
             os.remove(output_path)
 
         # ---------------------------------------------------------------------
