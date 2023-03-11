@@ -158,15 +158,19 @@ class TestCommon:
         return results
 
 
-    def run_with_config_file(self, config_path, unit_test_path,
+    def run_with_config_file(self, config_path, resource_directory,
                              global_namespace=None):
+        resource_path = os.path.join(
+            self.resource_base_path,
+            resource_directory)
+
         with open(config_path, mode='r') as f:
             config = json.load(f)
 
             print('Configuration:')
             print(json.dumps(config, ensure_ascii=False, indent=2))
 
-        self.copy_directory_tree(config, unit_test_path)
+        self.copy_directory_tree(config, resource_path)
 
         results = self.run(config_path, global_namespace)
         results['configuration'] = config
@@ -174,10 +178,10 @@ class TestCommon:
         return results
 
 
-    def run_and_compare(self, config_path, unit_test_path,
+    def run_and_compare(self, config_path, resource_path,
                         global_namespace=None):
         results = self.run_with_config_file(
-            config_path, unit_test_path, global_namespace)
+            config_path, resource_path, global_namespace)
 
         self.compare_directories(
             results['configuration'])

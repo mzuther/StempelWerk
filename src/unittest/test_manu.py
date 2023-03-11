@@ -15,18 +15,10 @@ from src.unittest.common import TestCommon
 
 
 class TestManu(TestCommon):
-    def run_with_config_file(self, config_path, unit_test_directory,
-                             global_namespace=None):
-        unit_test_path = os.path.join(
-            './src/unittest/manu/',
-            unit_test_directory)
+    @property
+    def resource_base_path(self):
+        return './src/unittest/manu/'
 
-        return super().run_with_config_file(
-            config_path,
-            unit_test_path,
-            global_namespace=global_namespace)
-
-    # ---------------------------------------------------------------------
 
     # Manu is an inquisitive developer and loves to try new things. She found
     # StempelWerk on GitHub, cloned it and wants to get her hands dirty.
@@ -130,7 +122,7 @@ class TestManu(TestCommon):
     # and comes up with a brainy scheme of printing multiples of her favorite
     # characters without touching the keyboard. It works!
     def test_render_notrim(self, tmp_path):
-        unit_test_directory = '1_template_1_notrim'
+        resource_directory = '1_template_1_notrim'
 
         # assert that StempelWerk can change Jinja options
         config = {
@@ -142,14 +134,14 @@ class TestManu(TestCommon):
         config_path = self.create_config(
             config, tmp_path, 'settings.json')
 
-        self.run_and_compare(config_path, unit_test_directory)
+        self.run_and_compare(config_path, resource_directory)
 
 
     # Manu decides that she will try enabling "trim_blocks". After seeing the
     # results, she concurs with the author of StempelWerk that this option
     # should always be enabled.
     def test_render_trim(self, tmp_path):
-        unit_test_directory = '1_template_2_trim'
+        resource_directory = '1_template_2_trim'
 
         # "trim_blocks" is set to "True" by default in "create_config"
         config = {}
@@ -157,14 +149,14 @@ class TestManu(TestCommon):
         config_path = self.create_config(
             config, tmp_path, 'settings.json')
 
-        self.run_and_compare(config_path, unit_test_directory)
+        self.run_and_compare(config_path, resource_directory)
 
 
     # The real power of templates lies in preventing DRY ("do not repeat
     # yourself"). Accordingly, Manu writes a template that creates two files,
     # but shares their settings and macros.
     def test_render_splitfile(self, tmp_path):
-        unit_test_directory = '1_template_3_splitfile'
+        resource_directory = '1_template_3_splitfile'
 
         # assert that a subdirectory under "tmp_path" also works
         root_dir = os.path.join(str(tmp_path), 'DRY')
@@ -181,7 +173,7 @@ class TestManu(TestCommon):
 
         # assert indirectly that the template file "ignored.jinja" is
         # ignored and not processed
-        self.run_and_compare(config_path, unit_test_directory)
+        self.run_and_compare(config_path, resource_directory)
 
         assert os.path.isfile(
             os.path.join(root_dir, '30-expected/ab.txt')
@@ -199,7 +191,7 @@ class TestManu(TestCommon):
     # However, Manu forgot that file separators need to be changed in the
     # configuration. So she is greeted by a nice error message.
     def test_render_file_separator_code_only(self, tmp_path):
-        unit_test_directory = '1_template_4_file_separator'
+        resource_directory = '1_template_4_file_separator'
 
         config = {}
 
@@ -207,7 +199,7 @@ class TestManu(TestCommon):
             config, tmp_path, 'settings.json')
 
         with pytest.raises(SystemExit):
-            self.run_and_compare(config_path, unit_test_directory)
+            self.run_and_compare(config_path, resource_directory)
 
 
     # After updating the configuration, Manu gets the output she is looking for.
@@ -217,7 +209,7 @@ class TestManu(TestCommon):
     # Manu is now looking for a good lawyer to get the article back. Good luck
     # with that!
     def test_render_file_separator(self, tmp_path):
-        unit_test_directory = '1_template_4_file_separator'
+        resource_directory = '1_template_4_file_separator'
 
         config = {
             'marker_new_file': 'START_FILE',
@@ -227,14 +219,14 @@ class TestManu(TestCommon):
         config_path = self.create_config(
             config, tmp_path, 'settings.json')
 
-        self.run_and_compare(config_path, unit_test_directory)
+        self.run_and_compare(config_path, resource_directory)
 
 
     # Manu changes the default name of the stencil directory, but forgets to
     # update the settings file. StempelWerk fails, but displays a helpful error
     # message.
     def test_render_missing_stencil(self, tmp_path):
-        unit_test_directory = '1_template_5_with_stencil'
+        resource_directory = '1_template_5_with_stencil'
 
         config = {
             'stencil_dir_name': 'stencils',
@@ -244,12 +236,12 @@ class TestManu(TestCommon):
             config, tmp_path, 'settings.json')
 
         with pytest.raises(SystemExit):
-            self.run_and_compare(config_path, unit_test_directory)
+            self.run_and_compare(config_path, resource_directory)
 
 
     # After updating the settings file, StempelWerk runs just fine.
     def test_render_with_stencil(self, tmp_path):
-        unit_test_directory = '1_template_5_with_stencil'
+        resource_directory = '1_template_5_with_stencil'
 
         config = {
             'stencil_dir_name': '00-stencils',
@@ -258,13 +250,13 @@ class TestManu(TestCommon):
         config_path = self.create_config(
             config, tmp_path, 'settings.json')
 
-        self.run_and_compare(config_path, unit_test_directory)
+        self.run_and_compare(config_path, resource_directory)
 
 
     # Manu wants to create different files using different stencils. StempelWerk
     # just yawns and goes back to sleep.
     def test_render_multiple_stencils(self, tmp_path):
-        unit_test_directory = '1_template_6_multiple_stencils'
+        resource_directory = '1_template_6_multiple_stencils'
 
         config = {
             'stencil_dir_name': 'stencils',
@@ -273,14 +265,14 @@ class TestManu(TestCommon):
         config_path = self.create_config(
             config, tmp_path, 'settings.json')
 
-        self.run_and_compare(config_path, unit_test_directory)
+        self.run_and_compare(config_path, resource_directory)
 
 
     # Manu tries to render a file into a subdirectory of the output directory.
     # StempelWerk expects subdirectories to already exist and thus exits with an
     # error message.
     def test_render_create_subdirectories_1(self, tmp_path):
-        unit_test_directory = '1_template_7_create_subdirs'
+        resource_directory = '1_template_7_create_subdirs'
 
         config = {}
 
@@ -288,13 +280,13 @@ class TestManu(TestCommon):
             config, tmp_path, 'settings.json')
 
         with pytest.raises(SystemExit):
-            self.run_and_compare(config_path, unit_test_directory)
+            self.run_and_compare(config_path, resource_directory)
 
 
     # When Manu creates the subdirectory before running StempelWerk, everything
     # works as expected.
     def test_render_create_subdirectories_2(self, tmp_path):
-        unit_test_directory = '1_template_7_create_subdirs'
+        resource_directory = '1_template_7_create_subdirs'
 
         config = {}
 
@@ -304,13 +296,13 @@ class TestManu(TestCommon):
         # create output subdirectory by hand
         os.makedirs(os.path.join(tmp_path, '20-output/other_name'))
 
-        self.run_and_compare(config_path, unit_test_directory)
+        self.run_and_compare(config_path, resource_directory)
 
 
     # Enabling the automatic creation of missing directories works just as well,
     # at the price of incuding a security risk.
     def test_render_create_subdirectories_3(self, tmp_path):
-        unit_test_directory = '1_template_7_create_subdirs'
+        resource_directory = '1_template_7_create_subdirs'
 
         config = {
             'create_directories': True
@@ -319,13 +311,13 @@ class TestManu(TestCommon):
         config_path = self.create_config(
             config, tmp_path, 'settings.json')
 
-        self.run_and_compare(config_path, unit_test_directory)
+        self.run_and_compare(config_path, resource_directory)
 
 
     # Manu is intrigued: different operating systems store text files with
     # different newline characters. Time to have some fun!
     def test_render_file_endings_1(self, tmp_path):
-        unit_test_directory = '1_template_8_file_endings'
+        resource_directory = '1_template_8_file_endings'
 
         config = {
             'create_directories': True,
@@ -335,12 +327,12 @@ class TestManu(TestCommon):
         config_path = self.create_config(
             config, tmp_path, 'settings.json')
 
-        self.run_and_compare(config_path, unit_test_directory)
+        self.run_and_compare(config_path, resource_directory)
 
 
     # Can StempelWerk's newline logic be turned on its head? Yes, ma'am!
     def test_render_file_endings_2(self, tmp_path):
-        unit_test_directory = '1_template_8_file_endings'
+        resource_directory = '1_template_8_file_endings'
 
         config = {
             'create_directories': True,
@@ -351,7 +343,7 @@ class TestManu(TestCommon):
         config_path = self.create_config(
             config, tmp_path, 'settings.json')
 
-        results = self.run_with_config_file(config_path, unit_test_directory)
+        results = self.run_with_config_file(config_path, resource_directory)
         instance = results['instance']
 
         instance.newline_exceptions = {
@@ -367,20 +359,20 @@ class TestManu(TestCommon):
     # After playing around with a single template, Manu is excited that
     # StempelWerk can process multiple templates. In a single run!!!
     def test_render_multi_no_stencil(self, tmp_path):
-        unit_test_directory = '2_templates_1_no_stencil'
+        resource_directory = '2_templates_1_no_stencil'
 
         config = {}
 
         config_path = self.create_config(
             config, tmp_path, 'settings.json')
 
-        self.run_and_compare(config_path, unit_test_directory)
+        self.run_and_compare(config_path, resource_directory)
 
 
     # When the excitement has worn off, she verifies that common template code
     # can be reused by moving it into a stencil.
     def test_render_multi_with_stencil(self, tmp_path):
-        unit_test_directory = '2_templates_2_with_stencil'
+        resource_directory = '2_templates_2_with_stencil'
 
         config = {
             'stencil_dir_name': 'stencils',
@@ -389,4 +381,4 @@ class TestManu(TestCommon):
         config_path = self.create_config(
             config, tmp_path, 'settings.json')
 
-        self.run_and_compare(config_path, unit_test_directory)
+        self.run_and_compare(config_path, resource_directory)

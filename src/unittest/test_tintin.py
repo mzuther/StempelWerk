@@ -14,18 +14,10 @@ from src.unittest.common import TestCommon
 
 
 class TestTinTin(TestCommon):
-    def run_with_config_file(self, config_path, unit_test_directory,
-                             global_namespace=None):
-        unit_test_path = os.path.join(
-            './src/unittest/tintin/',
-            unit_test_directory)
+    @property
+    def resource_base_path(self):
+        return './src/unittest/tintin/'
 
-        return super().run_with_config_file(
-            config_path,
-            unit_test_path,
-            global_namespace=global_namespace)
-
-    # ---------------------------------------------------------------------
 
     # Tin Tin lead a double life: he was both developer and a chairman of the
     # UTP (Union of Technology Purloiners). After "obtaining" StempelWerk from a
@@ -39,7 +31,7 @@ class TestTinTin(TestCommon):
     # As a thief who made the global news, he obviously starts by testing global
     # variables.
     def test_global_variables(self, tmp_path):
-        unit_test_directory = '1_global_variables'
+        resource_directory = '1_global_variables'
         global_namespace = '{"NO_cast": true}'
 
         config = {
@@ -51,7 +43,7 @@ class TestTinTin(TestCommon):
 
         # set up StempelWerk and execute full run
         self.run_and_compare(
-            config_path, unit_test_directory,
+            config_path, resource_directory,
             global_namespace=global_namespace)
 
 
@@ -59,7 +51,7 @@ class TestTinTin(TestCommon):
     # wanted to call them "prison_cell" and "inmate_canteen", but the author of
     # StempelWerk put his foot down.
     def test_custom_module(self, tmp_path):
-        unit_test_directory = '2_custom_module'
+        resource_directory = '2_custom_module'
 
         config = {
             'stencil_dir_name': 'stencils',
@@ -73,7 +65,7 @@ class TestTinTin(TestCommon):
             config, tmp_path, 'settings.json')
 
         # set up StempelWerk and execute full run
-        self.run_and_compare(config_path, unit_test_directory)
+        self.run_and_compare(config_path, resource_directory)
 
 
     # Only 148 years to go! At Tin Tin's current pace, he will run out of work
@@ -95,7 +87,7 @@ class TestTinTin(TestCommon):
 
         # ---------------------------------------------------------------------
 
-        unit_test_directory = '3_jinja_extension'
+        resource_directory = '3_jinja_extension'
         debug_file = '20-output/Debug.txt'
 
         config = {
@@ -113,7 +105,7 @@ class TestTinTin(TestCommon):
 
         # set up StempelWerk and execute full run
         results = self.run_with_config_file(
-            config_path, unit_test_directory)
+            config_path, resource_directory)
 
         file_exists(debug_file)
 

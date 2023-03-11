@@ -15,18 +15,10 @@ from src.unittest.common import TestCommon
 
 
 class TestMascara(TestCommon):
-    def run_with_config_file(self, config_path, unit_test_directory,
-                             global_namespace=None):
-        unit_test_path = os.path.join(
-            './src/unittest/mascara/',
-            unit_test_directory)
+    @property
+    def resource_base_path(self):
+        return './src/unittest/mascara/'
 
-        return super().run_with_config_file(
-            config_path,
-            unit_test_path,
-            global_namespace=global_namespace)
-
-    # ---------------------------------------------------------------------
 
     # Mascara is a front-end developer wanting to learn coding. From her
     # previous experience, she thinks that getting an existing Python
@@ -78,7 +70,7 @@ class TestMascara(TestCommon):
 
         # ---------------------------------------------------------------------
 
-        unit_test_directory = '1_process_only_modified_1'
+        resource_directory = '1_process_only_modified_1'
 
         config = {
             'stencil_dir_name': 'stencils',
@@ -88,7 +80,7 @@ class TestMascara(TestCommon):
             config, tmp_path, 'settings.json')
 
         # set up StempelWerk and execute full run
-        results = self.run_and_compare(config_path, unit_test_directory)
+        results = self.run_and_compare(config_path, resource_directory)
         config = results['configuration']
         assert results['saved_files'] == 2
 
@@ -143,7 +135,7 @@ class TestMascara(TestCommon):
 
         # ---------------------------------------------------------------------
 
-        unit_test_directory = '1_process_only_modified_2'
+        resource_directory = '1_process_only_modified_2'
 
         config = {
             'stencil_dir_name': 'stencils',
@@ -153,7 +145,7 @@ class TestMascara(TestCommon):
             config, tmp_path, 'settings.json')
 
         # set up StempelWerk and execute full run
-        results = self.run_and_compare(config_path, unit_test_directory)
+        results = self.run_and_compare(config_path, resource_directory)
         config = results['configuration']
         assert results['saved_files'] == 2
 
@@ -196,7 +188,7 @@ class TestMascara(TestCommon):
 
         # ---------------------------------------------------------------------
 
-        unit_test_directory = '1_process_only_modified_3'
+        resource_directory = '1_process_only_modified_3'
 
         config = {
             'stencil_dir_name': 'stencils',
@@ -206,7 +198,7 @@ class TestMascara(TestCommon):
             config, tmp_path, 'settings.json')
 
         # set up StempelWerk and execute full run
-        results = self.run_and_compare(config_path, unit_test_directory)
+        results = self.run_and_compare(config_path, resource_directory)
         config = results['configuration']
         assert results['saved_files'] == 2
 
@@ -248,7 +240,7 @@ class TestMascara(TestCommon):
 
         # ---------------------------------------------------------------------
 
-        unit_test_directory = '1_process_only_modified_1'
+        resource_directory = '1_process_only_modified_1'
 
         config = {
             'stencil_dir_name': 'stencils',
@@ -258,7 +250,7 @@ class TestMascara(TestCommon):
             config, tmp_path, 'settings.json')
 
         # set up StempelWerk and execute full run
-        results = self.run_and_compare(config_path, unit_test_directory)
+        results = self.run_and_compare(config_path, resource_directory)
         config = results['configuration']
         assert results['saved_files'] == 2
 
@@ -302,7 +294,7 @@ class TestMascara(TestCommon):
 
         # ---------------------------------------------------------------------
 
-        unit_test_directory = '1_process_only_modified_1'
+        resource_directory = '1_process_only_modified_1'
 
         last_run_file = 'mascara.HACK'
 
@@ -318,7 +310,7 @@ class TestMascara(TestCommon):
             file_exists(last_run_file)
 
         # set up StempelWerk and execute full run
-        results = self.run_and_compare(config_path, unit_test_directory)
+        results = self.run_and_compare(config_path, resource_directory)
         config = results['configuration']
         assert results['saved_files'] == 2
 
