@@ -32,6 +32,11 @@ Here are some more "selling points":
 - the template language Jinja2 is very mature and its [Template Designer
   Documentation](https://jinja.palletsprojects.com/en/3.1.x/templates/) of
   excellent quality
+- all functionality is covered by unit tests
+- permissive licensing:
+  - StempelWerk: [BSD 3-Clause License](./LICENSE.md)
+  - Jinja2: [BSD 3-Clause License](https://jinja.palletsprojects.com/en/3.1.x/license/)
+  - Python: [PSF licencse](https://docs.python.org/3/license.html)
 
 ### Case study
 
