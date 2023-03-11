@@ -64,8 +64,8 @@ class TestTinTin(TestCommon):
         config = {
             'stencil_dir_name': 'stencils',
             'custom_modules': [
-                'src.unittest.tintin.0-custom.add_filters',
-                'src.unittest.tintin.0-custom.add_tests',
+                'src.custom.add_filters',
+                'src.custom.add_tests',
             ],
         }
 
