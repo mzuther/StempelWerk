@@ -160,7 +160,7 @@ class TestManu(TestCommon):
         resource_directory = '1_template_3_splitfile'
 
         # assert that a subdirectory under "tmp_path" also works
-        root_dir = tmp_path / 'DRY'
+        root_dir = tmp_path / 'DRY/nested'
 
         config = {
             'root_dir': str(root_dir),
@@ -290,8 +290,8 @@ class TestManu(TestCommon):
         config_path = self.create_config(
             config, tmp_path, 'settings.json')
 
-        # create output subdirectory by hand
-        output_subpath = tmp_path / '20-output/other_name'
+        # create nested output subdirectory by hand
+        output_subpath = tmp_path / '20-output/other/name'
         output_subpath.mkdir(parents=True)
 
         self.run_and_compare(config_path, resource_directory)

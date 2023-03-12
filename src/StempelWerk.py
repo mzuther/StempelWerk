@@ -590,8 +590,7 @@ class StempelWerk:
 
         if not output_directory.is_dir():
             if self.settings.create_directories:
-                # FIXME: unit test for nested directory
-                output_directory.mkdir()
+                output_directory.mkdir(parents=True)
                 if self.verbosity >= 0:
                     print(f'  - created directory "{output_directory}"')
             else:
