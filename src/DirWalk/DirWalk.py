@@ -41,7 +41,6 @@
 #
 # ----------------------------------------------------------------------------
 
-import fnmatch
 import math
 import os
 import pathlib
@@ -52,42 +51,41 @@ def dirwalk_recurse(root_directory, directories_first,
                     include_directories, follow_symlinks,
                     included, modified_after):
     root_directory = pathlib.Path(root_directory)
+
     directories = []
     files = []
 
     # "os.scandir" minimizes system calls (including the retrieval of
     # timestamps)
     with os.scandir(root_directory) as paths_in_directory:
-        for current_path in paths_in_directory:
-            path_name = current_path.name
-            path_relname = os.path.normpath(root_directory / path_name)
-            path_basename = os.path.basename(path_relname)
+        for dir_entry in paths_in_directory:
+            current_path = root_directory / dir_entry.name
 
             # process directories
-            if current_path.is_dir(follow_symlinks=follow_symlinks):
+            if dir_entry.is_dir(follow_symlinks=follow_symlinks):
                 is_included = True
 
                 # exclude directories
                 if is_included and included.get(
                         'excluded_directory_names', []):
-                    is_included = path_basename not in \
+                    is_included = current_path.name not in \
                         included['excluded_directory_names']
 
                 if is_included:
-                    directories.append(path_relname)
+                    directories.append(current_path)
             # process files
-            elif current_path.is_file(follow_symlinks=follow_symlinks):
+            elif dir_entry.is_file(follow_symlinks=follow_symlinks):
                 is_included = True
 
                 # exclude files
                 if is_included and included.get('excluded_file_names', []):
-                    is_included = path_basename not in \
+                    is_included = current_path.name not in \
                         included['excluded_file_names']
 
                 # only include some file suffixes
                 if is_included and included.get('included_suffixes', []):
                     for suffix in included['included_suffixes']:
-                        if fnmatch.fnmatch(path_basename, suffix):
+                        if current_path.match(suffix):
                             break
                     else:
                         is_included = False
@@ -95,7 +93,7 @@ def dirwalk_recurse(root_directory, directories_first,
                 # only include files modified after a given date
                 if is_included and modified_after:
                     # get timestamp of linked file, not of symlink
-                    stat_result = current_path.stat(follow_symlinks=True)
+                    stat_result = dir_entry.stat(follow_symlinks=True)
 
                     # "st_mtime_ns" gets the exact timestamp, although
                     # nanoseconds may be missing or inexact
@@ -109,7 +107,7 @@ def dirwalk_recurse(root_directory, directories_first,
                     is_included = modification_time_in_seconds >= modified_after
 
                 if is_included:
-                    files.append(path_relname)
+                    files.append(current_path)
 
     return directories, files
 
