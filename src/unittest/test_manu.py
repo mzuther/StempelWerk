@@ -164,7 +164,7 @@ class TestManu(TestCommon):
 
         config = {
             'root_dir': str(root_dir),
-            'included_file_extensions': [
+            'included_suffixes': [
                 '*.txt.jinja',
             ],
         }

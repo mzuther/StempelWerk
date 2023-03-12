@@ -84,10 +84,10 @@ def dirwalk_recurse(root_directory, directories_first,
                     is_included = path_basename not in \
                         included['excluded_file_names']
 
-                # only include some file extensions
-                if is_included and included.get('included_file_extensions', []):
-                    for extension in included['included_file_extensions']:
-                        if fnmatch.fnmatch(path_basename, extension):
+                # only include some file suffixes
+                if is_included and included.get('included_suffixes', []):
+                    for suffix in included['included_suffixes']:
+                        if fnmatch.fnmatch(path_basename, suffix):
                             break
                     else:
                         is_included = False
@@ -173,7 +173,7 @@ if __name__ == '__main__':
         ],
         'excluded_file_names': [
         ],
-        'included_file_extensions': [
+        'included_suffixes': [
         ],
     }
 

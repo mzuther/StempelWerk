@@ -135,8 +135,8 @@ keeps setting up paths simple, and allows you to call StempelWerk from anywhere.
 ### `template_dir`
 
 Path to root of template directory, relative to `root_dir`. This directory is
-scanned recursively, and all files with an extension matching the setting
-`included_file_extensions` will be rendered using Jinja.
+scanned recursively, and all files with an suffix matching the setting
+`included_suffixes` will be rendered using Jinja.
 
 ### `output_dir`
 
@@ -169,11 +169,11 @@ _Depending on your use case, automatically creating directories for output files
 may be just awkward or a full-blown security issue. This option is therefore
 disabled by default, and it is encouraged to leave it that way._
 
-### `included_file_extensions`
+### `included_suffixes`
 
-List containing file extensions (e.g. `*.sql.jinja`). Only files with a
-[matching extension](https://docs.python.org/3/library/fnmatch.html) are
-considered to be templates and will be passed to Jinja.
+List containing suffixes such as `*.sql.jinja`. Only files with a [matching
+suffix](https://docs.python.org/3/library/fnmatch.html) are considered to be
+templates and will be passed to Jinja.
 
 ### `jinja_options`
 

@@ -62,7 +62,7 @@ class StempelWerk:
     # ---------------------------------------------------------------------
 
     APPLICATION = 'StempelWerk'
-    VERSION = '0.8.6'
+    VERSION = '0.8.7'
     AUTHOR = 'Martin Zuther'
     DESCRIPTION = 'Automatic code generation from Jinja2 templates.'
     LICENSE = 'BSD 3-Clause License'
@@ -135,7 +135,7 @@ class StempelWerk:
         template_dir: str
         output_dir: str
         # ----------------------------------------
-        included_file_extensions: list
+        included_suffixes: list
         stencil_dir_name: str = ''
         create_directories: bool = False
         # ----------------------------------------
@@ -609,16 +609,14 @@ class StempelWerk:
                 self.printer.error()
                 exit(1)
 
-        _, file_extension = os.path.splitext(output_filename)
+        _, suffix = os.path.splitext(output_filename)
 
         if self.verbosity >= 0:
             print('  - {}'.format(os.path.relpath(
                 output_filename, self.settings.output_dir)))
 
         # use default newline character unless there is an exception
-        newline = self.newline_exceptions.get(
-            file_extension,
-            self.settings.newline)
+        newline = self.newline_exceptions.get(suffix, self.settings.newline)
 
         # Jinja2 encodes all strings in UTF-8
         with open(output_filename, mode='w', encoding='utf-8',
@@ -626,7 +624,7 @@ class StempelWerk:
             f.write(content)
 
         # make Linux shell files executable by owner
-        if file_extension == '.sh' and platform.system() == 'Linux':
+        if suffix == '.sh' and platform.system() == 'Linux':
             with pathlib.Path(output_filename) as f:
                 mode = f.stat().st_mode
                 f.chmod(mode | stat.S_IXUSR)
@@ -644,7 +642,7 @@ class StempelWerk:
                 self.settings.stencil_dir_name
             ],
             'excluded_file_names': [],
-            'included_file_extensions': self.settings.included_file_extensions,
+            'included_suffixes': self.settings.included_suffixes,
         }
 
         modified_after = None
