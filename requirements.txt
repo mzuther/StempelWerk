@@ -1,3 +1,6 @@
 # "namespace()" function was introduced in v2.1.0
 Jinja2>=2.1.0
+
+# linting and unit testing
+flake8
 pytest>=7

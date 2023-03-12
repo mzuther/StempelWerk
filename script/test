@@ -2,8 +2,19 @@
 
 echo
 
-python -m pytest "$@"
+python -m pytest --ignore="./.git" --ignore="./.venv" "$@"
 EXIT_CODE=$?
 
 echo
+if [ $EXIT_CODE -ne 0 ]; then
+   exit $EXIT_CODE
+fi
+
+python -m flake8 --config="./.flake8" src/
+EXIT_CODE=$?
+
+if [ $EXIT_CODE -ne 0 ]; then
+  echo
+fi
+
 exit $EXIT_CODE
