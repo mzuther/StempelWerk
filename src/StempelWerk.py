@@ -49,7 +49,6 @@ import importlib
 import json
 import math
 import pathlib
-import platform
 import stat
 import sys
 
@@ -614,12 +613,6 @@ class StempelWerk:
         with open(output_filename, mode='w', encoding='utf-8',
                   newline=newline) as f:
             f.write(content)
-
-        # FIXME: write unit test
-        # make Linux shell files executable by owner
-        if output_filename.suffix == '.sh' and platform.system() == 'Linux':
-            mode = output_filename.stat().st_mode
-            output_filename.chmod(mode | stat.S_IXUSR)
 
         return 1
 
