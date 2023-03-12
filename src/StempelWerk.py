@@ -48,7 +48,6 @@ import datetime
 import importlib
 import json
 import math
-import os
 import pathlib
 import platform
 import stat
@@ -166,8 +165,7 @@ class StempelWerk:
 
         def __post_init__(self):
             # root directory is relative to the location of this file
-            script_dir = pathlib.Path(
-                os.path.dirname(os.path.abspath(__file__)))
+            script_dir = pathlib.Path(__file__).parent
 
             self.root_dir = self.finalize_path(
                 script_dir, self.root_dir)
@@ -178,17 +176,13 @@ class StempelWerk:
                 self.template_dir)
 
             # automatically create template folder
-            #
-            # NOTE: "os.makedirs" expects normalized paths
-            os.makedirs(self.template_dir, exist_ok=True)
+            self.template_dir.mkdir(exist_ok=True)
 
             self.output_dir = self.finalize_path(
                 self.root_dir, self.output_dir)
 
             # automatically create output folder
-            #
-            # NOTE: "os.makedirs" expects normalized paths
-            os.makedirs(self.output_dir, exist_ok=True)
+            self.output_dir.mkdir(exist_ok=True)
 
             self.last_run_file = self.finalize_path(
                 self.root_dir, self.last_run_file)
@@ -398,8 +392,8 @@ class StempelWerk:
 
         stencil_filenames = []
         for stencil_filename in template_filenames:
-            path_components = os.path.split(stencil_filename)
-            if self.settings.stencil_dir_name in path_components:
+            stencil_path = pathlib.Path(stencil_filename)
+            if self.settings.stencil_dir_name in stencil_path.parts:
                 stencil_filenames.append(stencil_filename)
 
         # check whether stencil directories contain any stencils
@@ -482,13 +476,16 @@ class StempelWerk:
             self.printer.debug()
 
 
-    def render_template(self, template_filename, global_namespace=None):
+    def render_template(self, template_path, global_namespace=None):
+        template_path = template_path.relative_to(
+            self.settings.template_dir)
+
+        # Jinja2 cannot handle Windows paths
+        template_filename = template_path.as_posix()
+
         # create environment automatically
         if not hasattr(self, 'jinja_environment'):
             self.create_environment()
-
-        template_filename = os.path.relpath(
-            template_filename, self.settings.template_dir)
 
         processed_templates = 1
         saved_files = 0
@@ -501,11 +498,7 @@ class StempelWerk:
             elif (processed_templates % 10) == 0:
                 print(' ', end='')
         elif self.verbosity >= -1:
-            print('- {}'.format(template_filename))
-
-        # Jinja2 cannot handle Windows paths
-        if os.path.sep != '/':
-            template_filename = template_filename.replace(os.path.sep, '/')
+            print('- {}'.format(template_path))
 
         current_global_namespace = self.settings.global_namespace
 
@@ -593,11 +586,12 @@ class StempelWerk:
 
         output_filename = self.Settings.finalize_path(
             self.settings.output_dir, output_filename)
-        output_directory = os.path.dirname(output_filename)
+        output_directory = output_filename.parent
 
-        if not os.path.exists(output_directory):
+        if not output_directory.is_dir():
             if self.settings.create_directories:
-                os.makedirs(output_directory)
+                # FIXME: unit test for nested directory
+                output_directory.mkdir()
                 if self.verbosity >= 0:
                     print(f'  - created directory "{output_directory}"')
             else:
@@ -609,8 +603,8 @@ class StempelWerk:
                 exit(1)
 
         if self.verbosity >= 0:
-            print('  - {}'.format(os.path.relpath(
-                output_filename, self.settings.output_dir)))
+            print('  - {}'.format(output_filename.relative_to(
+                self.settings.output_dir)))
 
         # use default newline character unless there is an exception
         newline = self.newline_exceptions.get(

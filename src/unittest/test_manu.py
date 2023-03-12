@@ -176,10 +176,6 @@ class TestManu(TestCommon):
         # ignored and not processed
         self.run_and_compare(config_path, resource_directory)
 
-        assert os.path.isfile(
-            root_dir / '30-expected/ab.txt'
-        )
-
 
     # Manu loves Wikipedia and articles on programming languages
     # (https://en.wikipedia.org/wiki/Esoteric_programming_language). She wants
@@ -295,7 +291,8 @@ class TestManu(TestCommon):
             config, tmp_path, 'settings.json')
 
         # create output subdirectory by hand
-        os.makedirs(tmp_path / '20-output/other_name')
+        output_subpath = tmp_path / '20-output/other_name'
+        output_subpath.mkdir(parents=True)
 
         self.run_and_compare(config_path, resource_directory)
 

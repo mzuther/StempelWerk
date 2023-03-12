@@ -2,7 +2,6 @@ import contextlib
 import difflib
 import filecmp
 import json
-import os
 import pathlib
 import shutil
 import sys
@@ -29,11 +28,11 @@ class TestCommon:
             dir_path = root_dir / config[dir_key]
             # directories that should be autocreated do not exist yet
             if pre_check:
-                assert not os.path.isdir(dir_path), \
+                assert not dir_path.is_dir(), \
                     f'directory "{dir_path}" already exists'
             # directories were autocreated
             else:
-                assert os.path.isdir(dir_path), \
+                assert dir_path.is_dir(), \
                     f'directory "{dir_path}" was not created'
 
     # ------------------------------------------------------------------------

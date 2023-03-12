@@ -7,7 +7,6 @@
 # names, but all personality traits have been made up. I hope they have as much
 # fun reading these tests as I had in writing them!
 
-import os
 import pathlib
 
 import pytest
@@ -78,13 +77,13 @@ class TestTinTin(TestCommon):
 
         def file_exists(partial_file_path):
             file_path = tmp_path / partial_file_path
-            if not os.path.isfile(file_path):
+            if not file_path.is_file():
                 raise FileNotFoundError(file_path)
 
 
         def remove_file(partial_file_path):
             output_path = tmp_path / partial_file_path
-            os.remove(output_path)
+            output_path.unlink()
 
         # ---------------------------------------------------------------------
 
