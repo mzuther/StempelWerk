@@ -17,7 +17,7 @@ from src.unittest.common import TestCommon
 class TestTinTin(TestCommon):
     @property
     def resource_base_path(self):
-        return pathlib.Path('./src/unittest/tintin/')
+        return pathlib.Path('src/unittest/') / 'tintin'
 
 
     # Tin Tin lead a double life: he was both developer and a chairman of the
@@ -89,7 +89,7 @@ class TestTinTin(TestCommon):
         # ---------------------------------------------------------------------
 
         resource_directory = '3_jinja_extension'
-        debug_file = '20-output/Debug.txt'
+        debug_file = pathlib.Path('20-output') / 'Debug.txt'
 
         config = {
             'stencil_dir_name': 'stencils',
@@ -115,9 +115,9 @@ class TestTinTin(TestCommon):
             print(debug_output)
 
             stencils = [
-                'stencils/00-common_settings.sql.jinja',
-                'stencils/10-sql_create_table.sql.jinja',
-                'stencils/20-sql_create_stored_procedure.sql.jinja',
+                '00-common_settings.sql.jinja',
+                '10-sql_create_table.sql.jinja',
+                '20-sql_create_stored_procedure.sql.jinja',
             ]
 
             for stencil in stencils:

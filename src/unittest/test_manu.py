@@ -18,7 +18,7 @@ from src.unittest.common import TestCommon
 class TestManu(TestCommon):
     @property
     def resource_base_path(self):
-        return pathlib.Path('./src/unittest/manu/')
+        return pathlib.Path('src/unittest/') / 'manu'
 
 
     # Manu is an inquisitive developer and loves to try new things. She found

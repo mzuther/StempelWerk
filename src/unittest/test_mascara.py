@@ -18,7 +18,7 @@ from src.unittest.common import TestCommon
 class TestMascara(TestCommon):
     @property
     def resource_base_path(self):
-        return pathlib.Path('./src/unittest/mascara/')
+        return pathlib.Path('src/unittest/') / 'mascara'
 
 
     # Mascara is a front-end developer wanting to learn coding. From her
@@ -86,13 +86,14 @@ class TestMascara(TestCommon):
         assert results['saved_files'] == 2
 
         # full run renders all files unconditonally
-        remove_file('20-output/ab.txt')
-        modify_file('20-output/cd.txt')
+        output_path = pathlib.Path('20-output')
+        remove_file(output_path / 'ab.txt')
+        modify_file(output_path / 'cd.txt')
         results = convenience_run(partial_run=False, matching=True)
         assert results['saved_files'] == 2
 
         # partial run leaves deleted output file alone
-        remove_file('20-output/cd.txt')
+        remove_file(output_path / 'cd.txt')
         results = convenience_run(partial_run=True, matching=False)
         assert results['saved_files'] == 0
 
@@ -101,7 +102,7 @@ class TestMascara(TestCommon):
         assert results['saved_files'] == 2
 
         # partial run does not render externally modified output file
-        modify_file('20-output/ab.txt')
+        modify_file(output_path / 'ab.txt')
         results = convenience_run(partial_run=True, matching=False)
         assert results['saved_files'] == 0
 
@@ -151,13 +152,15 @@ class TestMascara(TestCommon):
         config = results['configuration']
         assert results['saved_files'] == 2
 
-        update_file('30-expected_updated/ab.txt')
+        updated_path_30 = pathlib.Path('30-expected_updated')
+        update_file(updated_path_30 / 'ab.txt')
 
         # partial run does not update changed files
         results = convenience_run(partial_run=True, matching=False)
         assert results['saved_files'] == 0
 
-        update_file('10-templates_updated/ab.jinja')
+        updated_path_10 = pathlib.Path('10-templates_updated')
+        update_file(updated_path_10 / 'ab.jinja')
 
         # partial run updates output files of changed templates
         results = convenience_run(partial_run=True, matching=True)
@@ -205,14 +208,16 @@ class TestMascara(TestCommon):
         config = results['configuration']
         assert results['saved_files'] == 2
 
-        update_file('10-templates_updated/stencils/common.jinja')
+        updated_path_10 = pathlib.Path('10-templates_updated')
+        update_file(updated_path_10 / 'stencils/common.jinja')
 
         # partial run does not check for changed stencils
         results = convenience_run(partial_run=True, matching=True)
         assert results['saved_files'] == 0
 
-        update_file('30-expected_updated/ab.txt')
-        update_file('30-expected_updated/cd.txt')
+        updated_path_30 = pathlib.Path('30-expected_updated')
+        update_file(updated_path_30 / 'ab.txt')
+        update_file(updated_path_30 / 'cd.txt')
 
         # full run applies changed stencils
         results = convenience_run(partial_run=False, matching=True)
@@ -258,7 +263,8 @@ class TestMascara(TestCommon):
         assert results['saved_files'] == 2
 
         # deleting a template leaves the output file alone
-        remove_file('10-templates/ab.jinja')
+        template_path = pathlib.Path('10-templates')
+        remove_file(template_path / 'ab.jinja')
         results = convenience_run(partial_run=False, matching=True)
         assert results['saved_files'] == 1
 
