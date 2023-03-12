@@ -49,7 +49,6 @@ import importlib
 import json
 import math
 import pathlib
-import stat
 import sys
 
 import jinja2
@@ -245,7 +244,8 @@ class StempelWerk:
                 '-g',
                 '--globals',
                 action='store',
-                help='string or file containing JSON-formatted global variables',
+                help=('string or file containing JSON-formatted '
+                      'global variables'),
                 metavar='JSON',
                 dest='global_namespace')
 
@@ -530,7 +530,7 @@ class StempelWerk:
             self.printer.error(f'{err.message} (line {err.lineno})')
             self.printer.error()
 
-            raise(err)
+            raise err
 
         except Exception as err:
             if self.verbosity < -1:
@@ -540,7 +540,7 @@ class StempelWerk:
 
             self.printer.error()
 
-            raise(err)
+            raise err
 
         # split content of multiple files
         split_contents = content_of_multiple_files.split(
