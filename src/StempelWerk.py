@@ -160,7 +160,6 @@ class StempelWerk:
             original_path = original_path.strip()
 
             new_path = root_dir / original_path
-            new_path = os.path.normpath(new_path)
 
             return new_path
 
@@ -609,25 +608,25 @@ class StempelWerk:
                 self.printer.error()
                 exit(1)
 
-        _, suffix = os.path.splitext(output_filename)
-
         if self.verbosity >= 0:
             print('  - {}'.format(os.path.relpath(
                 output_filename, self.settings.output_dir)))
 
         # use default newline character unless there is an exception
-        newline = self.newline_exceptions.get(suffix, self.settings.newline)
+        newline = self.newline_exceptions.get(
+            output_filename.suffix,
+            self.settings.newline)
 
         # Jinja2 encodes all strings in UTF-8
         with open(output_filename, mode='w', encoding='utf-8',
                   newline=newline) as f:
             f.write(content)
 
+        # FIXME: write unit test
         # make Linux shell files executable by owner
-        if suffix == '.sh' and platform.system() == 'Linux':
-            with pathlib.Path(output_filename) as f:
-                mode = f.stat().st_mode
-                f.chmod(mode | stat.S_IXUSR)
+        if output_filename.suffix == '.sh' and platform.system() == 'Linux':
+            mode = output_filename.stat().st_mode
+            output_filename.chmod(mode | stat.S_IXUSR)
 
         return 1
 
