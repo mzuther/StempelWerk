@@ -50,66 +50,78 @@ import sys
 def dirwalk_recurse(root_directory, directories_first,
                     include_directories, follow_symlinks,
                     included, modified_after):
-    root_directory = pathlib.Path(root_directory)
-
     directories = []
     files = []
 
+    root_directory = pathlib.Path(root_directory)
+
     # "os.scandir" minimizes system calls (including the retrieval of
     # timestamps)
-    with os.scandir(root_directory) as paths_in_directory:
-        for dir_entry in paths_in_directory:
-            current_path = root_directory / dir_entry.name
+    for dir_entry in os.scandir(root_directory):
+        current_path = root_directory / dir_entry.name
 
-            # process directories
-            if dir_entry.is_dir(follow_symlinks=follow_symlinks):
-                is_included = True
+        # process directories
+        if dir_entry.is_dir(follow_symlinks=follow_symlinks):
+            is_included = is_directory_included(
+                current_path, dir_entry, included, modified_after)
 
-                # exclude directories
-                if is_included and included.get(
-                        'excluded_directory_names', []):
-                    is_included = current_path.name not in \
-                        included['excluded_directory_names']
+            if is_included:
+                directories.append(current_path)
+        # process files
+        elif dir_entry.is_file(follow_symlinks=follow_symlinks):
+            is_included = is_file_included(
+                current_path, dir_entry, included, modified_after)
 
-                if is_included:
-                    directories.append(current_path)
-            # process files
-            elif dir_entry.is_file(follow_symlinks=follow_symlinks):
-                is_included = True
-
-                # exclude files
-                if is_included and included.get('excluded_file_names', []):
-                    is_included = current_path.name not in \
-                        included['excluded_file_names']
-
-                # only include some file suffixes
-                if is_included and included.get('included_suffixes', []):
-                    for suffix in included['included_suffixes']:
-                        if current_path.match(suffix):
-                            break
-                    else:
-                        is_included = False
-
-                # only include files modified after a given date
-                if is_included and modified_after:
-                    # get timestamp of linked file, not of symlink
-                    stat_result = dir_entry.stat(follow_symlinks=True)
-
-                    # "st_mtime_ns" gets the exact timestamp, although
-                    # nanoseconds may be missing or inexact
-                    modification_time_in_seconds = stat_result.st_mtime_ns / 1e9
-
-                    # round up to ensure that files with inaccurate
-                    # timestamps and other edge cases are included
-                    modification_time_in_seconds = math.ceil(
-                        modification_time_in_seconds)
-
-                    is_included = modification_time_in_seconds >= modified_after
-
-                if is_included:
-                    files.append(current_path)
+            if is_included:
+                files.append(current_path)
 
     return directories, files
+
+
+def is_directory_included(current_path, dir_entry, included, modified_after):
+    is_included = True
+
+    # exclude directories
+    if is_included:
+        is_included = current_path.name not in \
+            included.get('excluded_directory_names', [])
+
+    return is_included
+
+
+def is_file_included(current_path, dir_entry, included, modified_after):
+    is_included = True
+
+    # exclude files
+    if is_included:
+        is_included = current_path.name not in \
+            included.get('excluded_file_names', [])
+
+    # only include some file suffixes
+    if is_included:
+        for suffix in included.get('included_suffixes', []):
+            if current_path.match(suffix):
+                break
+        else:
+            is_included = False
+
+    # only include files modified after a given date
+    if is_included and modified_after:
+        # get timestamp of linked file, not of symlink
+        stat_result = dir_entry.stat(follow_symlinks=True)
+
+        # "st_mtime_ns" gets the exact timestamp, although
+        # nanoseconds may be missing or inexact
+        modification_time_in_seconds = stat_result.st_mtime_ns / 1e9
+
+        # round up to ensure that files with inaccurate
+        # timestamps and other edge cases are included
+        modification_time_in_seconds = math.ceil(
+            modification_time_in_seconds)
+
+        is_included = modification_time_in_seconds >= modified_after
+
+    return is_included
 
 
 def dirwalk(root_directory, directories_first=True, include_directories=False,
