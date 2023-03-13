@@ -61,24 +61,22 @@ def dirwalk_recurse(root_directory, directories_first,
         current_path = root_directory / dir_entry.name
 
         # process directories
-        if dir_entry.is_dir(follow_symlinks=follow_symlinks):
-            is_included = is_directory_included(
-                current_path, dir_entry, included, modified_after)
-
-            if is_included:
-                directories.append(current_path)
+        if is_directory_included(current_path, dir_entry, follow_symlinks,
+                                 included, modified_after):
+            directories.append(current_path)
         # process files
-        elif dir_entry.is_file(follow_symlinks=follow_symlinks):
-            is_included = is_file_included(
-                current_path, dir_entry, included, modified_after)
-
-            if is_included:
-                files.append(current_path)
+        elif is_file_included(current_path, dir_entry, follow_symlinks,
+                              included, modified_after):
+            files.append(current_path)
 
     return directories, files
 
 
-def is_directory_included(current_path, dir_entry, included, modified_after):
+def is_directory_included(current_path, dir_entry, follow_symlinks,
+                          included, modified_after):
+    if not dir_entry.is_dir(follow_symlinks=follow_symlinks):
+        return False
+
     # exclude directories
     if current_path.name in included.get('excluded_directory_names', []):
         return False
@@ -86,7 +84,11 @@ def is_directory_included(current_path, dir_entry, included, modified_after):
     return True
 
 
-def is_file_included(current_path, dir_entry, included, modified_after):
+def is_file_included(current_path, dir_entry, follow_symlinks,
+                     included, modified_after):
+    if not dir_entry.is_file(follow_symlinks=follow_symlinks):
+        return False
+
     # exclude files
     if current_path.name in included.get('excluded_file_names', []):
         return False
