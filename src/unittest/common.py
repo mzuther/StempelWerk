@@ -60,7 +60,8 @@ class TestCommon:
             # ----------------------------------------
             'last_run_file': '.last_run',
             'marker_new_file': '### New file:',
-            'marker_content': '### Content:'
+            'marker_content': '### Content:',
+            'newline': '\n'
         }
 
         # update config with custom settings
