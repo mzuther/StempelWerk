@@ -55,13 +55,13 @@ class TestMascara(TestCommon):
         def modify_file(partial_file_path):
             output_path = tmp_path / partial_file_path
 
-            with open(output_path, 'r') as f:
+            with output_path.open() as f:
                 contents = f.readlines()
 
             # delete first line
             contents = contents[1:]
 
-            with open(output_path, 'w') as f:
+            with output_path.open(mode='w') as f:
                 f.writelines(contents)
 
             # assert modification

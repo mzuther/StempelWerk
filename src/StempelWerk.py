@@ -325,7 +325,7 @@ class StempelWerk:
 
         def load_json_file(self, json_file_path):
             try:
-                with open(json_file_path) as f:
+                with json_file_path.open() as f:
                     result = json.load(f)
 
             except FileNotFoundError:
@@ -610,8 +610,8 @@ class StempelWerk:
             self.settings.newline)
 
         # Jinja2 encodes all strings in UTF-8
-        with open(output_filename, mode='w', encoding='utf-8',
-                  newline=newline) as f:
+        with output_filename.open(mode='w', encoding='utf-8',
+                                  newline=newline) as f:
             f.write(content)
 
         return 1
@@ -634,7 +634,7 @@ class StempelWerk:
         if process_only_modified:
             # get time of last run
             try:
-                with open(self.settings.last_run_file) as f:
+                with self.settings.last_run_file.open() as f:
                     modified_after = f.read()
                     modified_after = modified_after.strip()
             except IOError:
@@ -658,7 +658,7 @@ class StempelWerk:
                 saved_files += results['saved_files']
 
             # save time of current run
-            with open(self.settings.last_run_file, mode='w') as f:
+            with self.settings.last_run_file.open(mode='w') as f:
                 # convert to UNIX time
                 start_of_processing_timestamp = start_of_processing.timestamp()
 

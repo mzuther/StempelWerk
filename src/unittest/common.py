@@ -67,7 +67,7 @@ class TestCommon:
         # update config with custom settings
         config.update(custom_config)
 
-        with open(config_path, mode='w', encoding='utf-8') as f:
+        with config_path.open(mode='w', encoding='utf-8') as f:
             json.dump(config, f, ensure_ascii=False, indent=2)
 
         return config_path
@@ -82,9 +82,9 @@ class TestCommon:
     def compare_directories(self, config):
         root_dir = pathlib.Path(config['root_dir'])
         output_path = root_dir / config['output_dir']
-        expected_path = root_dir / '30-expected'
+        expected_base = root_dir / '30-expected'
 
-        comparator = filecmp.dircmp(expected_path, output_path)
+        comparator = filecmp.dircmp(expected_base, output_path)
 
         assert not comparator.left_only, \
             f'these files were not generated: { comparator.left_only }'
@@ -100,12 +100,12 @@ class TestCommon:
             # only print first differing file
             differing_file_path = comparator.diff_files[0]
 
-            path_expected = expected_path / differing_file_path
-            with open(path_expected, mode='r') as f:
+            path_expected = expected_base / differing_file_path
+            with path_expected.open() as f:
                 expected_contents = f.readlines()
 
             path_real = output_path / differing_file_path
-            with open(path_real, mode='r') as f:
+            with path_real.open() as f:
                 real_contents = f.readlines()
 
             result = difflib.unified_diff(
@@ -165,7 +165,7 @@ class TestCommon:
                              global_namespace=None):
         resource_path = self.resource_base_path / resource_directory
 
-        with open(config_path, mode='r') as f:
+        with config_path.open() as f:
             config = json.load(f)
 
             print('Configuration:')
