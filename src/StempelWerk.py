@@ -158,7 +158,7 @@ class StempelWerk:
 
             new_path = root_dir / original_path
 
-            return new_path
+            return new_path.expanduser()
 
 
         def __post_init__(self):
