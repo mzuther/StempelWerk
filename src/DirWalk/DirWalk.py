@@ -47,31 +47,6 @@ import pathlib
 import sys
 
 
-def dirwalk_recurse(root_directory, directories_first,
-                    include_directories, follow_symlinks,
-                    included, modified_after):
-    directories = []
-    files = []
-
-    root_directory = pathlib.Path(root_directory)
-
-    # "os.scandir" minimizes system calls (including the retrieval of
-    # timestamps)
-    for dir_entry in os.scandir(root_directory):
-        current_path = root_directory / dir_entry.name
-
-        # process directories
-        if is_directory_included(current_path, dir_entry, follow_symlinks,
-                                 included, modified_after):
-            directories.append(current_path)
-        # process files
-        elif is_file_included(current_path, dir_entry, follow_symlinks,
-                              included, modified_after):
-            files.append(current_path)
-
-    return directories, files
-
-
 def is_directory_included(current_path, dir_entry, follow_symlinks,
                           included, modified_after):
     if not dir_entry.is_dir(follow_symlinks=follow_symlinks):
@@ -119,8 +94,9 @@ def is_file_included(current_path, dir_entry, follow_symlinks,
     return modification_time_in_seconds >= modified_after
 
 
-def dirwalk(root_directory, directories_first=True, include_directories=False,
-            follow_symlinks=False, included=None, modified_after=None):
+def dirwalk_prepare(root_directory, included, modified_after):
+    root_directory = pathlib.Path(root_directory)
+
     if not included:
         included = {}
 
@@ -128,7 +104,15 @@ def dirwalk(root_directory, directories_first=True, include_directories=False,
     if modified_after:
         modified_after = int(modified_after)
 
-    directories, files = dirwalk_recurse(root_directory, directories_first,
+    return (root_directory, included, modified_after)
+
+
+def dirwalk(root_directory, directories_first=True, include_directories=False,
+            follow_symlinks=False, included=None, modified_after=None):
+    root_directory, included, modified_after = dirwalk_prepare(
+        root_directory, included, modified_after)
+
+    directories, files = dirwalk_process(root_directory, directories_first,
                                          include_directories, follow_symlinks,
                                          included, modified_after)
 
@@ -157,6 +141,29 @@ def dirwalk(root_directory, directories_first=True, include_directories=False,
         result.extend(files)
 
     return result
+
+
+def dirwalk_process(root_directory, directories_first,
+                    include_directories, follow_symlinks,
+                    included, modified_after):
+    directories = []
+    files = []
+
+    # "os.scandir" minimizes system calls (including the retrieval of
+    # timestamps)
+    for dir_entry in os.scandir(root_directory):
+        current_path = root_directory / dir_entry.name
+
+        # process directories
+        if is_directory_included(current_path, dir_entry, follow_symlinks,
+                                 included, modified_after):
+            directories.append(current_path)
+        # process files
+        elif is_file_included(current_path, dir_entry, follow_symlinks,
+                              included, modified_after):
+            files.append(current_path)
+
+    return directories, files
 
 
 if __name__ == '__main__':
