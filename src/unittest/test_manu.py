@@ -73,10 +73,11 @@ class TestManu(TestCommon):
         # common path separator can be used (cross-platform support)
         tmp_path = str(tmp_path).replace(os.sep, '/')
 
-        # paths without trailing path separator are functional
+        # paths without trailing path separator are functional;
+        # auto-creation of nested directories works
         config = {
-            'template_dir': 'templates/',
-            'output_dir': 'output/'
+            'template_dir': 'templates/nested/',
+            'output_dir': 'output/deep/'
         }
 
         config_path = self.create_config(

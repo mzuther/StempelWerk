@@ -223,7 +223,7 @@ class TestMascara(TestCommon):
         assert results['saved_files'] == 2
 
 
-    # Mascara wants to get become more proficient in Python [ahem] and checks
+    # Mascara wants to become more proficient in Python [ahem] and checks
     # whether StempelWerk is really as lean as its developer promises.
     def test_lean_template_removal(self, tmp_path):
 

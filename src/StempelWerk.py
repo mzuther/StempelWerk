@@ -174,13 +174,13 @@ class StempelWerk:
                 self.template_dir)
 
             # automatically create template folder
-            self.template_dir.mkdir(exist_ok=True)
+            self.template_dir.mkdir(parents=True, exist_ok=True)
 
             self.output_dir = self.finalize_path(
                 self.root_dir, self.output_dir)
 
             # automatically create output folder
-            self.output_dir.mkdir(exist_ok=True)
+            self.output_dir.mkdir(parents=True, exist_ok=True)
 
             self.last_run_file = self.finalize_path(
                 self.root_dir, self.last_run_file)
