@@ -79,49 +79,42 @@ def dirwalk_recurse(root_directory, directories_first,
 
 
 def is_directory_included(current_path, dir_entry, included, modified_after):
-    is_included = True
-
     # exclude directories
-    if is_included:
-        is_included = current_path.name not in \
-            included.get('excluded_directory_names', [])
+    if current_path.name in included.get('excluded_directory_names', []):
+        return False
 
-    return is_included
+    return True
 
 
 def is_file_included(current_path, dir_entry, included, modified_after):
-    is_included = True
-
     # exclude files
-    if is_included:
-        is_included = current_path.name not in \
-            included.get('excluded_file_names', [])
+    if current_path.name in included.get('excluded_file_names', []):
+        return False
 
     # only include some file suffixes
-    if is_included:
-        for suffix in included.get('included_suffixes', []):
-            if current_path.match(suffix):
-                break
-        else:
-            is_included = False
+    for suffix in included.get('included_suffixes', []):
+        if current_path.match(suffix):
+            break
+    else:
+        return False
 
-    # only include files modified after a given date
-    if is_included and modified_after:
-        # get timestamp of linked file, not of symlink
-        stat_result = dir_entry.stat(follow_symlinks=True)
+    # "stat" is costly
+    if not modified_after:
+        return True
 
-        # "st_mtime_ns" gets the exact timestamp, although
-        # nanoseconds may be missing or inexact
-        modification_time_in_seconds = stat_result.st_mtime_ns / 1e9
+    # only include files modified after a given date;
+    # get timestamp of linked file, not of symlink
+    stat_result = dir_entry.stat(follow_symlinks=True)
 
-        # round up to ensure that files with inaccurate
-        # timestamps and other edge cases are included
-        modification_time_in_seconds = math.ceil(
-            modification_time_in_seconds)
+    # "st_mtime_ns" gets the exact timestamp, although
+    # nanoseconds may be missing or inexact
+    modification_time_in_seconds = stat_result.st_mtime_ns / 1e9
 
-        is_included = modification_time_in_seconds >= modified_after
+    # round up to ensure that files with inaccurate
+    # timestamps and other edge cases are included
+    modification_time_in_seconds = math.ceil(modification_time_in_seconds)
 
-    return is_included
+    return modification_time_in_seconds >= modified_after
 
 
 def dirwalk(root_directory, directories_first=True, include_directories=False,
