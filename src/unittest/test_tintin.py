@@ -108,19 +108,18 @@ class TestTinTin(TestCommon):
 
         file_exists(debug_path)
 
-        with debug_path.open() as f:
-            debug_output = f.read()
-            print(debug_output)
+        debug_output = debug_path.read_text()
+        print(debug_output)
 
-            stencils = [
-                '00-common_settings.sql.jinja',
-                '10-sql_create_table.sql.jinja',
-                '20-sql_create_stored_procedure.sql.jinja',
-            ]
+        stencils = [
+            '00-common_settings.sql.jinja',
+            '10-sql_create_table.sql.jinja',
+            '20-sql_create_stored_procedure.sql.jinja',
+        ]
 
-            for stencil in stencils:
-                assert debug_output.find(stencil) != -1, \
-                    f'stencil "{stencil}" not found in debug output'
+        for stencil in stencils:
+            assert debug_output.find(stencil) != -1, \
+                f'stencil "{stencil}" not found in debug output'
 
         remove_file(debug_path)
         self.compare_directories(results['configuration'])

@@ -67,8 +67,8 @@ class TestCommon:
         # update config with custom settings
         config.update(custom_config)
 
-        with config_path.open(mode='w', encoding='utf-8') as f:
-            json.dump(config, f, ensure_ascii=False, indent=2)
+        contents = json.dumps(config, ensure_ascii=False, indent=2)
+        config_path.write_text(contents)
 
         return config_path
 
@@ -165,11 +165,11 @@ class TestCommon:
                              global_namespace=None):
         resource_path = self.resource_base_path / resource_directory
 
-        with config_path.open() as f:
-            config = json.load(f)
+        contents = config_path.read_text()
+        config = json.loads(contents)
 
-            print('Configuration:')
-            print(json.dumps(config, ensure_ascii=False, indent=2))
+        print('Configuration:')
+        print(json.dumps(config, ensure_ascii=False, indent=2))
 
         self.copy_directory_tree(config, resource_path)
 

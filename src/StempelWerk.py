@@ -325,8 +325,8 @@ class StempelWerk:
 
         def load_json_file(self, json_file_path):
             try:
-                with json_file_path.open() as f:
-                    result = json.load(f)
+                contents = json_file_path.read_text()
+                result = json.loads(contents)
 
             except FileNotFoundError:
                 self.printer.error(f'File "{json_file_path}" not found.')
@@ -610,9 +610,10 @@ class StempelWerk:
             self.settings.newline)
 
         # Jinja2 encodes all strings in UTF-8
-        with output_filename.open(mode='w', encoding='utf-8',
-                                  newline=newline) as f:
-            f.write(content)
+        output_filename.write_text(
+            content,
+            encoding='utf-8',
+            newline=newline)
 
         return 1
 
@@ -634,9 +635,8 @@ class StempelWerk:
         if process_only_modified:
             # get time of last run
             try:
-                with self.settings.last_run_file.open() as f:
-                    modified_after = f.read()
-                    modified_after = modified_after.strip()
+                modified_after = self.settings.last_run_file.read_text()
+                modified_after = modified_after.strip()
             except IOError:
                 modified_after = None
 
@@ -657,17 +657,17 @@ class StempelWerk:
                 processed_templates += results['processed_templates']
                 saved_files += results['saved_files']
 
+            # save time of current run; convert to UNIX time
+            start_of_processing_timestamp = start_of_processing.timestamp()
+
+            # round down to ensure that files with inaccurate timestamps and
+            # other edge cases are included
+            start_of_processing_timestamp = math.floor(
+                start_of_processing_timestamp)
+
             # save time of current run
-            with self.settings.last_run_file.open(mode='w') as f:
-                # convert to UNIX time
-                start_of_processing_timestamp = start_of_processing.timestamp()
-
-                # round down to ensure that files with inaccurate timestamps and
-                # other edge cases are included
-                start_of_processing_timestamp = math.floor(
-                    start_of_processing_timestamp)
-
-                f.write(str(start_of_processing_timestamp))
+            self.settings.last_run_file.write_text(
+                str(start_of_processing_timestamp))
 
             processing_time = datetime.datetime.now() - start_of_processing
             time_per_template = processing_time / processed_templates

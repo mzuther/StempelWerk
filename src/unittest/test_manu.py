@@ -56,8 +56,8 @@ class TestManu(TestCommon):
         config_path = self.create_config(
             config, tmp_path, 'settings_unique.json')
 
-        with config_path.open() as f:
-            config = json.load(f)
+        contents = config_path.read_text()
+        config = json.loads(contents)
 
         # implicitly check that StempelWerk runs without any templates
         with self.does_not_raise(SystemExit):
@@ -83,8 +83,8 @@ class TestManu(TestCommon):
         config_path = self.create_config(
             config, tmp_path, 'settings.json')
 
-        with config_path.open() as f:
-            config = json.load(f)
+        contents = config_path.read_text()
+        config = json.loads(contents)
 
         # implicitly check that StempelWerk runs without any templates
         with self.does_not_raise(SystemExit):
@@ -109,8 +109,8 @@ class TestManu(TestCommon):
         config_path = self.create_config(
             config, tmp_path, 'settings.json')
 
-        with config_path.open() as f:
-            config = json.load(f)
+        contents = config_path.read_text()
+        config = json.loads(contents)
 
         # implicitly check that StempelWerk runs without any templates
         with self.does_not_raise(SystemExit):
