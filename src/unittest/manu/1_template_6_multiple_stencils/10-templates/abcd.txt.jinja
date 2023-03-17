@@ -1,4 +1,4 @@
-{%- import 'stencils/common.jinja' as common -%}
+{%- import 'stencils/subdir/common.jinja' as common -%}
 {%- import 'stencils/fancy.jinja' as fancy -%}
 
 {# -------------------------------------------------------------------------- #}
@@ -36,12 +36,12 @@
 
 {# -------------------------------------------------------------------------- #}
 
-{{- common.start_new_file('cd.txt') -}}
+{{- common.start_new_file('nested/cd.txt') -}}
 
 {{- common.render(all_variables, 'cd') -}}
 
 {# -------------------------------------------------------------------------- #}
 
-{{- common.start_new_file('cd_fancy.txt') -}}
+{{- common.start_new_file('nested/cd_fancy.txt') -}}
 
 {{- fancy.render(all_variables, 'cd') -}}

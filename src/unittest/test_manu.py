@@ -236,8 +236,9 @@ class TestManu(TestCommon):
         self.run_and_compare(config_path)
 
 
-    # Manu wants to create different files using different stencils. StempelWerk
-    # just yawns and goes back to sleep.
+    # Manu wants to create different files using different stencils that are
+    # located in different directories. StempelWerk just yawns, processes
+    # everything and goes back to sleep.
     @pytest.mark.datafiles(FIXTURE_DIR / '1_template_6_multiple_stencils')
     def test_render_multiple_stencils(self, datafiles):
         config = {
@@ -246,6 +247,10 @@ class TestManu(TestCommon):
 
         config_path = self.create_config(
             config, datafiles / 'settings.json')
+
+        # create nested output subdirectory by hand
+        output_subpath = datafiles / '20-output/nested'
+        output_subpath.mkdir(parents=True)
 
         self.run_and_compare(config_path)
 
