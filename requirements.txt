@@ -5,3 +5,4 @@ Jinja2>=2.1.0
 flake8
 flake8-cognitive-complexity
 pytest>=7
+pytest-datafiles>=3

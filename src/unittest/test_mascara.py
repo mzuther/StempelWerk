@@ -13,11 +13,13 @@ import shutil
 import pytest
 from src.unittest.common import TestCommon
 
+FIXTURE_DIR = pathlib.Path('src/unittest/') / 'mascara'
+
 
 class TestMascara(TestCommon):
     @property
     def resource_base_path(self):
-        return pathlib.Path('src/unittest/') / 'mascara'
+        return FIXTURE_DIR
 
 
     # Mascara is a front-end developer wanting to learn coding. From her
@@ -27,7 +29,8 @@ class TestMascara(TestCommon):
     #
     # After getting StempelWerk to run (congrats!), Mascara randomly deletes and
     # changes files and checks whether the application restores the files.
-    def test_process_only_modified_1(self, tmp_path):
+    @pytest.mark.datafiles(FIXTURE_DIR / '1_process_only_modified_1')
+    def test_process_only_modified_1(self, datafiles):
 
         def convenience_run(partial_run, matching):
             results = self.run(
@@ -44,7 +47,7 @@ class TestMascara(TestCommon):
 
 
         def remove_file(partial_file_path):
-            output_path = tmp_path / partial_file_path
+            output_path = datafiles / partial_file_path
             output_path.unlink()
 
             # assert deletion
@@ -53,7 +56,7 @@ class TestMascara(TestCommon):
 
 
         def modify_file(partial_file_path):
-            output_path = tmp_path / partial_file_path
+            output_path = datafiles / partial_file_path
 
             with output_path.open() as f:
                 contents = f.readlines()
@@ -70,17 +73,15 @@ class TestMascara(TestCommon):
 
         # ---------------------------------------------------------------------
 
-        resource_directory = '1_process_only_modified_1'
-
         config = {
             'stencil_dir_name': 'stencils',
         }
 
         config_path = self.create_config(
-            config, tmp_path, 'settings.json')
+            config, datafiles, 'settings.json')
 
         # set up StempelWerk and execute full run
-        results = self.run_and_compare(config_path, resource_directory)
+        results = self.run_and_compare(config_path, datafiles)
         config = results['configuration']
         assert results['saved_files'] == 2
 
@@ -112,7 +113,8 @@ class TestMascara(TestCommon):
 
     # She updates a template and checks whether a partial run updates the
     # respective output file.
-    def test_process_only_modified_2(self, tmp_path):
+    @pytest.mark.datafiles(FIXTURE_DIR / '1_process_only_modified_2')
+    def test_process_only_modified_2(self, datafiles):
 
         def convenience_run(partial_run, matching):
             results = self.run(
@@ -129,7 +131,7 @@ class TestMascara(TestCommon):
 
 
         def update_file(partial_file_path):
-            input_path = tmp_path / partial_file_path
+            input_path = datafiles / partial_file_path
             output_path = pathlib.Path(
                 str(input_path).replace('_updated', ''))
 
@@ -137,17 +139,15 @@ class TestMascara(TestCommon):
 
         # ---------------------------------------------------------------------
 
-        resource_directory = '1_process_only_modified_2'
-
         config = {
             'stencil_dir_name': 'stencils',
         }
 
         config_path = self.create_config(
-            config, tmp_path, 'settings.json')
+            config, datafiles, 'settings.json')
 
         # set up StempelWerk and execute full run
-        results = self.run_and_compare(config_path, resource_directory)
+        results = self.run_and_compare(config_path, datafiles)
         config = results['configuration']
         assert results['saved_files'] == 2
 
@@ -168,7 +168,8 @@ class TestMascara(TestCommon):
 
     # Having the genes of a real tester, Mascara checks whether updating a
     # stencil changes any output files in a partial run.
-    def test_process_only_modified_3(self, tmp_path):
+    @pytest.mark.datafiles(FIXTURE_DIR / '1_process_only_modified_3')
+    def test_process_only_modified_3(self, datafiles):
 
         def convenience_run(partial_run, matching):
             results = self.run(
@@ -185,7 +186,7 @@ class TestMascara(TestCommon):
 
 
         def update_file(partial_file_path):
-            input_path = tmp_path / partial_file_path
+            input_path = datafiles / partial_file_path
             output_path = pathlib.Path(
                 str(input_path).replace('_updated', ''))
 
@@ -193,17 +194,15 @@ class TestMascara(TestCommon):
 
         # ---------------------------------------------------------------------
 
-        resource_directory = '1_process_only_modified_3'
-
         config = {
             'stencil_dir_name': 'stencils',
         }
 
         config_path = self.create_config(
-            config, tmp_path, 'settings.json')
+            config, datafiles, 'settings.json')
 
         # set up StempelWerk and execute full run
-        results = self.run_and_compare(config_path, resource_directory)
+        results = self.run_and_compare(config_path, datafiles)
         config = results['configuration']
         assert results['saved_files'] == 2
 
@@ -225,7 +224,8 @@ class TestMascara(TestCommon):
 
     # Mascara wants to become more proficient in Python [ahem] and checks
     # whether StempelWerk is really as lean as its developer promises.
-    def test_lean_template_removal(self, tmp_path):
+    @pytest.mark.datafiles(FIXTURE_DIR / '1_process_only_modified_1')
+    def test_lean_template_removal(self, datafiles):
 
         def convenience_run(partial_run, matching):
             results = self.run(
@@ -242,22 +242,20 @@ class TestMascara(TestCommon):
 
 
         def remove_file(partial_file_path):
-            output_path = tmp_path / partial_file_path
+            output_path = datafiles / partial_file_path
             output_path.unlink()
 
         # ---------------------------------------------------------------------
-
-        resource_directory = '1_process_only_modified_1'
 
         config = {
             'stencil_dir_name': 'stencils',
         }
 
         config_path = self.create_config(
-            config, tmp_path, 'settings.json')
+            config, datafiles, 'settings.json')
 
         # set up StempelWerk and execute full run
-        results = self.run_and_compare(config_path, resource_directory)
+        results = self.run_and_compare(config_path, datafiles)
         config = results['configuration']
         assert results['saved_files'] == 2
 
@@ -274,7 +272,8 @@ class TestMascara(TestCommon):
     # "rm -rf /proc/" looks tempting, but Mascara wants to show off her Python
     # skills. She thus deletes a file that StempelWerk creates during runtime.
     # With little effect - StempelWerk just creates it again. No! NO!!!
-    def test_last_run_file(self, tmp_path):
+    @pytest.mark.datafiles(FIXTURE_DIR / '1_process_only_modified_1')
+    def test_last_run_file(self, datafiles):
 
         def convenience_run(partial_run, matching):
             results = self.run(
@@ -291,18 +290,16 @@ class TestMascara(TestCommon):
 
 
         def file_exists(partial_file_path):
-            file_path = tmp_path / partial_file_path
+            file_path = datafiles / partial_file_path
             if not file_path.is_file():
                 raise FileNotFoundError(file_path)
 
 
         def remove_file(partial_file_path):
-            output_path = tmp_path / partial_file_path
+            output_path = datafiles / partial_file_path
             output_path.unlink()
 
         # ---------------------------------------------------------------------
-
-        resource_directory = '1_process_only_modified_1'
 
         last_run_file = 'mascara.HACK'
 
@@ -312,13 +309,13 @@ class TestMascara(TestCommon):
         }
 
         config_path = self.create_config(
-            config, tmp_path, 'settings.json')
+            config, datafiles, 'settings.json')
 
         with pytest.raises(FileNotFoundError):
             file_exists(last_run_file)
 
         # set up StempelWerk and execute full run
-        results = self.run_and_compare(config_path, resource_directory)
+        results = self.run_and_compare(config_path, datafiles)
         config = results['configuration']
         assert results['saved_files'] == 2
 

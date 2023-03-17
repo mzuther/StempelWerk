@@ -12,11 +12,13 @@ import pathlib
 import pytest
 from src.unittest.common import TestCommon
 
+FIXTURE_DIR = pathlib.Path('src/unittest/') / 'tintin'
+
 
 class TestTinTin(TestCommon):
     @property
     def resource_base_path(self):
-        return pathlib.Path('src/unittest/') / 'tintin'
+        return FIXTURE_DIR
 
 
     # Tin Tin lead a double life: he was both developer and a chairman of the
@@ -30,8 +32,8 @@ class TestTinTin(TestCommon):
     #
     # As a thief who made the global news, he obviously starts by testing global
     # variables.
-    def test_global_variables(self, tmp_path):
-        resource_directory = '1_global_variables'
+    @pytest.mark.datafiles(FIXTURE_DIR / '1_global_variables')
+    def test_global_variables(self, datafiles):
         global_namespace = '{"NO_cast": true}'
 
         config = {
@@ -39,20 +41,18 @@ class TestTinTin(TestCommon):
         }
 
         config_path = self.create_config(
-            config, tmp_path, 'settings.json')
+            config, datafiles, 'settings.json')
 
         # set up StempelWerk and execute full run
-        self.run_and_compare(
-            config_path, resource_directory,
-            global_namespace=global_namespace)
+        self.run_and_compare(config_path, datafiles,
+                             global_namespace=global_namespace)
 
 
     # After a year of intense testing, Tin Tin moved on to custom modules. He
     # wanted to call them "prison_cell" and "inmate_canteen", but the author of
     # StempelWerk put his foot down.
-    def test_custom_module(self, tmp_path):
-        resource_directory = '2_custom_module'
-
+    @pytest.mark.datafiles(FIXTURE_DIR / '2_custom_module')
+    def test_custom_module(self, datafiles):
         config = {
             'stencil_dir_name': 'stencils',
             'custom_modules': [
@@ -62,10 +62,10 @@ class TestTinTin(TestCommon):
         }
 
         config_path = self.create_config(
-            config, tmp_path, 'settings.json')
+            config, datafiles, 'settings.json')
 
         # set up StempelWerk and execute full run
-        self.run_and_compare(config_path, resource_directory)
+        self.run_and_compare(config_path, datafiles)
 
 
     # Only 148 years to go! At Tin Tin's current pace, he will run out of work
@@ -73,7 +73,8 @@ class TestTinTin(TestCommon):
     #
     # Anyway, he recently started testing Jinja extensions. We will keep you
     # posted on his progress. Don't expect news anytime soon, though.
-    def test_jinja_extension(self, tmp_path):
+    @pytest.mark.datafiles(FIXTURE_DIR / '3_jinja_extension')
+    def test_jinja_extension(self, datafiles):
 
         def file_exists(file_path):
             if not file_path.is_file():
@@ -81,13 +82,12 @@ class TestTinTin(TestCommon):
 
 
         def remove_file(partial_file_path):
-            output_path = tmp_path / partial_file_path
+            output_path = datafiles / partial_file_path
             output_path.unlink()
 
         # ---------------------------------------------------------------------
 
-        resource_directory = '3_jinja_extension'
-        debug_path = tmp_path / '20-output/Debug.txt'
+        debug_path = datafiles / '20-output/Debug.txt'
 
         config = {
             'stencil_dir_name': 'stencils',
@@ -97,14 +97,13 @@ class TestTinTin(TestCommon):
         }
 
         config_path = self.create_config(
-            config, tmp_path, 'settings.json')
+            config, datafiles, 'settings.json')
 
         with pytest.raises(FileNotFoundError):
             file_exists(debug_path)
 
         # set up StempelWerk and execute full run
-        results = self.run_with_config_file(
-            config_path, resource_directory)
+        results = self.run_with_config_file(config_path, datafiles)
 
         file_exists(debug_path)
 

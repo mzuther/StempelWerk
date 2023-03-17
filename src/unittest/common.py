@@ -3,7 +3,6 @@ import difflib
 import filecmp
 import json
 import pathlib
-import shutil
 import sys
 
 import pytest
@@ -71,12 +70,6 @@ class TestCommon:
         config_path.write_text(contents)
 
         return config_path
-
-
-    def copy_directory_tree(self, config, source_path):
-        destination_path = config['root_dir']
-        shutil.copytree(source_path, destination_path,
-                        dirs_exist_ok=True)
 
 
     def compare_directories(self, config):
@@ -163,15 +156,11 @@ class TestCommon:
 
     def run_with_config_file(self, config_path, resource_directory,
                              global_namespace=None):
-        resource_path = self.resource_base_path / resource_directory
-
         contents = config_path.read_text()
         config = json.loads(contents)
 
         print('Configuration:')
         print(json.dumps(config, ensure_ascii=False, indent=2))
-
-        self.copy_directory_tree(config, resource_path)
 
         results = self.run(config_path, global_namespace)
         results['configuration'] = config
