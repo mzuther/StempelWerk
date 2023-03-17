@@ -73,7 +73,7 @@ class TestMascara(TestCommon):
         }
 
         config_path = self.create_config(
-            config, datafiles, 'settings.json')
+            config, datafiles / 'settings.json')
 
         # set up StempelWerk and execute full run
         results = self.run_and_compare(config_path)
@@ -139,7 +139,7 @@ class TestMascara(TestCommon):
         }
 
         config_path = self.create_config(
-            config, datafiles, 'settings.json')
+            config, datafiles / 'settings.json')
 
         # set up StempelWerk and execute full run
         results = self.run_and_compare(config_path)
@@ -194,7 +194,7 @@ class TestMascara(TestCommon):
         }
 
         config_path = self.create_config(
-            config, datafiles, 'settings.json')
+            config, datafiles / 'settings.json')
 
         # set up StempelWerk and execute full run
         results = self.run_and_compare(config_path)
@@ -247,7 +247,7 @@ class TestMascara(TestCommon):
         }
 
         config_path = self.create_config(
-            config, datafiles, 'settings.json')
+            config, datafiles / 'settings.json')
 
         # set up StempelWerk and execute full run
         results = self.run_and_compare(config_path)
@@ -304,7 +304,7 @@ class TestMascara(TestCommon):
         }
 
         config_path = self.create_config(
-            config, datafiles, 'settings.json')
+            config, datafiles / 'settings.json')
 
         with pytest.raises(FileNotFoundError):
             file_exists(last_run_file)

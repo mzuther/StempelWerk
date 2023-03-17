@@ -9,7 +9,6 @@
 
 import json
 import pathlib
-import os
 
 import pytest
 from src.unittest.common import TestCommon
@@ -51,7 +50,7 @@ class TestManu(TestCommon):
         config = {}
 
         config_path = self.create_config(
-            config, tmp_path, 'settings_unique.json')
+            config, tmp_path / 'settings_unique.json')
 
         contents = config_path.read_text()
         config = json.loads(contents)
@@ -67,9 +66,6 @@ class TestManu(TestCommon):
     # leaving the DOS ecosystem behind, so she verfifies that paths can really
     # be specified in a cross-platform way.
     def test_path_separators(self, tmp_path):
-        # common path separator can be used (cross-platform support)
-        tmp_path = str(tmp_path).replace(os.sep, '/')
-
         # paths without trailing path separator are functional;
         # auto-creation of nested directories works
         config = {
@@ -77,8 +73,9 @@ class TestManu(TestCommon):
             'output_dir': 'output/deep/'
         }
 
+        # common path separator can be used (cross-platform support)
         config_path = self.create_config(
-            config, tmp_path, 'settings.json')
+            config, tmp_path / 'settings.json', common_path_separator=True)
 
         contents = config_path.read_text()
         config = json.loads(contents)
@@ -94,17 +91,15 @@ class TestManu(TestCommon):
     # should any other OS?) and stubbornly removes them. StempelWerk just smiles
     # and keeps on working as before.
     def test_path_separators_trailing(self, tmp_path):
-        # common path separator can be used (cross-platform support)
-        tmp_path = str(tmp_path).replace(os.sep, '/')
-
         # paths without trailing path separator are functional
         config = {
             'template_dir': 'templates',
             'output_dir': 'output'
         }
 
+        # common path separator can be used (cross-platform support)
         config_path = self.create_config(
-            config, tmp_path, 'settings.json')
+            config, tmp_path / 'settings.json', common_path_separator=True)
 
         contents = config_path.read_text()
         config = json.loads(contents)
@@ -130,7 +125,7 @@ class TestManu(TestCommon):
         }
 
         config_path = self.create_config(
-            config, datafiles, 'settings.json')
+            config, datafiles / 'settings.json')
 
         self.run_and_compare(config_path)
 
@@ -144,7 +139,7 @@ class TestManu(TestCommon):
         config = {}
 
         config_path = self.create_config(
-            config, datafiles, 'settings.json')
+            config, datafiles / 'settings.json')
 
         self.run_and_compare(config_path)
 
@@ -165,7 +160,7 @@ class TestManu(TestCommon):
         }
 
         config_path = self.create_config(
-            config, datafiles, 'settings.json')
+            config, datafiles / 'settings.json')
 
         # assert indirectly that the template file "ignored.jinja" is
         # ignored and not processed
@@ -187,7 +182,7 @@ class TestManu(TestCommon):
         config = {}
 
         config_path = self.create_config(
-            config, datafiles, 'settings.json')
+            config, datafiles / 'settings.json')
 
         with pytest.raises(SystemExit):
             self.run_and_compare(config_path)
@@ -207,7 +202,7 @@ class TestManu(TestCommon):
         }
 
         config_path = self.create_config(
-            config, datafiles, 'settings.json')
+            config, datafiles / 'settings.json')
 
         self.run_and_compare(config_path)
 
@@ -222,7 +217,7 @@ class TestManu(TestCommon):
         }
 
         config_path = self.create_config(
-            config, datafiles, 'settings.json')
+            config, datafiles / 'settings.json')
 
         with pytest.raises(SystemExit):
             self.run_and_compare(config_path)
@@ -236,7 +231,7 @@ class TestManu(TestCommon):
         }
 
         config_path = self.create_config(
-            config, datafiles, 'settings.json')
+            config, datafiles / 'settings.json')
 
         self.run_and_compare(config_path)
 
@@ -250,7 +245,7 @@ class TestManu(TestCommon):
         }
 
         config_path = self.create_config(
-            config, datafiles, 'settings.json')
+            config, datafiles / 'settings.json')
 
         self.run_and_compare(config_path)
 
@@ -263,7 +258,7 @@ class TestManu(TestCommon):
         config = {}
 
         config_path = self.create_config(
-            config, datafiles, 'settings.json')
+            config, datafiles / 'settings.json')
 
         with pytest.raises(SystemExit):
             self.run_and_compare(config_path)
@@ -276,7 +271,7 @@ class TestManu(TestCommon):
         config = {}
 
         config_path = self.create_config(
-            config, datafiles, 'settings.json')
+            config, datafiles / 'settings.json')
 
         # create nested output subdirectory by hand
         output_subpath = datafiles / '20-output/other/name'
@@ -294,7 +289,7 @@ class TestManu(TestCommon):
         }
 
         config_path = self.create_config(
-            config, datafiles, 'settings.json')
+            config, datafiles / 'settings.json')
 
         self.run_and_compare(config_path)
 
@@ -309,7 +304,7 @@ class TestManu(TestCommon):
         }
 
         config_path = self.create_config(
-            config, datafiles, 'settings.json')
+            config, datafiles / 'settings.json')
 
         self.run_and_compare(config_path)
 
@@ -324,7 +319,7 @@ class TestManu(TestCommon):
         }
 
         config_path = self.create_config(
-            config, datafiles, 'settings.json')
+            config, datafiles / 'settings.json')
 
         results = self.run_with_config_file(config_path)
         instance = results['instance']
@@ -346,7 +341,7 @@ class TestManu(TestCommon):
         config = {}
 
         config_path = self.create_config(
-            config, datafiles, 'settings.json')
+            config, datafiles / 'settings.json')
 
         self.run_and_compare(config_path)
 
@@ -360,6 +355,6 @@ class TestManu(TestCommon):
         }
 
         config_path = self.create_config(
-            config, datafiles, 'settings.json')
+            config, datafiles / 'settings.json')
 
         self.run_and_compare(config_path)

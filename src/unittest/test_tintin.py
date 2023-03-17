@@ -36,7 +36,7 @@ class TestTinTin(TestCommon):
         }
 
         config_path = self.create_config(
-            config, datafiles, 'settings.json')
+            config, datafiles / 'settings.json')
 
         # set up StempelWerk and execute full run
         self.run_and_compare(config_path, global_namespace=global_namespace)
@@ -56,7 +56,7 @@ class TestTinTin(TestCommon):
         }
 
         config_path = self.create_config(
-            config, datafiles, 'settings.json')
+            config, datafiles / 'settings.json')
 
         # set up StempelWerk and execute full run
         self.run_and_compare(config_path)
@@ -91,7 +91,7 @@ class TestTinTin(TestCommon):
         }
 
         config_path = self.create_config(
-            config, datafiles, 'settings.json')
+            config, datafiles / 'settings.json')
 
         with pytest.raises(FileNotFoundError):
             file_exists(debug_path)

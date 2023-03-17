@@ -36,12 +36,14 @@ class TestCommon:
 
     # ------------------------------------------------------------------------
 
-    def create_config(self, custom_config, output_path, filename):
-        output_path = pathlib.Path(output_path)
-        config_path = output_path / filename
+    def create_config(self, custom_config, config_path,
+                      common_path_separator=True):
+        root_dir = config_path.parent
+        if common_path_separator:
+            root_dir = root_dir.as_posix()
 
         config = {
-            'root_dir': str(output_path),
+            'root_dir': str(root_dir),
             'template_dir': '10-templates',
             'output_dir': '20-output',
             # ----------------------------------------
