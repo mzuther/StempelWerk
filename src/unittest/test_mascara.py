@@ -17,11 +17,6 @@ FIXTURE_DIR = pathlib.Path('src/unittest/') / 'mascara'
 
 
 class TestMascara(TestCommon):
-    @property
-    def resource_base_path(self):
-        return FIXTURE_DIR
-
-
     # Mascara is a front-end developer wanting to learn coding. From her
     # previous experience, she thinks that getting an existing Python
     # application to do what she wants is already coding. She's a good tester,
@@ -81,7 +76,7 @@ class TestMascara(TestCommon):
             config, datafiles, 'settings.json')
 
         # set up StempelWerk and execute full run
-        results = self.run_and_compare(config_path, datafiles)
+        results = self.run_and_compare(config_path)
         config = results['configuration']
         assert results['saved_files'] == 2
 
@@ -147,7 +142,7 @@ class TestMascara(TestCommon):
             config, datafiles, 'settings.json')
 
         # set up StempelWerk and execute full run
-        results = self.run_and_compare(config_path, datafiles)
+        results = self.run_and_compare(config_path)
         config = results['configuration']
         assert results['saved_files'] == 2
 
@@ -202,7 +197,7 @@ class TestMascara(TestCommon):
             config, datafiles, 'settings.json')
 
         # set up StempelWerk and execute full run
-        results = self.run_and_compare(config_path, datafiles)
+        results = self.run_and_compare(config_path)
         config = results['configuration']
         assert results['saved_files'] == 2
 
@@ -255,7 +250,7 @@ class TestMascara(TestCommon):
             config, datafiles, 'settings.json')
 
         # set up StempelWerk and execute full run
-        results = self.run_and_compare(config_path, datafiles)
+        results = self.run_and_compare(config_path)
         config = results['configuration']
         assert results['saved_files'] == 2
 
@@ -315,7 +310,7 @@ class TestMascara(TestCommon):
             file_exists(last_run_file)
 
         # set up StempelWerk and execute full run
-        results = self.run_and_compare(config_path, datafiles)
+        results = self.run_and_compare(config_path)
         config = results['configuration']
         assert results['saved_files'] == 2
 

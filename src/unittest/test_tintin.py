@@ -16,11 +16,6 @@ FIXTURE_DIR = pathlib.Path('src/unittest/') / 'tintin'
 
 
 class TestTinTin(TestCommon):
-    @property
-    def resource_base_path(self):
-        return FIXTURE_DIR
-
-
     # Tin Tin lead a double life: he was both developer and a chairman of the
     # UTP (Union of Technology Purloiners). After "obtaining" StempelWerk from a
     # project, he noticed with horror that he had stolen free software - a faux
@@ -44,8 +39,7 @@ class TestTinTin(TestCommon):
             config, datafiles, 'settings.json')
 
         # set up StempelWerk and execute full run
-        self.run_and_compare(config_path, datafiles,
-                             global_namespace=global_namespace)
+        self.run_and_compare(config_path, global_namespace=global_namespace)
 
 
     # After a year of intense testing, Tin Tin moved on to custom modules. He
@@ -65,7 +59,7 @@ class TestTinTin(TestCommon):
             config, datafiles, 'settings.json')
 
         # set up StempelWerk and execute full run
-        self.run_and_compare(config_path, datafiles)
+        self.run_and_compare(config_path)
 
 
     # Only 148 years to go! At Tin Tin's current pace, he will run out of work
@@ -103,7 +97,7 @@ class TestTinTin(TestCommon):
             file_exists(debug_path)
 
         # set up StempelWerk and execute full run
-        results = self.run_with_config_file(config_path, datafiles)
+        results = self.run_with_config_file(config_path)
 
         file_exists(debug_path)
 

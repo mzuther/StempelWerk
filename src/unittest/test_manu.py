@@ -18,11 +18,6 @@ FIXTURE_DIR = pathlib.Path('src/unittest/') / 'manu'
 
 
 class TestManu(TestCommon):
-    @property
-    def resource_base_path(self):
-        return FIXTURE_DIR
-
-
     # Manu is an inquisitive developer and loves to try new things. She found
     # StempelWerk on GitHub, cloned it and wants to get her hands dirty.
     #
@@ -137,7 +132,7 @@ class TestManu(TestCommon):
         config_path = self.create_config(
             config, datafiles, 'settings.json')
 
-        self.run_and_compare(config_path, datafiles)
+        self.run_and_compare(config_path)
 
 
     # Manu decides that she will try enabling "trim_blocks". After seeing the
@@ -151,7 +146,7 @@ class TestManu(TestCommon):
         config_path = self.create_config(
             config, datafiles, 'settings.json')
 
-        self.run_and_compare(config_path, datafiles)
+        self.run_and_compare(config_path)
 
 
     # The real power of templates lies in preventing DRY ("do not repeat
@@ -174,7 +169,7 @@ class TestManu(TestCommon):
 
         # assert indirectly that the template file "ignored.jinja" is
         # ignored and not processed
-        self.run_and_compare(config_path, datafiles)
+        self.run_and_compare(config_path)
 
 
     # Manu loves Wikipedia and articles on programming languages
@@ -195,7 +190,7 @@ class TestManu(TestCommon):
             config, datafiles, 'settings.json')
 
         with pytest.raises(SystemExit):
-            self.run_and_compare(config_path, datafiles)
+            self.run_and_compare(config_path)
 
 
     # After updating the configuration, Manu gets the output she is looking for.
@@ -214,7 +209,7 @@ class TestManu(TestCommon):
         config_path = self.create_config(
             config, datafiles, 'settings.json')
 
-        self.run_and_compare(config_path, datafiles)
+        self.run_and_compare(config_path)
 
 
     # Manu changes the default name of the stencil directory, but forgets to
@@ -230,7 +225,7 @@ class TestManu(TestCommon):
             config, datafiles, 'settings.json')
 
         with pytest.raises(SystemExit):
-            self.run_and_compare(config_path, datafiles)
+            self.run_and_compare(config_path)
 
 
     # After updating the settings file, StempelWerk runs just fine.
@@ -243,7 +238,7 @@ class TestManu(TestCommon):
         config_path = self.create_config(
             config, datafiles, 'settings.json')
 
-        self.run_and_compare(config_path, datafiles)
+        self.run_and_compare(config_path)
 
 
     # Manu wants to create different files using different stencils. StempelWerk
@@ -257,7 +252,7 @@ class TestManu(TestCommon):
         config_path = self.create_config(
             config, datafiles, 'settings.json')
 
-        self.run_and_compare(config_path, datafiles)
+        self.run_and_compare(config_path)
 
 
     # Manu tries to render a file into a subdirectory of the output directory.
@@ -271,7 +266,7 @@ class TestManu(TestCommon):
             config, datafiles, 'settings.json')
 
         with pytest.raises(SystemExit):
-            self.run_and_compare(config_path, datafiles)
+            self.run_and_compare(config_path)
 
 
     # When Manu creates the subdirectory before running StempelWerk, everything
@@ -287,7 +282,7 @@ class TestManu(TestCommon):
         output_subpath = datafiles / '20-output/other/name'
         output_subpath.mkdir(parents=True)
 
-        self.run_and_compare(config_path, datafiles)
+        self.run_and_compare(config_path)
 
 
     # Enabling the automatic creation of missing directories works just as well,
@@ -301,7 +296,7 @@ class TestManu(TestCommon):
         config_path = self.create_config(
             config, datafiles, 'settings.json')
 
-        self.run_and_compare(config_path, datafiles)
+        self.run_and_compare(config_path)
 
 
     # Manu is intrigued: different operating systems store text files with
@@ -316,7 +311,7 @@ class TestManu(TestCommon):
         config_path = self.create_config(
             config, datafiles, 'settings.json')
 
-        self.run_and_compare(config_path, datafiles)
+        self.run_and_compare(config_path)
 
 
     # Can StempelWerk's newline logic be turned on its head? Yes, ma'am!
@@ -331,7 +326,7 @@ class TestManu(TestCommon):
         config_path = self.create_config(
             config, datafiles, 'settings.json')
 
-        results = self.run_with_config_file(config_path, datafiles)
+        results = self.run_with_config_file(config_path)
         instance = results['instance']
 
         instance.newline_exceptions = {
@@ -353,7 +348,7 @@ class TestManu(TestCommon):
         config_path = self.create_config(
             config, datafiles, 'settings.json')
 
-        self.run_and_compare(config_path, datafiles)
+        self.run_and_compare(config_path)
 
 
     # When the excitement has worn off, she verifies that common template code
@@ -367,4 +362,4 @@ class TestManu(TestCommon):
         config_path = self.create_config(
             config, datafiles, 'settings.json')
 
-        self.run_and_compare(config_path, datafiles)
+        self.run_and_compare(config_path)

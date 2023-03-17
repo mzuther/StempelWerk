@@ -154,8 +154,7 @@ class TestCommon:
         return results
 
 
-    def run_with_config_file(self, config_path, resource_directory,
-                             global_namespace=None):
+    def run_with_config_file(self, config_path, global_namespace=None):
         contents = config_path.read_text()
         config = json.loads(contents)
 
@@ -168,10 +167,8 @@ class TestCommon:
         return results
 
 
-    def run_and_compare(self, config_path, resource_path,
-                        global_namespace=None):
-        results = self.run_with_config_file(
-            config_path, resource_path, global_namespace)
+    def run_and_compare(self, config_path, global_namespace=None):
+        results = self.run_with_config_file(config_path, global_namespace)
 
         self.compare_directories(
             results['configuration'])
