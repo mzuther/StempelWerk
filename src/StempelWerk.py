@@ -373,30 +373,63 @@ class StempelWerk:
 
         # NOTE: Jinja loads templates from sub-directories;
         # NOTE: stencils will also be included
+        #
+        # cache stencils and templates to improve performance
         template_loader = jinja2.FileSystemLoader(
-            # cache stencils and templates to improve performance
-            self.settings.template_dir)
+            self.settings.template_dir,
+            encoding='utf-8')
 
         self.jinja_environment = jinja2.Environment(
             loader=template_loader,
             **self.settings.jinja_options)
 
-        template_filenames = self.jinja_environment.list_templates()
+        template_paths = self._get_templates()
+        self._check_templates(template_paths)
 
-        if not template_filenames:
+        stencil_paths = self._get_stencils(template_paths)
+        self._check_stencils(stencil_paths)
+
+        self.printer.debug('Done.')
+        self.printer.debug()
+
+        # load extensions and run custom Python code
+        self._update_environment()
+
+
+    def _get_templates(self):
+        template_paths = []
+
+        for template_filename in self.jinja_environment.list_templates():
+            template_path = pathlib.Path(template_filename)
+            template_paths.append(template_path)
+
+        return template_paths
+
+
+    def _check_templates(self, template_paths):
+        if not template_paths:
             self.printer.error()
             self.printer.error('No templates found.')
             self.printer.error()
             exit(1)
 
-        stencil_filenames = []
-        for stencil_filename in template_filenames:
-            stencil_path = pathlib.Path(stencil_filename)
-            if self.settings.stencil_dir_name in stencil_path.parts:
-                stencil_filenames.append(stencil_filename)
+
+    def _get_stencils(self, template_paths):
+        stencil_paths = []
+
+        for template_path in template_paths:
+            if self.settings.stencil_dir_name in template_path.parts:
+                stencil_paths.append(template_path)
+
+        return stencil_paths
+
+
+    def _check_stencils(self, stencil_paths):
+        if not self.settings.stencil_dir_name:
+            return
 
         # check whether stencil directories contain any stencils
-        if self.settings.stencil_dir_name and not stencil_filenames:
+        if not stencil_paths:
             self.printer.error()
             self.printer.error('No stencils found.')
             self.printer.error()
@@ -408,20 +441,14 @@ class StempelWerk:
             self.printer.debug('Available stencils:')
             self.printer.debug(' ')
 
-            for stencil_filename in stencil_filenames:
-                self.printer.debug(f'  - {stencil_filename}')
+            for stencil_path in stencil_paths:
+                self.printer.debug(f'  - {stencil_path}')
 
             self.printer.debug(' ')
             self.printer.debug('  Use relative paths to access templates in'
                                'sub-directories')
             self.printer.debug('  (https://stackoverflow.com/a/9644828).')
             self.printer.debug(' ')
-
-        self.printer.debug('Done.')
-        self.printer.debug()
-
-        # load extensions and run custom Python code
-        self._update_environment()
 
 
     def _update_environment(self):
