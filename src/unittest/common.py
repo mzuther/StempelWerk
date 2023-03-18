@@ -4,6 +4,7 @@ import filecmp
 import json
 import pathlib
 import sys
+import shutil
 
 import pytest
 from src.StempelWerk import StempelWerk
@@ -33,6 +34,29 @@ class TestCommon:
             else:
                 assert dir_path.is_dir(), \
                     f'directory "{dir_path}" was not created'
+
+    # ------------------------------------------------------------------------
+
+    def modify_file(self, config, file_path):
+        with file_path.open() as f:
+            contents = f.readlines()
+
+        # delete first line
+        contents = contents[1:]
+
+        with file_path.open(mode='w') as f:
+            f.writelines(contents)
+
+        # assert modification
+        with pytest.raises(AssertionError):
+            self.compare_directories(config)
+
+
+    def update_file(self, input_path):
+        output_path = pathlib.Path(
+            str(input_path).replace('_updated', ''))
+
+        shutil.copyfile(input_path, output_path)
 
     # ------------------------------------------------------------------------
 

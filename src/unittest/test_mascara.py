@@ -8,7 +8,6 @@
 # fun reading these tests as I had in writing them!
 
 import pathlib
-import shutil
 
 import pytest
 from src.unittest.common import TestCommon
@@ -40,32 +39,6 @@ class TestMascara(TestCommon):
 
             return results
 
-
-        def remove_file(partial_file_path):
-            output_path = datafiles / partial_file_path
-            output_path.unlink()
-
-            # assert deletion
-            with pytest.raises(AssertionError):
-                self.compare_directories(config)
-
-
-        def modify_file(partial_file_path):
-            output_path = datafiles / partial_file_path
-
-            with output_path.open() as f:
-                contents = f.readlines()
-
-            # delete first line
-            contents = contents[1:]
-
-            with output_path.open(mode='w') as f:
-                f.writelines(contents)
-
-            # assert modification
-            with pytest.raises(AssertionError):
-                self.compare_directories(config)
-
         # ---------------------------------------------------------------------
 
         custom_config = {
@@ -80,15 +53,18 @@ class TestMascara(TestCommon):
         assert results['saved_files'] == 2
 
         # full run renders all files unconditonally
-        output_path = pathlib.Path('20-output')
-        remove_file(output_path / 'ab.txt')
-        modify_file(output_path / 'cd.txt')
+        file_to_be_deleted = datafiles / '20-output/ab.txt'
+        file_to_be_deleted.unlink()
+
+        file_to_be_modified = datafiles / '20-output/cd.txt'
+        self.modify_file(config, file_to_be_modified)
 
         results = convenience_run(partial_run=False, matching=True)
         assert results['saved_files'] == 2
 
         # partial run leaves deleted output file alone
-        remove_file(output_path / 'cd.txt')
+        file_to_be_deleted = datafiles / '20-output/cd.txt'
+        file_to_be_deleted.unlink()
 
         results = convenience_run(partial_run=True, matching=False)
         assert results['saved_files'] == 0
@@ -98,7 +74,8 @@ class TestMascara(TestCommon):
         assert results['saved_files'] == 2
 
         # partial run does not render externally modified output file
-        modify_file(output_path / 'ab.txt')
+        file_to_be_modified = datafiles / '20-output/ab.txt'
+        self.modify_file(config, file_to_be_modified)
 
         results = convenience_run(partial_run=True, matching=False)
         assert results['saved_files'] == 0
@@ -126,14 +103,6 @@ class TestMascara(TestCommon):
 
             return results
 
-
-        def update_file(partial_file_path):
-            input_path = datafiles / partial_file_path
-            output_path = pathlib.Path(
-                str(input_path).replace('_updated', ''))
-
-            shutil.copyfile(input_path, output_path)
-
         # ---------------------------------------------------------------------
 
         custom_config = {
@@ -148,15 +117,13 @@ class TestMascara(TestCommon):
         assert results['saved_files'] == 2
 
         # partial run does not update changed files
-        updated_path_30 = pathlib.Path('30-expected_updated')
-        update_file(updated_path_30 / 'ab.txt')
+        self.update_file(datafiles / '30-expected_updated/ab.txt')
 
         results = convenience_run(partial_run=True, matching=False)
         assert results['saved_files'] == 0
 
         # partial run updates output files of changed templates
-        updated_path_10 = pathlib.Path('10-templates_updated')
-        update_file(updated_path_10 / 'ab.jinja')
+        self.update_file(datafiles / '10-templates_updated/ab.jinja')
 
         results = convenience_run(partial_run=True, matching=True)
         assert results['saved_files'] == 1
@@ -180,14 +147,6 @@ class TestMascara(TestCommon):
 
             return results
 
-
-        def update_file(partial_file_path):
-            input_path = datafiles / partial_file_path
-            output_path = pathlib.Path(
-                str(input_path).replace('_updated', ''))
-
-            shutil.copyfile(input_path, output_path)
-
         # ---------------------------------------------------------------------
 
         custom_config = {
@@ -202,16 +161,15 @@ class TestMascara(TestCommon):
         assert results['saved_files'] == 2
 
         # partial run does not check for changed stencils
-        updated_path_10 = pathlib.Path('10-templates_updated')
-        update_file(updated_path_10 / 'stencils/common.jinja')
+        self.update_file(
+            datafiles / '10-templates_updated/stencils/common.jinja')
 
         results = convenience_run(partial_run=True, matching=True)
         assert results['saved_files'] == 0
 
         # full run applies changed stencils
-        updated_path_30 = pathlib.Path('30-expected_updated')
-        update_file(updated_path_30 / 'ab.txt')
-        update_file(updated_path_30 / 'cd.txt')
+        self.update_file(datafiles / '30-expected_updated/ab.txt')
+        self.update_file(datafiles / '30-expected_updated/cd.txt')
 
         results = convenience_run(partial_run=False, matching=True)
         assert results['saved_files'] == 2
@@ -235,11 +193,6 @@ class TestMascara(TestCommon):
 
             return results
 
-
-        def remove_file(partial_file_path):
-            output_path = datafiles / partial_file_path
-            output_path.unlink()
-
         # ---------------------------------------------------------------------
 
         custom_config = {
@@ -254,8 +207,8 @@ class TestMascara(TestCommon):
         assert results['saved_files'] == 2
 
         # deleting a template leaves the output file alone
-        template_path = pathlib.Path('10-templates')
-        remove_file(template_path / 'ab.jinja')
+        file_to_be_deleted = datafiles / '10-templates/ab.jinja'
+        file_to_be_deleted.unlink()
 
         results = convenience_run(partial_run=False, matching=True)
         assert results['saved_files'] == 1
@@ -283,28 +236,16 @@ class TestMascara(TestCommon):
 
             return results
 
-
-        def file_exists(partial_file_path):
-            file_path = datafiles / partial_file_path
-            if not file_path.is_file():
-                raise FileNotFoundError(file_path)
-
-
-        def remove_file(partial_file_path):
-            output_path = datafiles / partial_file_path
-            output_path.unlink()
-
         # ---------------------------------------------------------------------
 
-        last_run_file = 'mascara.HACK'
+        last_run_file = datafiles / 'mascara.HACK'
 
         custom_config = {
             'stencil_dir_name': 'stencils',
-            'last_run_file': last_run_file,
+            'last_run_file': str(last_run_file),
         }
 
-        with pytest.raises(FileNotFoundError):
-            file_exists(last_run_file)
+        assert not last_run_file.is_file()
 
         # set up StempelWerk and execute full run
         config_path = datafiles / 'settings.json'
@@ -314,20 +255,20 @@ class TestMascara(TestCommon):
         assert results['saved_files'] == 2
 
         # "last_run_file" is created
-        file_exists(last_run_file)
+        assert last_run_file.is_file()
 
         # partial run finds "last_run_file" and does not render any files
         results = convenience_run(partial_run=True, matching=True)
         assert results['saved_files'] == 0
 
         # "last_run_file" is not deleted accidentally
-        file_exists(last_run_file)
+        assert last_run_file.is_file()
 
         # partial run becomes full run when "last_run_file" is missing
-        remove_file(last_run_file)
+        last_run_file.unlink()
 
         results = convenience_run(partial_run=True, matching=True)
         assert results['saved_files'] == 2
 
         # "last_run_file" is re-created
-        file_exists(last_run_file)
+        assert last_run_file.is_file()

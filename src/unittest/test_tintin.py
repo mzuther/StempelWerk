@@ -66,18 +66,6 @@ class TestTinTin(TestCommon):
     # posted on his progress. Don't expect news anytime soon, though.
     @pytest.mark.datafiles(FIXTURE_DIR / '3_jinja_extension')
     def test_jinja_extension(self, datafiles):
-
-        def file_exists(file_path):
-            if not file_path.is_file():
-                raise FileNotFoundError(file_path)
-
-
-        def remove_file(partial_file_path):
-            output_path = datafiles / partial_file_path
-            output_path.unlink()
-
-        # ---------------------------------------------------------------------
-
         custom_config = {
             'stencil_dir_name': 'stencils',
             'jinja_extensions': [
@@ -86,16 +74,13 @@ class TestTinTin(TestCommon):
         }
 
         debug_path = datafiles / '20-output/Debug.txt'
-
-        with pytest.raises(FileNotFoundError):
-            file_exists(debug_path)
+        assert not debug_path.is_file()
 
         # set up StempelWerk and execute full run
         config_path = datafiles / 'settings.json'
         results = self.run_with_config(custom_config, config_path)
 
-        with self.does_not_raise(FileNotFoundError):
-            file_exists(debug_path)
+        assert debug_path.is_file()
 
         # assert that debug file has been created by this test
         debug_output = debug_path.read_text()
@@ -112,5 +97,5 @@ class TestTinTin(TestCommon):
                 f'stencil "{stencil}" not found in debug output'
 
         # assert that output files are rendered correctly
-        remove_file(debug_path)
+        debug_path.unlink()
         self.compare_directories(results['configuration'])
