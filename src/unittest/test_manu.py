@@ -16,6 +16,18 @@ FIXTURE_DIR = pathlib.Path('src/unittest/') / 'manu'
 
 
 class TestManu(TestCommon):
+
+    def check_path_autocreation(self, config, config_path):
+        self.assert_autocreated_paths(config, pre_check=True)
+
+        with self.does_not_raise(SystemExit):
+            result = self.run(config_path)
+
+        self.assert_autocreated_paths(config, pre_check=False)
+        return result
+
+    # ------------------------------------------------------------------------
+
     # Manu is an inquisitive developer and loves to try new things. She found
     # StempelWerk on GitHub, cloned it and wants to get her hands dirty.
     #
@@ -54,10 +66,7 @@ class TestManu(TestCommon):
         config = self.create_config(custom_config, config_path)
 
         # implicitly check that StempelWerk runs without any templates
-        with self.does_not_raise(SystemExit):
-            self.assert_autocreated_paths(config, pre_check=True)
-            self.run(config_path)
-            self.assert_autocreated_paths(config, pre_check=False)
+        self.check_path_autocreation(config, config_path)
 
 
     # Manu finally reads (a small part of) the documentation. She dreams of
@@ -77,10 +86,7 @@ class TestManu(TestCommon):
                                     common_path_separator=True)
 
         # implicitly check that StempelWerk runs without any templates
-        with self.does_not_raise(SystemExit):
-            self.assert_autocreated_paths(config, pre_check=True)
-            self.run(config_path)
-            self.assert_autocreated_paths(config, pre_check=False)
+        self.check_path_autocreation(config, config_path)
 
 
     # She also dislikes trailing path separators (if DOS does not need them, why
@@ -99,10 +105,7 @@ class TestManu(TestCommon):
                                     common_path_separator=True)
 
         # implicitly check that StempelWerk runs without any templates
-        with self.does_not_raise(SystemExit):
-            self.assert_autocreated_paths(config, pre_check=True)
-            self.run(config_path)
-            self.assert_autocreated_paths(config, pre_check=False)
+        self.check_path_autocreation(config, config_path)
 
     # ------------------------------------------------------------------------
 
