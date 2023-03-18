@@ -49,7 +49,9 @@ class TestManu(TestCommon):
     def test_autocreation_of_directories(self, tmp_path):
         custom_config = {}
 
-        config_path = tmp_path / 'settings_unique.json'
+        config_path = tmp_path / 'nested/uncommon/location_and.suffix'
+        config_path.parent.mkdir(parents=True)
+
         self.create_config(custom_config, config_path)
 
         contents = config_path.read_text()
