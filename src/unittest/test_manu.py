@@ -7,7 +7,6 @@
 # names, but all personality traits have been made up. I hope they have as much
 # fun reading these tests as I had in writing them!
 
-import json
 import pathlib
 
 import pytest
@@ -52,10 +51,7 @@ class TestManu(TestCommon):
         config_path = tmp_path / 'nested/uncommon/location_and.suffix'
         config_path.parent.mkdir(parents=True)
 
-        self.create_config(custom_config, config_path)
-
-        contents = config_path.read_text()
-        config = json.loads(contents)
+        config = self.create_config(custom_config, config_path)
 
         # implicitly check that StempelWerk runs without any templates
         with self.does_not_raise(SystemExit):
@@ -77,11 +73,8 @@ class TestManu(TestCommon):
 
         # common path separator can be used (cross-platform support)
         config_path = tmp_path / 'settings.json'
-        self.create_config(custom_config, config_path,
-                           common_path_separator=True)
-
-        contents = config_path.read_text()
-        config = json.loads(contents)
+        config = self.create_config(custom_config, config_path,
+                                    common_path_separator=True)
 
         # implicitly check that StempelWerk runs without any templates
         with self.does_not_raise(SystemExit):
@@ -102,11 +95,8 @@ class TestManu(TestCommon):
 
         # common path separator can be used (cross-platform support)
         config_path = tmp_path / 'settings.json'
-        self.create_config(custom_config, config_path,
-                           common_path_separator=True)
-
-        contents = config_path.read_text()
-        config = json.loads(contents)
+        config = self.create_config(custom_config, config_path,
+                                    common_path_separator=True)
 
         # implicitly check that StempelWerk runs without any templates
         with self.does_not_raise(SystemExit):
@@ -137,8 +127,11 @@ class TestManu(TestCommon):
     # should always be enabled.
     @pytest.mark.datafiles(FIXTURE_DIR / '1_template_2_trim')
     def test_render_trim(self, datafiles):
-        # "trim_blocks" is set to "True" by default in "create_config"
-        custom_config = {}
+        custom_config = {
+            'jinja_options': {
+                'trim_blocks': True,
+            },
+        }
 
         config_path = datafiles / 'settings.json'
         self.run_and_compare(custom_config, config_path)

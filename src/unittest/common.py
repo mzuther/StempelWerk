@@ -65,13 +65,17 @@ class TestCommon:
             'newline': '\n'
         }
 
-        # update config with custom settings
+        # overwrite defaults with custom settings
         config.update(custom_config)
 
-        contents = json.dumps(config, ensure_ascii=False, indent=2)
-        config_path.write_text(contents)
+        json_string = json.dumps(config, ensure_ascii=False, indent=2)
+        config_path.write_text(json_string)
 
-        return config_path
+        # load and parse stored settings
+        actual_contents = config_path.read_text()
+        actual_config = json.loads(actual_contents)
+
+        return actual_config
 
 
     def compare_directories(self, config):
@@ -158,11 +162,7 @@ class TestCommon:
 
     def run_with_config(self, custom_config, config_path,
                         global_namespace=None):
-        config_path = self.create_config(
-            custom_config, config_path)
-
-        contents = config_path.read_text()
-        config = json.loads(contents)
+        config = self.create_config(custom_config, config_path)
 
         print('Configuration:')
         print(json.dumps(config, ensure_ascii=False, indent=2))
