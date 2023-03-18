@@ -29,17 +29,16 @@ class TestTinTin(TestCommon):
     # variables.
     @pytest.mark.datafiles(FIXTURE_DIR / '1_global_variables')
     def test_global_variables(self, datafiles):
-        global_namespace = '{"NO_cast": true}'
-
-        config = {
+        custom_config = {
             'stencil_dir_name': 'stencils',
         }
 
-        config_path = self.create_config(
-            config, datafiles / 'settings.json')
+        global_namespace = '{"NO_cast": true}'
 
         # set up StempelWerk and execute full run
-        self.run_and_compare(config_path, global_namespace=global_namespace)
+        config_path = datafiles / 'settings.json'
+        self.run_and_compare(custom_config, config_path,
+                             global_namespace=global_namespace)
 
 
     # After a year of intense testing, Tin Tin moved on to custom modules. He
@@ -47,7 +46,7 @@ class TestTinTin(TestCommon):
     # StempelWerk put his foot down.
     @pytest.mark.datafiles(FIXTURE_DIR / '2_custom_module')
     def test_custom_module(self, datafiles):
-        config = {
+        custom_config = {
             'stencil_dir_name': 'stencils',
             'custom_modules': [
                 'src.custom.add_filters',
@@ -55,11 +54,9 @@ class TestTinTin(TestCommon):
             ],
         }
 
-        config_path = self.create_config(
-            config, datafiles / 'settings.json')
-
         # set up StempelWerk and execute full run
-        self.run_and_compare(config_path)
+        config_path = datafiles / 'settings.json'
+        self.run_and_compare(custom_config, config_path)
 
 
     # Only 148 years to go! At Tin Tin's current pace, he will run out of work
@@ -81,26 +78,26 @@ class TestTinTin(TestCommon):
 
         # ---------------------------------------------------------------------
 
-        debug_path = datafiles / '20-output/Debug.txt'
-
-        config = {
+        custom_config = {
             'stencil_dir_name': 'stencils',
             'jinja_extensions': [
                 'jinja2.ext.debug',
             ],
         }
 
-        config_path = self.create_config(
-            config, datafiles / 'settings.json')
+        debug_path = datafiles / '20-output/Debug.txt'
 
         with pytest.raises(FileNotFoundError):
             file_exists(debug_path)
 
         # set up StempelWerk and execute full run
-        results = self.run_with_config_file(config_path)
+        config_path = datafiles / 'settings.json'
+        results = self.run_with_config(custom_config, config_path)
 
-        file_exists(debug_path)
+        with self.does_not_raise(FileNotFoundError):
+            file_exists(debug_path)
 
+        # assert that debug file has been created by this test
         debug_output = debug_path.read_text()
         print(debug_output)
 
@@ -114,5 +111,6 @@ class TestTinTin(TestCommon):
             assert debug_output.find(stencil) != -1, \
                 f'stencil "{stencil}" not found in debug output'
 
+        # assert that output files are rendered correctly
         remove_file(debug_path)
         self.compare_directories(results['configuration'])

@@ -47,10 +47,10 @@ class TestManu(TestCommon):
     # She is also pleased that she is able to concentrate on the task and does
     # not have to provide any templates.
     def test_autocreation_of_directories(self, tmp_path):
-        config = {}
+        custom_config = {}
 
-        config_path = self.create_config(
-            config, tmp_path / 'settings_unique.json')
+        config_path = tmp_path / 'settings_unique.json'
+        self.create_config(custom_config, config_path)
 
         contents = config_path.read_text()
         config = json.loads(contents)
@@ -68,14 +68,15 @@ class TestManu(TestCommon):
     def test_path_separators(self, tmp_path):
         # paths without trailing path separator are functional;
         # auto-creation of nested directories works
-        config = {
+        custom_config = {
             'template_dir': 'templates/nested/',
             'output_dir': 'output/deep/'
         }
 
         # common path separator can be used (cross-platform support)
-        config_path = self.create_config(
-            config, tmp_path / 'settings.json', common_path_separator=True)
+        config_path = tmp_path / 'settings.json'
+        self.create_config(custom_config, config_path,
+                           common_path_separator=True)
 
         contents = config_path.read_text()
         config = json.loads(contents)
@@ -92,14 +93,15 @@ class TestManu(TestCommon):
     # and keeps on working as before.
     def test_path_separators_trailing(self, tmp_path):
         # paths without trailing path separator are functional
-        config = {
+        custom_config = {
             'template_dir': 'templates',
             'output_dir': 'output'
         }
 
         # common path separator can be used (cross-platform support)
-        config_path = self.create_config(
-            config, tmp_path / 'settings.json', common_path_separator=True)
+        config_path = tmp_path / 'settings.json'
+        self.create_config(custom_config, config_path,
+                           common_path_separator=True)
 
         contents = config_path.read_text()
         config = json.loads(contents)
@@ -118,16 +120,14 @@ class TestManu(TestCommon):
     @pytest.mark.datafiles(FIXTURE_DIR / '1_template_1_notrim')
     def test_render_notrim(self, datafiles):
         # assert that StempelWerk can change Jinja options
-        config = {
+        custom_config = {
             'jinja_options': {
                 'trim_blocks': False,
             },
         }
 
-        config_path = self.create_config(
-            config, datafiles / 'settings.json')
-
-        self.run_and_compare(config_path)
+        config_path = datafiles / 'settings.json'
+        self.run_and_compare(custom_config, config_path)
 
 
     # Manu decides that she will try enabling "trim_blocks". After seeing the
@@ -136,12 +136,10 @@ class TestManu(TestCommon):
     @pytest.mark.datafiles(FIXTURE_DIR / '1_template_2_trim')
     def test_render_trim(self, datafiles):
         # "trim_blocks" is set to "True" by default in "create_config"
-        config = {}
+        custom_config = {}
 
-        config_path = self.create_config(
-            config, datafiles / 'settings.json')
-
-        self.run_and_compare(config_path)
+        config_path = datafiles / 'settings.json'
+        self.run_and_compare(custom_config, config_path)
 
 
     # The real power of templates lies in preventing DRY ("do not repeat
@@ -152,19 +150,17 @@ class TestManu(TestCommon):
         # assert that a subdirectory under "datafiles" also works
         root_dir = datafiles / 'DRY/nested'
 
-        config = {
+        custom_config = {
             'root_dir': str(root_dir),
             'included_suffixes': [
                 '*.included.jinja',
             ],
         }
 
-        config_path = self.create_config(
-            config, datafiles / 'settings.json')
-
         # assert indirectly that the template file "ignored.jinja" is
         # ignored and not processed
-        self.run_and_compare(config_path)
+        config_path = datafiles / 'settings.json'
+        self.run_and_compare(custom_config, config_path)
 
 
     # Manu loves Wikipedia and articles on programming languages
@@ -179,13 +175,11 @@ class TestManu(TestCommon):
     # configuration. So she is greeted by a nice error message.
     @pytest.mark.datafiles(FIXTURE_DIR / '1_template_4_file_separator')
     def test_render_file_separator_code_only(self, datafiles):
-        config = {}
+        custom_config = {}
 
-        config_path = self.create_config(
-            config, datafiles / 'settings.json')
-
+        config_path = datafiles / 'settings.json'
         with pytest.raises(SystemExit):
-            self.run_and_compare(config_path)
+            self.run_and_compare(custom_config, config_path)
 
 
     # After updating the configuration, Manu gets the output she is looking for.
@@ -196,15 +190,13 @@ class TestManu(TestCommon):
     # with that!
     @pytest.mark.datafiles(FIXTURE_DIR / '1_template_4_file_separator')
     def test_render_file_separator(self, datafiles):
-        config = {
+        custom_config = {
             'marker_new_file': 'START_FILE',
             'marker_content': 'START_CONTENT'
         }
 
-        config_path = self.create_config(
-            config, datafiles / 'settings.json')
-
-        self.run_and_compare(config_path)
+        config_path = datafiles / 'settings.json'
+        self.run_and_compare(custom_config, config_path)
 
 
     # Manu changes the default name of the stencil directory, but forgets to
@@ -212,28 +204,24 @@ class TestManu(TestCommon):
     # message.
     @pytest.mark.datafiles(FIXTURE_DIR / '1_template_5_with_stencil')
     def test_render_missing_stencil(self, datafiles):
-        config = {
+        custom_config = {
             'stencil_dir_name': 'stencils',
         }
 
-        config_path = self.create_config(
-            config, datafiles / 'settings.json')
-
+        config_path = datafiles / 'settings.json'
         with pytest.raises(SystemExit):
-            self.run_and_compare(config_path)
+            self.run_and_compare(custom_config, config_path)
 
 
     # After updating the settings file, StempelWerk runs just fine.
     @pytest.mark.datafiles(FIXTURE_DIR / '1_template_5_with_stencil')
     def test_render_with_stencil(self, datafiles):
-        config = {
+        custom_config = {
             'stencil_dir_name': '00-stencils',
         }
 
-        config_path = self.create_config(
-            config, datafiles / 'settings.json')
-
-        self.run_and_compare(config_path)
+        config_path = datafiles / 'settings.json'
+        self.run_and_compare(custom_config, config_path)
 
 
     # Manu wants to create different files using different stencils that are
@@ -241,18 +229,16 @@ class TestManu(TestCommon):
     # everything and goes back to sleep.
     @pytest.mark.datafiles(FIXTURE_DIR / '1_template_6_multiple_stencils')
     def test_render_multiple_stencils(self, datafiles):
-        config = {
+        custom_config = {
             'stencil_dir_name': 'stencils',
         }
-
-        config_path = self.create_config(
-            config, datafiles / 'settings.json')
 
         # create nested output subdirectory by hand
         output_subpath = datafiles / '20-output/nested'
         output_subpath.mkdir(parents=True)
 
-        self.run_and_compare(config_path)
+        config_path = datafiles / 'settings.json'
+        self.run_and_compare(custom_config, config_path)
 
 
     # Manu tries to render a file into a subdirectory of the output directory.
@@ -260,73 +246,63 @@ class TestManu(TestCommon):
     # error message.
     @pytest.mark.datafiles(FIXTURE_DIR / '1_template_7_create_subdirs')
     def test_render_create_subdirectories_1(self, datafiles):
-        config = {}
+        custom_config = {}
 
-        config_path = self.create_config(
-            config, datafiles / 'settings.json')
-
+        config_path = datafiles / 'settings.json'
         with pytest.raises(SystemExit):
-            self.run_and_compare(config_path)
+            self.run_and_compare(custom_config, config_path)
 
 
     # When Manu creates the subdirectory before running StempelWerk, everything
     # works as expected.
     @pytest.mark.datafiles(FIXTURE_DIR / '1_template_7_create_subdirs')
     def test_render_create_subdirectories_2(self, datafiles):
-        config = {}
-
-        config_path = self.create_config(
-            config, datafiles / 'settings.json')
+        custom_config = {}
 
         # create nested output subdirectory by hand
         output_subpath = datafiles / '20-output/other/name'
         output_subpath.mkdir(parents=True)
 
-        self.run_and_compare(config_path)
+        config_path = datafiles / 'settings.json'
+        self.run_and_compare(custom_config, config_path)
 
 
     # Enabling the automatic creation of missing directories works just as well,
     # at the price of incuding a security risk.
     @pytest.mark.datafiles(FIXTURE_DIR / '1_template_7_create_subdirs')
     def test_render_create_subdirectories_3(self, datafiles):
-        config = {
+        custom_config = {
             'create_directories': True
         }
 
-        config_path = self.create_config(
-            config, datafiles / 'settings.json')
-
-        self.run_and_compare(config_path)
+        config_path = datafiles / 'settings.json'
+        self.run_and_compare(custom_config, config_path)
 
 
     # Manu is intrigued: different operating systems store text files with
     # different newline characters. Time to have some fun!
     @pytest.mark.datafiles(FIXTURE_DIR / '1_template_8_file_endings')
     def test_render_file_endings_1(self, datafiles):
-        config = {
+        custom_config = {
             'create_directories': True,
             'newline': '\n'
         }
 
-        config_path = self.create_config(
-            config, datafiles / 'settings.json')
-
-        self.run_and_compare(config_path)
+        config_path = datafiles / 'settings.json'
+        self.run_and_compare(custom_config, config_path)
 
 
     # Can StempelWerk's newline logic be turned on its head? Yes, ma'am!
     @pytest.mark.datafiles(FIXTURE_DIR / '1_template_8_file_endings')
     def test_render_file_endings_2(self, datafiles):
-        config = {
+        custom_config = {
             'create_directories': True,
             # invert logic, part 1
             'newline': '\r\n'
         }
 
-        config_path = self.create_config(
-            config, datafiles / 'settings.json')
-
-        results = self.run_with_config_file(config_path)
+        config_path = datafiles / 'settings.json'
+        results = self.run_with_config(custom_config, config_path)
         instance = results['instance']
 
         instance.newline_exceptions = {
@@ -343,23 +319,19 @@ class TestManu(TestCommon):
     # StempelWerk can process multiple templates. In a single run!!!
     @pytest.mark.datafiles(FIXTURE_DIR / '2_templates_1_no_stencil')
     def test_render_multi_no_stencil(self, datafiles):
-        config = {}
+        custom_config = {}
 
-        config_path = self.create_config(
-            config, datafiles / 'settings.json')
-
-        self.run_and_compare(config_path)
+        config_path = datafiles / 'settings.json'
+        self.run_and_compare(custom_config, config_path)
 
 
     # When the excitement has worn off, she verifies that common template code
     # can be reused by moving it into a stencil.
     @pytest.mark.datafiles(FIXTURE_DIR / '2_templates_2_with_stencil')
     def test_render_multi_with_stencil(self, datafiles):
-        config = {
+        custom_config = {
             'stencil_dir_name': 'stencils',
         }
 
-        config_path = self.create_config(
-            config, datafiles / 'settings.json')
-
-        self.run_and_compare(config_path)
+        config_path = datafiles / 'settings.json'
+        self.run_and_compare(custom_config, config_path)

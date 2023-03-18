@@ -68,15 +68,14 @@ class TestMascara(TestCommon):
 
         # ---------------------------------------------------------------------
 
-        config = {
+        custom_config = {
             'stencil_dir_name': 'stencils',
         }
 
-        config_path = self.create_config(
-            config, datafiles / 'settings.json')
-
         # set up StempelWerk and execute full run
-        results = self.run_and_compare(config_path)
+        config_path = datafiles / 'settings.json'
+        results = self.run_and_compare(custom_config, config_path)
+
         config = results['configuration']
         assert results['saved_files'] == 2
 
@@ -84,11 +83,13 @@ class TestMascara(TestCommon):
         output_path = pathlib.Path('20-output')
         remove_file(output_path / 'ab.txt')
         modify_file(output_path / 'cd.txt')
+
         results = convenience_run(partial_run=False, matching=True)
         assert results['saved_files'] == 2
 
         # partial run leaves deleted output file alone
         remove_file(output_path / 'cd.txt')
+
         results = convenience_run(partial_run=True, matching=False)
         assert results['saved_files'] == 0
 
@@ -98,6 +99,7 @@ class TestMascara(TestCommon):
 
         # partial run does not render externally modified output file
         modify_file(output_path / 'ab.txt')
+
         results = convenience_run(partial_run=True, matching=False)
         assert results['saved_files'] == 0
 
@@ -134,29 +136,28 @@ class TestMascara(TestCommon):
 
         # ---------------------------------------------------------------------
 
-        config = {
+        custom_config = {
             'stencil_dir_name': 'stencils',
         }
 
-        config_path = self.create_config(
-            config, datafiles / 'settings.json')
-
         # set up StempelWerk and execute full run
-        results = self.run_and_compare(config_path)
+        config_path = datafiles / 'settings.json'
+        results = self.run_and_compare(custom_config, config_path)
+
         config = results['configuration']
         assert results['saved_files'] == 2
 
+        # partial run does not update changed files
         updated_path_30 = pathlib.Path('30-expected_updated')
         update_file(updated_path_30 / 'ab.txt')
 
-        # partial run does not update changed files
         results = convenience_run(partial_run=True, matching=False)
         assert results['saved_files'] == 0
 
+        # partial run updates output files of changed templates
         updated_path_10 = pathlib.Path('10-templates_updated')
         update_file(updated_path_10 / 'ab.jinja')
 
-        # partial run updates output files of changed templates
         results = convenience_run(partial_run=True, matching=True)
         assert results['saved_files'] == 1
 
@@ -189,30 +190,29 @@ class TestMascara(TestCommon):
 
         # ---------------------------------------------------------------------
 
-        config = {
+        custom_config = {
             'stencil_dir_name': 'stencils',
         }
 
-        config_path = self.create_config(
-            config, datafiles / 'settings.json')
-
         # set up StempelWerk and execute full run
-        results = self.run_and_compare(config_path)
+        config_path = datafiles / 'settings.json'
+        results = self.run_and_compare(custom_config, config_path)
+
         config = results['configuration']
         assert results['saved_files'] == 2
 
+        # partial run does not check for changed stencils
         updated_path_10 = pathlib.Path('10-templates_updated')
         update_file(updated_path_10 / 'stencils/common.jinja')
 
-        # partial run does not check for changed stencils
         results = convenience_run(partial_run=True, matching=True)
         assert results['saved_files'] == 0
 
+        # full run applies changed stencils
         updated_path_30 = pathlib.Path('30-expected_updated')
         update_file(updated_path_30 / 'ab.txt')
         update_file(updated_path_30 / 'cd.txt')
 
-        # full run applies changed stencils
         results = convenience_run(partial_run=False, matching=True)
         assert results['saved_files'] == 2
 
@@ -242,21 +242,21 @@ class TestMascara(TestCommon):
 
         # ---------------------------------------------------------------------
 
-        config = {
+        custom_config = {
             'stencil_dir_name': 'stencils',
         }
 
-        config_path = self.create_config(
-            config, datafiles / 'settings.json')
-
         # set up StempelWerk and execute full run
-        results = self.run_and_compare(config_path)
+        config_path = datafiles / 'settings.json'
+        results = self.run_and_compare(custom_config, config_path)
+
         config = results['configuration']
         assert results['saved_files'] == 2
 
         # deleting a template leaves the output file alone
         template_path = pathlib.Path('10-templates')
         remove_file(template_path / 'ab.jinja')
+
         results = convenience_run(partial_run=False, matching=True)
         assert results['saved_files'] == 1
 
@@ -298,19 +298,18 @@ class TestMascara(TestCommon):
 
         last_run_file = 'mascara.HACK'
 
-        config = {
+        custom_config = {
             'stencil_dir_name': 'stencils',
             'last_run_file': last_run_file,
         }
-
-        config_path = self.create_config(
-            config, datafiles / 'settings.json')
 
         with pytest.raises(FileNotFoundError):
             file_exists(last_run_file)
 
         # set up StempelWerk and execute full run
-        results = self.run_and_compare(config_path)
+        config_path = datafiles / 'settings.json'
+        results = self.run_and_compare(custom_config, config_path)
+
         config = results['configuration']
         assert results['saved_files'] == 2
 
@@ -326,6 +325,7 @@ class TestMascara(TestCommon):
 
         # partial run becomes full run when "last_run_file" is missing
         remove_file(last_run_file)
+
         results = convenience_run(partial_run=True, matching=True)
         assert results['saved_files'] == 2
 
