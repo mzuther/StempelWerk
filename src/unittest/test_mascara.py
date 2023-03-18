@@ -16,6 +16,23 @@ FIXTURE_DIR = pathlib.Path('src/unittest/') / 'mascara'
 
 
 class TestMascara(TestCommon):
+
+    def convenience_run(self, config, config_path, process_only_modified,
+                        must_match):
+        results = self.run(
+            config_path,
+            process_only_modified=process_only_modified)
+
+        if must_match:
+            self.compare_directories(config)
+        else:
+            with pytest.raises(AssertionError):
+                self.compare_directories(config)
+
+        return results
+
+    # ---------------------------------------------------------------------
+
     # Mascara is a front-end developer wanting to learn coding. From her
     # previous experience, she thinks that getting an existing Python
     # application to do what she wants is already coding. She's a good tester,
@@ -25,22 +42,6 @@ class TestMascara(TestCommon):
     # changes files and checks whether the application restores the files.
     @pytest.mark.datafiles(FIXTURE_DIR / '1_process_only_modified_1')
     def test_process_only_modified_1(self, datafiles):
-
-        def convenience_run(partial_run, matching):
-            results = self.run(
-                config_path,
-                process_only_modified=partial_run)
-
-            if matching:
-                self.compare_directories(config)
-            else:
-                with pytest.raises(AssertionError):
-                    self.compare_directories(config)
-
-            return results
-
-        # ---------------------------------------------------------------------
-
         custom_config = {
             'stencil_dir_name': 'stencils',
         }
@@ -59,29 +60,34 @@ class TestMascara(TestCommon):
         file_to_be_modified = datafiles / '20-output/cd.txt'
         self.modify_file(config, file_to_be_modified)
 
-        results = convenience_run(partial_run=False, matching=True)
+        results = self.convenience_run(
+            config, config_path, process_only_modified=False, must_match=True)
         assert results['saved_files'] == 2
 
         # partial run leaves deleted output file alone
         file_to_be_deleted = datafiles / '20-output/cd.txt'
         file_to_be_deleted.unlink()
 
-        results = convenience_run(partial_run=True, matching=False)
+        results = self.convenience_run(
+            config, config_path, process_only_modified=True, must_match=False)
         assert results['saved_files'] == 0
 
         # full run re-creates all output files
-        results = convenience_run(partial_run=False, matching=True)
+        results = self.convenience_run(
+            config, config_path, process_only_modified=False, must_match=True)
         assert results['saved_files'] == 2
 
         # partial run does not render externally modified output file
         file_to_be_modified = datafiles / '20-output/ab.txt'
         self.modify_file(config, file_to_be_modified)
 
-        results = convenience_run(partial_run=True, matching=False)
+        results = self.convenience_run(
+            config, config_path, process_only_modified=True, must_match=False)
         assert results['saved_files'] == 0
 
         # full run also renders externally modified output files
-        results = convenience_run(partial_run=False, matching=True)
+        results = self.convenience_run(
+            config, config_path, process_only_modified=False, must_match=True)
         assert results['saved_files'] == 2
 
 
@@ -89,22 +95,6 @@ class TestMascara(TestCommon):
     # respective output file.
     @pytest.mark.datafiles(FIXTURE_DIR / '1_process_only_modified_2')
     def test_process_only_modified_2(self, datafiles):
-
-        def convenience_run(partial_run, matching):
-            results = self.run(
-                config_path,
-                process_only_modified=partial_run)
-
-            if matching:
-                self.compare_directories(config)
-            else:
-                with pytest.raises(AssertionError):
-                    self.compare_directories(config)
-
-            return results
-
-        # ---------------------------------------------------------------------
-
         custom_config = {
             'stencil_dir_name': 'stencils',
         }
@@ -119,13 +109,15 @@ class TestMascara(TestCommon):
         # partial run does not update changed files
         self.update_file(datafiles / '30-expected_updated/ab.txt')
 
-        results = convenience_run(partial_run=True, matching=False)
+        results = self.convenience_run(
+            config, config_path, process_only_modified=True, must_match=False)
         assert results['saved_files'] == 0
 
         # partial run updates output files of changed templates
         self.update_file(datafiles / '10-templates_updated/ab.jinja')
 
-        results = convenience_run(partial_run=True, matching=True)
+        results = self.convenience_run(
+            config, config_path, process_only_modified=True, must_match=True)
         assert results['saved_files'] == 1
 
 
@@ -133,22 +125,6 @@ class TestMascara(TestCommon):
     # stencil changes any output files in a partial run.
     @pytest.mark.datafiles(FIXTURE_DIR / '1_process_only_modified_3')
     def test_process_only_modified_3(self, datafiles):
-
-        def convenience_run(partial_run, matching):
-            results = self.run(
-                config_path,
-                process_only_modified=partial_run)
-
-            if matching:
-                self.compare_directories(config)
-            else:
-                with pytest.raises(AssertionError):
-                    self.compare_directories(config)
-
-            return results
-
-        # ---------------------------------------------------------------------
-
         custom_config = {
             'stencil_dir_name': 'stencils',
         }
@@ -164,14 +140,16 @@ class TestMascara(TestCommon):
         self.update_file(
             datafiles / '10-templates_updated/stencils/common.jinja')
 
-        results = convenience_run(partial_run=True, matching=True)
+        results = self.convenience_run(
+            config, config_path, process_only_modified=True, must_match=True)
         assert results['saved_files'] == 0
 
         # full run applies changed stencils
         self.update_file(datafiles / '30-expected_updated/ab.txt')
         self.update_file(datafiles / '30-expected_updated/cd.txt')
 
-        results = convenience_run(partial_run=False, matching=True)
+        results = self.convenience_run(
+            config, config_path, process_only_modified=False, must_match=True)
         assert results['saved_files'] == 2
 
 
@@ -179,22 +157,6 @@ class TestMascara(TestCommon):
     # whether StempelWerk is really as lean as its developer promises.
     @pytest.mark.datafiles(FIXTURE_DIR / '1_process_only_modified_1')
     def test_lean_template_removal(self, datafiles):
-
-        def convenience_run(partial_run, matching):
-            results = self.run(
-                config_path,
-                process_only_modified=partial_run)
-
-            if matching:
-                self.compare_directories(config)
-            else:
-                with pytest.raises(AssertionError):
-                    self.compare_directories(config)
-
-            return results
-
-        # ---------------------------------------------------------------------
-
         custom_config = {
             'stencil_dir_name': 'stencils',
         }
@@ -210,7 +172,8 @@ class TestMascara(TestCommon):
         file_to_be_deleted = datafiles / '10-templates/ab.jinja'
         file_to_be_deleted.unlink()
 
-        results = convenience_run(partial_run=False, matching=True)
+        results = self.convenience_run(
+            config, config_path, process_only_modified=False, must_match=True)
         assert results['saved_files'] == 1
 
 
@@ -222,22 +185,6 @@ class TestMascara(TestCommon):
     # With little effect - StempelWerk just creates it again. No! NO!!!
     @pytest.mark.datafiles(FIXTURE_DIR / '1_process_only_modified_1')
     def test_last_run_file(self, datafiles):
-
-        def convenience_run(partial_run, matching):
-            results = self.run(
-                config_path,
-                process_only_modified=partial_run)
-
-            if matching:
-                self.compare_directories(config)
-            else:
-                with pytest.raises(AssertionError):
-                    self.compare_directories(config)
-
-            return results
-
-        # ---------------------------------------------------------------------
-
         last_run_file = datafiles / 'mascara.HACK'
 
         custom_config = {
@@ -258,7 +205,8 @@ class TestMascara(TestCommon):
         assert last_run_file.is_file()
 
         # partial run finds "last_run_file" and does not render any files
-        results = convenience_run(partial_run=True, matching=True)
+        results = self.convenience_run(
+            config, config_path, process_only_modified=True, must_match=True)
         assert results['saved_files'] == 0
 
         # "last_run_file" is not deleted accidentally
@@ -267,7 +215,8 @@ class TestMascara(TestCommon):
         # partial run becomes full run when "last_run_file" is missing
         last_run_file.unlink()
 
-        results = convenience_run(partial_run=True, matching=True)
+        results = self.convenience_run(
+            config, config_path, process_only_modified=True, must_match=True)
         assert results['saved_files'] == 2
 
         # "last_run_file" is re-created

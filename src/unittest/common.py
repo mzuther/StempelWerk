@@ -178,6 +178,7 @@ class TestCommon:
         assert parsed_args.process_only_modified == \
             process_only_modified
 
+        # "results" contains number of processed and saved files
         results = instance.process_templates(process_only_modified)
         results['instance'] = instance
 
