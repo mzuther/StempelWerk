@@ -392,8 +392,9 @@ class StempelWerk:
         self.printer.debug('Done.')
         self.printer.debug()
 
-        # load extensions and run custom Python code
-        self._update_environment()
+        # load Jinja extensions first so they can be used in custom modules
+        self._load_jinja_extensions()
+        self._execute_custom_modules()
 
 
     def _get_templates(self):
@@ -451,55 +452,58 @@ class StempelWerk:
             self.printer.debug(' ')
 
 
-    def _update_environment(self):
-        # load Jinja extensions first so they can be referenced in custom
-        # Python code
-        if self.settings.jinja_extensions:
-            self.printer.debug('Loading extensions:')
+    def _load_jinja_extensions(self):
+        if not self.settings.jinja_extensions:
+            return
+
+        self.printer.debug('Loading extensions:')
+        self.printer.debug(' ')
+
+        for extension in self.settings.jinja_extensions:
+            self.printer.debug(f'  - {extension}')
+            self.jinja_environment.add_extension(extension)
+
+        self.printer.debug(' ')
+        self.printer.debug('Done.')
+        self.printer.debug()
+
+
+    def _execute_custom_modules(self):
+        if not self.settings.custom_modules:
+            return
+
+        self.printer.debug('Loading custom modules:')
+        self.printer.debug(' ')
+
+        for module_name in self.settings.custom_modules:
+            self.printer.debug(f'  [ {module_name} ]')
+
+            # import code as module
+            module_spec = importlib.util.find_spec(
+                module_name)
+            imported_module = importlib.util.module_from_spec(
+                module_spec)
+
+            # execute module its own namespace
+            module_spec.loader.exec_module(
+                imported_module)
+
+            # prevent changes to settings
+            custom_code = imported_module.CustomCode(
+                copy.deepcopy(self.settings),
+                self.printer)
+
+            self.printer.debug('  - Updating environment ...')
+
+            # execute custom code and store updated Jinja environment
+            self.jinja_environment = custom_code.update_environment(
+                self.jinja_environment)
+
+            self.printer.debug('  - Done.')
             self.printer.debug(' ')
 
-            for extension in self.settings.jinja_extensions:
-                self.printer.debug(f'  - {extension}')
-                self.jinja_environment.add_extension(extension)
-
-            self.printer.debug(' ')
-            self.printer.debug('Done.')
-            self.printer.debug()
-
-        # run custom Python code
-        if self.settings.custom_modules:
-            self.printer.debug('Loading custom modules:')
-            self.printer.debug(' ')
-
-            for module_name in self.settings.custom_modules:
-                self.printer.debug(f'  [ {module_name} ]')
-
-                # import code as module
-                module_spec = importlib.util.find_spec(
-                    module_name)
-                imported_module = importlib.util.module_from_spec(
-                    module_spec)
-
-                # execute module its own namespace
-                module_spec.loader.exec_module(
-                    imported_module)
-
-                # prevent changes to settings
-                custom_code = imported_module.CustomCode(
-                    copy.deepcopy(self.settings),
-                    self.printer)
-
-                self.printer.debug('  - Updating environment ...')
-
-                # execute custom code and store updated Jinja environment
-                self.jinja_environment = custom_code.update_environment(
-                    self.jinja_environment)
-
-                self.printer.debug('  - Done.')
-                self.printer.debug(' ')
-
-            self.printer.debug('Done.')
-            self.printer.debug()
+        self.printer.debug('Done.')
+        self.printer.debug()
 
 
     def render_template(self, template_path, global_namespace=None):
