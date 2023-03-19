@@ -9,6 +9,7 @@
 
 import pathlib
 
+import jinja2
 import pytest
 from src.unittest.common import TestCommon
 
@@ -221,3 +222,28 @@ class TestMascara(TestCommon):
 
         # "last_run_file" is re-created
         assert last_run_file.is_file()
+
+
+    # Mascara, Destroyer of Worlds? Maybe not, but certainly Destroyer of Files.
+    # And now: Destroyer of Templates. We stand in awe.
+    @pytest.mark.datafiles(FIXTURE_DIR / '2_exception_syntax_error')
+    def test_exception_syntax_error(self, datafiles):
+        custom_config = {}
+
+        # set up StempelWerk and execute full run
+        config_path = datafiles / 'settings.json'
+
+        with pytest.raises(jinja2.TemplateError):
+            self.run_and_compare(custom_config, config_path)
+
+
+    # Om. I mean: OOOMMMMMMMMmmmmmmmmm........!
+    @pytest.mark.datafiles(FIXTURE_DIR / '2_exception_template_not_found')
+    def test_exception_template_not_found(self, datafiles):
+        custom_config = {}
+
+        # set up StempelWerk and execute full run
+        config_path = datafiles / 'settings.json'
+
+        with pytest.raises(jinja2.TemplateError):
+            self.run_and_compare(custom_config, config_path)
