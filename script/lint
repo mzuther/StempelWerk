@@ -1,0 +1,9 @@
+#! /bin/bash
+
+echo
+
+python -m flake8 --config="./.flake8" src/
+EXIT_CODE=$?
+
+echo
+exit $EXIT_CODE
