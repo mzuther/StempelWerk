@@ -507,30 +507,28 @@ class StempelWerk:
 
 
     def render_template(self, template_path, custom_global_namespace=None):
-        # create environment automatically
-        if not hasattr(self, 'jinja_environment'):
-            self.create_environment()
-
-        current_global_namespace = self._prepare_global_namespace(
-            custom_global_namespace)
-
         template_path = template_path.relative_to(
             self.settings.template_dir)
 
         # Jinja2 cannot handle Windows paths
         template_filename = template_path.as_posix()
 
-        processed_templates = 1
-        saved_files = 0
-
         if self.verbosity >= -1:
-            print('- {}'.format(template_path))
+            # print template name in the way it is used in Jinja2
+            print('- {}'.format(template_filename))
+
+        global_namespace = self._prepare_global_namespace(
+            custom_global_namespace)
+
+        # create environment automatically
+        if not hasattr(self, 'jinja_environment'):
+            self.create_environment()
 
         # render template
         try:
             template = self.jinja_environment.get_template(
                 template_filename,
-                globals=current_global_namespace)
+                globals=global_namespace)
 
             content_of_multiple_files = template.render()
 
@@ -560,6 +558,9 @@ class StempelWerk:
         # split content of multiple files
         split_contents = content_of_multiple_files.split(
             self.settings.marker_new_file)
+
+        processed_templates = 1
+        saved_files = 0
 
         for content_of_single_file in split_contents:
             saved_files += self._render_to_single_file(content_of_single_file)
@@ -651,7 +652,7 @@ class StempelWerk:
 
 
     def process_templates(self, process_only_modified=False,
-                          global_namespace=None):
+                          custom_global_namespace=None):
         start_of_processing = datetime.datetime.now()
 
         dirwalk_inclusions = {
@@ -684,7 +685,7 @@ class StempelWerk:
         if template_filenames:
             for template_filename in template_filenames:
                 results = self.render_template(
-                    template_filename, global_namespace)
+                    template_filename, custom_global_namespace)
 
                 processed_templates += results['processed_templates']
                 saved_files += results['saved_files']
@@ -746,7 +747,7 @@ if __name__ == '__main__':
     # if you want to modify the global namespace programmatically,
     # here is the right place to do so; this will extend / overwrite
     # the global variables specified on the command line
-    additional_global_namespace = {}
+    custom_global_namespace = {}
 
     sw.process_templates(parsed_args.process_only_modified,
-                         additional_global_namespace)
+                         custom_global_namespace)
