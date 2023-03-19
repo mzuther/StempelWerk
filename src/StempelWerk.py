@@ -591,7 +591,12 @@ class StempelWerk:
         saved_files = 0
 
         for content_of_single_file in split_contents:
-            saved_files += self._render_to_single_file(content_of_single_file)
+            # content starts with "marker_new_file", so first string is empty
+            # (or contains whitespace when a template is not well written)
+            if not content_of_single_file.strip():
+                continue
+
+            saved_files += self._save_single_file(content_of_single_file)
 
         if self.verbosity >= 0:
             print()
@@ -602,34 +607,9 @@ class StempelWerk:
         }
 
 
-    def _render_to_single_file(self, content_raw):
-        # content starts with "marker_new_file", so first string is
-        # empty (or contains whitespace when a template is not well
-        # written)
-        if not content_raw.strip():
-            return 0
-
-        # catch problems with file separation markers early
-        if (content_raw.count(self.settings.marker_new_file) != 0) or \
-           (content_raw.count(self.settings.marker_content) != 1):
-            self.printer.error(
-                'there was a problem with splitting the output into files,')
-            self.printer.error(
-                'check "marker_new_file", "marker_content" and your templates.')
-            self.printer.error()
-            exit(1)
-
-        # extract path and content of output file
-        output_filename, content = content_raw.split(
-            self.settings.marker_content, 1)
-
-        # FIXME: check validity of input
-        output_filename = output_filename.strip()
-        content = content.lstrip()
-
-        output_filename = self.Settings.finalize_path(
-            self.settings.output_dir, output_filename)
-        output_directory = output_filename.parent
+    def _save_single_file(self, raw_content):
+        output_path, content = self._process_raw_content(raw_content)
+        output_directory = output_path.parent
 
         if not output_directory.is_dir():
             if self.settings.create_directories:
@@ -645,21 +625,47 @@ class StempelWerk:
                 exit(1)
 
         if self.verbosity >= 0:
-            print('  - {}'.format(output_filename.relative_to(
+            print('  - {}'.format(output_path.relative_to(
                 self.settings.output_dir)))
 
         # use default newline character unless there is an exception
         newline = self.newline_exceptions.get(
-            output_filename.suffix,
+            output_path.suffix,
             self.settings.newline)
 
         # Jinja2 encodes all strings in UTF-8
-        output_filename.write_text(
+        output_path.write_text(
             content,
             encoding='utf-8',
             newline=newline)
 
         return 1
+
+
+    def _process_raw_content(self, raw_content):
+        new_file_markers = raw_content.count(self.settings.marker_new_file)
+        content_markers = raw_content.count(self.settings.marker_content)
+
+        # catch problems with file separation markers early
+        if new_file_markers != 0 or content_markers != 1:
+            self.printer.error(
+                'there was a problem with splitting the output into files,')
+            self.printer.error(
+                'check "marker_new_file", "marker_content" and your templates.')
+            self.printer.error()
+            exit(1)
+
+        # extract name and content of output file
+        filename, content = raw_content.split(
+            self.settings.marker_content, 1)
+
+        filename = filename.strip()
+        content = content.lstrip()
+
+        output_path = self.Settings.finalize_path(
+            self.settings.output_dir, filename)
+
+        return output_path, content
 
 
     def process_templates(self, process_only_modified=False,
