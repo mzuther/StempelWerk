@@ -78,7 +78,7 @@ class TestTinTin(TestCommon):
 
         # set up StempelWerk and execute full run
         config_path = datafiles / 'settings.json'
-        results = self.run_with_config(custom_config, config_path)
+        run_results = self.run_with_config(custom_config, config_path)
 
         assert debug_path.is_file()
 
@@ -98,4 +98,4 @@ class TestTinTin(TestCommon):
 
         # assert that output files are rendered correctly
         debug_path.unlink()
-        self.compare_directories(results['configuration'])
+        self.compare_directories(run_results['configuration'])

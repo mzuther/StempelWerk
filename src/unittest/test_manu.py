@@ -21,10 +21,10 @@ class TestManu(TestCommon):
         self.assert_autocreated_paths(config, pre_check=True)
 
         with self.does_not_raise(SystemExit):
-            result = self.run(config_path)
+            run_results = self.run(config_path)
 
         self.assert_autocreated_paths(config, pre_check=False)
-        return result
+        return run_results
 
     # ------------------------------------------------------------------------
 
@@ -300,8 +300,8 @@ class TestManu(TestCommon):
         }
 
         config_path = datafiles / 'settings.json'
-        results = self.run_with_config(custom_config, config_path)
-        instance = results['instance']
+        run_results = self.run_with_config(custom_config, config_path)
+        instance = run_results['instance']
 
         instance.newline_exceptions = {
             # invert logic, part 2
@@ -309,8 +309,7 @@ class TestManu(TestCommon):
         }
 
         instance.process_templates()
-        self.compare_directories(
-            results['configuration'])
+        self.compare_directories(run_results['configuration'])
 
 
     # After playing around with a single template, Manu is excited that

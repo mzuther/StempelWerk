@@ -39,13 +39,13 @@ class TestCommon:
 
     def modify_file(self, config, file_path):
         with file_path.open() as original_file:
-            contents = original_file.readlines()
+            original_contents = original_file.readlines()
 
         # delete first line
-        contents = contents[1:]
+        modified_contents = original_contents[1:]
 
         with file_path.open(mode='w') as modified_file:
-            modified_file.writelines(contents)
+            modified_file.writelines(modified_contents)
 
         # assert modification
         with pytest.raises(AssertionError):
@@ -131,7 +131,7 @@ class TestCommon:
             with path_actual.open() as actual_file:
                 actual_contents = actual_file.readlines()
 
-            result = difflib.unified_diff(
+            diff_result = difflib.unified_diff(
                 expected_contents,
                 actual_contents,
                 fromfile=str(path_expected),
@@ -141,7 +141,7 @@ class TestCommon:
             print()
             print('Difference between expected output and result:')
             print()
-            sys.stdout.writelines(result)
+            sys.stdout.writelines(diff_result)
             print()
 
             assert False, 'Found differing files.'
@@ -178,11 +178,11 @@ class TestCommon:
         assert parsed_args.process_only_modified == \
             process_only_modified
 
-        # "results" contains number of processed and saved files
-        results = instance.process_templates(process_only_modified)
-        results['instance'] = instance
+        # "run_results" contains number of processed and saved files
+        run_results = instance.process_templates(process_only_modified)
+        run_results['instance'] = instance
 
-        return results
+        return run_results
 
 
     def run_with_config(self, custom_config, config_path,
@@ -192,18 +192,18 @@ class TestCommon:
         print('Configuration:')
         print(json.dumps(config, ensure_ascii=False, indent=2))
 
-        results = self.run(config_path, global_namespace)
-        results['configuration'] = config
+        run_results = self.run(config_path, global_namespace)
+        run_results['configuration'] = config
 
-        return results
+        return run_results
 
 
     def run_and_compare(self, custom_config, config_path,
                         global_namespace=None):
-        results = self.run_with_config(
+        run_results = self.run_with_config(
             custom_config, config_path, global_namespace)
 
         self.compare_directories(
-            results['configuration'])
+            run_results['configuration'])
 
-        return results
+        return run_results
