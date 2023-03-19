@@ -6,10 +6,14 @@ class CustomCode(StempelWerk.CustomCodeTemplate):
         super().__init__(copy_of_settings, printer)
 
 
-    def _display_environment_change(self, new, old, display_type):
-        added = ['"' + s + '"' for s in sorted(new - old)]
+    def _display_environment_change(self, new_environment, old_environment,
+                                    display_type):
+        differences = sorted(new_environment - old_environment)
+
+        added = ['"' + difference + '"' for difference in differences]
         count = len(added)
         added = ', '.join(added)
+
         self.print_debug(f'  - Added { count } { display_type }: { added }.')
 
 

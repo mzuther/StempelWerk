@@ -38,14 +38,14 @@ class TestCommon:
     # ------------------------------------------------------------------------
 
     def modify_file(self, config, file_path):
-        with file_path.open() as f:
-            contents = f.readlines()
+        with file_path.open() as original_file:
+            contents = original_file.readlines()
 
         # delete first line
         contents = contents[1:]
 
-        with file_path.open(mode='w') as f:
-            f.writelines(contents)
+        with file_path.open(mode='w') as modified_file:
+            modified_file.writelines(contents)
 
         # assert modification
         with pytest.raises(AssertionError):
@@ -124,18 +124,18 @@ class TestCommon:
             differing_file_path = comparator.diff_files[0]
 
             path_expected = expected_base / differing_file_path
-            with path_expected.open() as f:
-                expected_contents = f.readlines()
+            with path_expected.open() as expected_file:
+                expected_contents = expected_file.readlines()
 
-            path_real = output_path / differing_file_path
-            with path_real.open() as f:
-                real_contents = f.readlines()
+            path_actual = output_path / differing_file_path
+            with path_actual.open() as actual_file:
+                actual_contents = actual_file.readlines()
 
             result = difflib.unified_diff(
                 expected_contents,
-                real_contents,
+                actual_contents,
                 fromfile=str(path_expected),
-                tofile=str(path_real))
+                tofile=str(path_actual))
 
             print('------------------------------------------------------')
             print()

@@ -121,26 +121,26 @@ def dirwalk(root_directory, directories_first=True, include_directories=False,
     files.sort()
 
     # collect results
-    result = []
+    found_items = []
 
     if not directories_first:
-        result.extend(files)
+        found_items.extend(files)
 
     # recurse
     for current_directory in directories:
-        deep_result = dirwalk(current_directory, directories_first,
-                              include_directories, follow_symlinks,
-                              included, modified_after)
+        deep_found_items = dirwalk(current_directory, directories_first,
+                                   include_directories, follow_symlinks,
+                                   included, modified_after)
 
         if include_directories:
-            result.append(current_directory + os.sep)
+            found_items.append(current_directory + os.sep)
 
-        result.extend(deep_result)
+        found_items.extend(deep_found_items)
 
     if directories_first:
-        result.extend(files)
+        found_items.extend(files)
 
-    return result
+    return found_items
 
 
 def dirwalk_process(root_directory, directories_first,
