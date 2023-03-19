@@ -52,7 +52,7 @@ import pathlib
 import sys
 
 import jinja2
-from .DirWalk.DirWalk import dirwalk
+from src.DirWalk.DirWalk import dirwalk
 
 
 class StempelWerk:
@@ -516,13 +516,13 @@ class StempelWerk:
             custom_global_namespace)
 
         # create environment automatically
-        if not hasattr(self, 'jinja_environment'):
+        if not hasattr(self, 'jinja_environment'):  # noqa: WPS110
             self.create_environment()
 
         raw_content_of_multiple_files = self._render_content(
             relative_template_path, global_namespace)
 
-        # "run_results" contain number of processed and saved files
+        # "run_results" contains number of processed and saved files
         run_results = self._save_content(raw_content_of_multiple_files)
 
         return run_results
@@ -692,7 +692,7 @@ class StempelWerk:
         # only save time of _templates current run when files are processed
         if template_filenames:
             for template_filename in template_filenames:
-                # "run_results" contain number of processed and saved files
+                # "run_results" contains number of processed and saved files
                 run_results = self.render_template(
                     template_filename, custom_global_namespace)
 
