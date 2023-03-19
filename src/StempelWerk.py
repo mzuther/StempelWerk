@@ -507,7 +507,7 @@ class StempelWerk:
 
 
     def render_template(self, template_path, custom_global_namespace=None):
-        template_path = template_path.relative_to(
+        relative_template_path = template_path.relative_to(
             self.settings.template_dir)
 
         global_namespace = self._prepare_global_namespace(
@@ -518,7 +518,7 @@ class StempelWerk:
             self.create_environment()
 
         content_of_multiple_files = self._render_content(
-            template_path, global_namespace)
+            relative_template_path, global_namespace)
 
         return self._save_content(content_of_multiple_files)
 
@@ -542,17 +542,20 @@ class StempelWerk:
 
     def _render_content(self, template_path, global_namespace):
         if self.verbosity >= -1:
-            print('- {}'.format(template_path))
+            print(f'- {template_path}')
 
         # Jinja2 cannot handle Windows paths
         template_filename = template_path.as_posix()
 
         try:
-            template = self.jinja_environment.get_template(
+            jinja_template = self.jinja_environment.get_template(
                 template_filename,
                 globals=global_namespace)
 
-            content_of_multiple_files = template.render()
+            # the Jinja2 documentation suggests that applications should use
+            # environment globals instead of (local) template context
+            # (https://jinja.palletsprojects.com/en/3.1.x/api/#global-namespace)
+            content_of_multiple_files = jinja_template.render()
 
         except (jinja2.exceptions.TemplateSyntaxError,
                 jinja2.exceptions.TemplateAssertionError) as err:
@@ -608,36 +611,22 @@ class StempelWerk:
 
 
     def _save_single_file(self, raw_content):
-        output_path, content = self._process_raw_content(raw_content)
-        output_directory = output_path.parent
-
-        if not output_directory.is_dir():
-            if self.settings.create_directories:
-                output_directory.mkdir(parents=True)
-                if self.verbosity >= 0:
-                    print(f'  - created directory "{output_directory}"')
-            else:
-                self.printer.error(
-                    f'directory "{output_directory}"')
-                self.printer.error(
-                    'does not exist.')
-                self.printer.error()
-                exit(1)
+        output_file_name, content = self._process_raw_content(raw_content)
 
         if self.verbosity >= 0:
-            print('  - {}'.format(output_path.relative_to(
-                self.settings.output_dir)))
+            print(f'  - {output_file_name}')
+
+        output_file_path = self.Settings.finalize_path(self.settings.output_dir,
+                                                       output_file_name)
+
+        self._create_output_directory(output_file_path)
 
         # use default newline character unless there is an exception
-        newline = self.newline_exceptions.get(
-            output_path.suffix,
-            self.settings.newline)
+        newline = self.newline_exceptions.get(output_file_path.suffix,
+                                              self.settings.newline)
 
         # Jinja2 encodes all strings in UTF-8
-        output_path.write_text(
-            content,
-            encoding='utf-8',
-            newline=newline)
+        output_file_path.write_text(content, encoding='utf-8', newline=newline)
 
         return 1
 
@@ -656,16 +645,32 @@ class StempelWerk:
             exit(1)
 
         # extract name and content of output file
-        filename, content = raw_content.split(
+        output_file_name, content = raw_content.split(
             self.settings.marker_content, 1)
 
-        filename = filename.strip()
+        output_file_name = output_file_name.strip()
         content = content.lstrip()
 
-        output_path = self.Settings.finalize_path(
-            self.settings.output_dir, filename)
+        return output_file_name, content
 
-        return output_path, content
+
+    def _create_output_directory(self, output_file_path):
+        output_directory = output_file_path.parent
+
+        if output_directory.is_dir():
+            return
+
+        if self.settings.create_directories:
+            output_directory.mkdir(parents=True)
+            if self.verbosity >= 0:
+                print(f'  - created directory "{output_directory}"')
+        else:
+            self.printer.error(
+                f'directory "{output_directory}"')
+            self.printer.error(
+                'does not exist.')
+            self.printer.error()
+            exit(1)
 
 
     def process_templates(self, process_only_modified=False,
