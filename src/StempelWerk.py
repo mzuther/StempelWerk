@@ -506,16 +506,19 @@ class StempelWerk:
         self.printer.debug()
 
 
-    def render_template(self, template_path, global_namespace=None):
+    def render_template(self, template_path, custom_global_namespace=None):
+        # create environment automatically
+        if not hasattr(self, 'jinja_environment'):
+            self.create_environment()
+
+        current_global_namespace = self._prepare_global_namespace(
+            custom_global_namespace)
+
         template_path = template_path.relative_to(
             self.settings.template_dir)
 
         # Jinja2 cannot handle Windows paths
         template_filename = template_path.as_posix()
-
-        # create environment automatically
-        if not hasattr(self, 'jinja_environment'):
-            self.create_environment()
 
         processed_templates = 1
         saved_files = 0
@@ -529,18 +532,6 @@ class StempelWerk:
                 print(' ', end='')
         elif self.verbosity >= -1:
             print('- {}'.format(template_path))
-
-        current_global_namespace = self.settings.global_namespace
-
-        # add provided global variables, overwriting existing entries
-        if global_namespace:
-            current_global_namespace.update(global_namespace)
-
-        # group global variables under key "globals" to explicitly
-        # mark them as globals in code
-        current_global_namespace = {
-            'globals': current_global_namespace
-        }
 
         # render template
         try:
@@ -586,6 +577,23 @@ class StempelWerk:
         return {
             'processed_templates': processed_templates,
             'saved_files': saved_files
+        }
+
+
+    def _prepare_global_namespace(self, custom_global_namespace):
+        # get default global variables
+        global_namespace = self.settings.global_namespace
+
+        # add custom global variables, overwriting existing entries
+        #
+        # this allows processing the same template in different ways without
+        # creating a new instance of StempelWerk
+        if custom_global_namespace:
+            global_namespace.update(custom_global_namespace)
+
+        # force users to explicitly mark global variables in code
+        return {
+            'globals': global_namespace
         }
 
 
