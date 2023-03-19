@@ -523,14 +523,7 @@ class StempelWerk:
         processed_templates = 1
         saved_files = 0
 
-        if self.verbosity < -1:
-            print('.', end='')
-
-            if (processed_templates % 40) == 0:
-                print()
-            elif (processed_templates % 10) == 0:
-                print(' ', end='')
-        elif self.verbosity >= -1:
+        if self.verbosity >= -1:
             print('- {}'.format(template_path))
 
         # render template
@@ -695,6 +688,14 @@ class StempelWerk:
 
                 processed_templates += results['processed_templates']
                 saved_files += results['saved_files']
+
+                if self.verbosity < -1:
+                    print('.', end='')
+
+                    if (processed_templates % 40) == 0:
+                        print()
+                    elif (processed_templates % 10) == 0:
+                        print(' ', end='')
 
             # save time of current run; convert to UNIX time
             start_of_processing_timestamp = start_of_processing.timestamp()
