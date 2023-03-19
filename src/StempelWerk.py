@@ -325,8 +325,8 @@ class StempelWerk:
 
         def load_json_file(self, json_file_path):
             try:
-                contents = json_file_path.read_text()
-                result = json.loads(contents)
+                json_string = json_file_path.read_text()
+                parsed_json = json.loads(json_string)
 
             except FileNotFoundError:
                 self.printer.error(f'File "{json_file_path}" not found.')
@@ -348,7 +348,7 @@ class StempelWerk:
                 # print traceback to help with debugging
                 raise err
 
-            return result
+            return parsed_json
 
     # ---------------------------------------------------------------------
 
@@ -519,10 +519,13 @@ class StempelWerk:
         if not hasattr(self, 'jinja_environment'):
             self.create_environment()
 
-        content_of_multiple_files = self._render_content(
+        raw_content_of_multiple_files = self._render_content(
             relative_template_path, global_namespace)
 
-        return self._save_content(content_of_multiple_files)
+        # "run_results" contain number of processed and saved files
+        run_results = self._save_content(raw_content_of_multiple_files)
+
+        return run_results
 
 
     def _prepare_global_namespace(self, custom_global_namespace):
@@ -587,21 +590,21 @@ class StempelWerk:
         return content_of_multiple_files
 
 
-    def _save_content(self, content_of_multiple_files):
+    def _save_content(self, raw_content_of_multiple_files):
         # split content into multiple files
-        split_contents = content_of_multiple_files.split(
+        split_contents = raw_content_of_multiple_files.split(
             self.settings.marker_new_file)
 
         processed_templates = 1
         saved_files = 0
 
-        for content_of_single_file in split_contents:
+        for raw_content_of_single_file in split_contents:
             # content starts with "marker_new_file", so first string is empty
             # (or contains whitespace when a template is not well written)
-            if not content_of_single_file.strip():
+            if not raw_content_of_single_file.strip():
                 continue
 
-            saved_files += self._save_single_file(content_of_single_file)
+            saved_files += self._save_single_file(raw_content_of_single_file)
 
         if self.verbosity >= 0:
             print()
@@ -613,7 +616,8 @@ class StempelWerk:
 
 
     def _save_single_file(self, raw_content):
-        output_file_name, content = self._process_raw_content(raw_content)
+        output_file_name, processed_content = self._process_raw_content(
+            raw_content)
 
         if self.verbosity >= 0:
             print(f'  - {output_file_name}')
@@ -628,7 +632,8 @@ class StempelWerk:
                                               self.settings.newline)
 
         # Jinja2 encodes all strings in UTF-8
-        output_file_path.write_text(content, encoding='utf-8', newline=newline)
+        output_file_path.write_text(processed_content, encoding='utf-8',
+                                    newline=newline)
 
         return 1
 
@@ -647,13 +652,13 @@ class StempelWerk:
             exit(1)
 
         # extract name and content of output file
-        output_file_name, content = raw_content.split(
+        output_file_name, processed_content = raw_content.split(
             self.settings.marker_content, 1)
 
         output_file_name = output_file_name.strip()
-        content = content.lstrip()
+        processed_content = processed_content.lstrip()
 
-        return output_file_name, content
+        return output_file_name, processed_content
 
 
     def _create_output_directory(self, output_file_path):
@@ -687,11 +692,12 @@ class StempelWerk:
         # only save time of _templates current run when files are processed
         if template_filenames:
             for template_filename in template_filenames:
-                results = self.render_template(
+                # "run_results" contain number of processed and saved files
+                run_results = self.render_template(
                     template_filename, custom_global_namespace)
 
-                processed_templates += results['processed_templates']
-                saved_files += results['saved_files']
+                processed_templates += run_results['processed_templates']
+                saved_files += run_results['saved_files']
 
                 if self.verbosity < -1:
                     print('.', end='')
