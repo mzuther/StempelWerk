@@ -1,8 +1,11 @@
 # "namespace()" function was introduced in v2.1.0
 Jinja2>=2.1.0
 
-# linting and unit testing
+# linting
 flake8
 flake8-cognitive-complexity
+flake8-fixme
+
+# unit testing
 pytest>=7
 pytest-datafiles>=3
