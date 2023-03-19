@@ -299,7 +299,7 @@ class StempelWerk:
                 '', args.config_file_path)
 
             # parse config file
-            loaded_settings = self.load_json_file(config_file_path)
+            loaded_settings = self._load_json_file(config_file_path)
 
             # parse global variables for Jinja environment
             #
@@ -312,7 +312,7 @@ class StempelWerk:
                     args.global_namespace)
             # load JSON file
             else:
-                loaded_settings['global_namespace'] = self.load_json_file(
+                loaded_settings['global_namespace'] = self._load_json_file(
                     args.global_namespace)
 
             # here's where the magic happens: unpack JSON file into class
@@ -323,7 +323,7 @@ class StempelWerk:
             self.verbosity = args.verbosity
 
 
-        def load_json_file(self, json_file_path):
+        def _load_json_file(self, json_file_path):
             try:
                 json_string = json_file_path.read_text()
                 parsed_json = json.loads(json_string)
@@ -375,8 +375,8 @@ class StempelWerk:
         # NOTE: stencils will also be included
         #
         # cache stencils and templates to improve performance; this loads
-        # *every* template in the template directory; "process_templates()"
-        # decides which of these will be processed
+        # *every* template, and "render_all_templates()" decides which of
+        # these will be processed
         template_loader = jinja2.FileSystemLoader(
             self.settings.template_dir,
             encoding='utf-8')
@@ -680,8 +680,8 @@ class StempelWerk:
             exit(1)
 
 
-    def process_templates(self, process_only_modified=False,
-                          custom_global_namespace=None):
+    def render_all_templates(self, process_only_modified=False,
+                             custom_global_namespace=None):
         start_of_processing = datetime.datetime.now()
 
         template_filenames = self._find_templates(process_only_modified)
@@ -698,12 +698,7 @@ class StempelWerk:
             saved_files += run_results['saved_files']
 
             if self.verbosity < -1:
-                print('.', end='')
-
-                if (processed_templates % 40) == 0:
-                    print()
-                elif (processed_templates % 10) == 0:
-                    print(' ', end='')
+                self._show_progress(processed_templates)
 
         # only save time of current run and show statistics when files have
         # actually been processed
@@ -716,6 +711,15 @@ class StempelWerk:
             'processed_templates': processed_templates,
             'saved_files': saved_files
         }
+
+
+    def _show_progress(self, processed_templates):
+        print('.', end='')
+
+        if (processed_templates % 40) == 0:
+            print()
+        elif (processed_templates % 10) == 0:
+            print(' ', end='')
 
 
     def _get_last_run(self):
@@ -799,5 +803,5 @@ if __name__ == '__main__':
     # specified on the command line
     custom_global_namespace = {}
 
-    sw.process_templates(parsed_args.process_only_modified,
-                         custom_global_namespace)
+    sw.render_all_templates(parsed_args.process_only_modified,
+                            custom_global_namespace)

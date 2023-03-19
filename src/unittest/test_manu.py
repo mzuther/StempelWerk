@@ -308,7 +308,7 @@ class TestManu(TestCommon):
             '.txt': '\n',
         }
 
-        instance.process_templates()
+        instance.render_all_templates()
         self.compare_directories(run_results['configuration'])
 
 
