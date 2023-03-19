@@ -123,9 +123,9 @@ class StempelWerk:
     # The "@dataclass" decorator creates a class, class members, and a
     # constructor with key-word parameters that have default values.
     #
-    # In addition, this allows us to address settings with the more
-    # readable membership operator ("settings.template_dir") instead
-    # of using dictionary access ("settings['template_dir']").
+    # In addition, this allows us to address settings with the more readable
+    # membership operator ("settings.template_dir") instead of using dictionary
+    # access ("settings['template_dir']").
     @dataclasses.dataclass
     class Settings:
         root_dir: str
@@ -190,8 +190,8 @@ class StempelWerk:
     # Template class for customizing the Jinja environment
     class CustomCodeTemplate:  # noqa: E301
         def __init__(self, copy_of_settings, printer):
-            # this is only a copy; changing this variable does *not*
-            # change the settings of StempelWerk
+            # this is only a copy; changing this variable does *not* change the
+            # settings of StempelWerk
             self.settings = copy_of_settings
             self.printer = printer
 
@@ -684,62 +684,33 @@ class StempelWerk:
                           custom_global_namespace=None):
         start_of_processing = datetime.datetime.now()
 
-        template_filenames = self._choose_templates(process_only_modified)
+        template_filenames = self._find_templates(process_only_modified)
 
         processed_templates = 0
         saved_files = 0
 
-        # only save time of _templates current run when files are processed
-        if template_filenames:
-            for template_filename in template_filenames:
-                # "run_results" contains number of processed and saved files
-                run_results = self.render_template(
-                    template_filename, custom_global_namespace)
+        for template_filename in template_filenames:
+            # "run_results" contains number of processed and saved files
+            run_results = self.render_template(
+                template_filename, custom_global_namespace)
 
-                processed_templates += run_results['processed_templates']
-                saved_files += run_results['saved_files']
+            processed_templates += run_results['processed_templates']
+            saved_files += run_results['saved_files']
 
-                if self.verbosity < -1:
-                    print('.', end='')
+            if self.verbosity < -1:
+                print('.', end='')
 
-                    if (processed_templates % 40) == 0:
-                        print()
-                    elif (processed_templates % 10) == 0:
-                        print(' ', end='')
-
-            # save time of current run; convert to UNIX time
-            start_of_processing_timestamp = start_of_processing.timestamp()
-
-            # round down to ensure that files with inaccurate timestamps and
-            # other edge cases are included
-            start_of_processing_timestamp = math.floor(
-                start_of_processing_timestamp)
-
-            # save time of current run
-            self.settings.last_run_file.write_text(
-                str(start_of_processing_timestamp))
-
-            processing_time = datetime.datetime.now() - start_of_processing
-            time_per_template = processing_time / processed_templates
-            time_per_file = processing_time / saved_files
-
-            self.printer.debug(f'Time per template file: {time_per_template}')
-            self.printer.debug(f'Time per output file:   {time_per_file}')
-            self.printer.debug()
-
-            if self.verbosity < 0:
-                print()
-
-                if self.verbosity < -1 and (processed_templates % 40) != 0:
+                if (processed_templates % 40) == 0:
                     print()
+                elif (processed_templates % 10) == 0:
+                    print(' ', end='')
 
-                print(f'{processed_templates } =>',
-                      f'{saved_files} in {processing_time}')
-                print()
-            else:
-                print(f'TOTAL: {processed_templates } templates =>',
-                      f'{saved_files} files in {processing_time}')
-                print()
+        # only save time of current run and show statistics when files have
+        # actually been processed
+        if template_filenames:
+            self._store_last_run(start_of_processing)
+            self._display_statistics(start_of_processing, processed_templates,
+                                     saved_files)
 
         return {
             'processed_templates': processed_templates,
@@ -747,7 +718,51 @@ class StempelWerk:
         }
 
 
-    def _choose_templates(self, process_only_modified):
+    def _get_last_run(self):
+        last_run_timestamp = self.settings.last_run_file.read_text()
+        return last_run_timestamp.strip()
+
+
+    def _store_last_run(self, last_run):
+        # convert datetime to UNIX time
+        last_run_timestamp = last_run.timestamp()
+
+        # round down to ensure that files with inaccurate timestamps and other
+        # edge cases are included
+        last_run_timestamp = math.floor(last_run_timestamp)
+
+        self.settings.last_run_file.write_text(
+            str(last_run_timestamp))
+
+
+    def _display_statistics(self, start_of_processing, processed_templates,
+                            saved_files):
+        processing_time = datetime.datetime.now() - start_of_processing
+
+        time_per_template = processing_time / processed_templates
+        time_per_file = processing_time / saved_files
+
+        self.printer.debug(f'Time per template file: {time_per_template}')
+        self.printer.debug(f'Time per output file:   {time_per_file}')
+        self.printer.debug()
+
+        if self.verbosity < 0:
+            print()
+
+            # start new output line
+            if self.verbosity < -1 and (processed_templates % 40) != 0:
+                print()
+
+            print(f'{processed_templates } =>',
+                  f'{saved_files} in {processing_time}')
+            print()
+        else:
+            print(f'TOTAL: {processed_templates } templates =>',
+                  f'{saved_files} files in {processing_time}')
+            print()
+
+
+    def _find_templates(self, process_only_modified):
         dirwalk_inclusions = {
             # do not render stencils
             'excluded_directory_names': [
@@ -761,8 +776,7 @@ class StempelWerk:
         if process_only_modified:
             try:
                 # get time of last run
-                modified_after = self.settings.last_run_file.read_text()
-                modified_after = modified_after.strip()
+                modified_after = self._get_last_run()
             except IOError:
                 modified_after = None
 
@@ -780,9 +794,9 @@ if __name__ == '__main__':
 
     sw = StempelWerk(parsed_args.settings, parsed_args.verbosity)
 
-    # if you want to modify the global namespace programmatically,
-    # here is the right place to do so; this will extend / overwrite
-    # the global variables specified on the command line
+    # if you want to modify the global namespace programmatically, here is the
+    # right place to do so; this will extend / overwrite the global variables
+    # specified on the command line
     custom_global_namespace = {}
 
     sw.process_templates(parsed_args.process_only_modified,

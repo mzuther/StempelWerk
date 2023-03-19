@@ -79,16 +79,16 @@ def is_file_included(current_path, dir_entry, follow_symlinks,
     if not modified_after:
         return True
 
-    # only include files modified after a given date;
-    # get timestamp of linked file, not of symlink
+    # only include files modified after a given date; get timestamp of linked
+    # file, not of symlink
     stat_result = dir_entry.stat(follow_symlinks=True)
 
-    # "st_mtime_ns" gets the exact timestamp, although
-    # nanoseconds may be missing or inexact
+    # "st_mtime_ns" gets the exact timestamp, although nanoseconds may be
+    # missing or inexact
     modification_time_in_seconds = stat_result.st_mtime_ns / 1e9
 
-    # round up to ensure that files with inaccurate
-    # timestamps and other edge cases are included
+    # round up to ensure that files with inaccurate timestamps and other edge
+    # cases are included
     modification_time_in_seconds = math.ceil(modification_time_in_seconds)
 
     return modification_time_in_seconds >= modified_after
@@ -190,6 +190,7 @@ if __name__ == '__main__':
     }
 
     MODIFIED_AFTER = None
+
     # import datetime
     # MODIFIED_AFTER = datetime.datetime(2022, 12, 1).timestamp()
 
