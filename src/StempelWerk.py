@@ -374,7 +374,9 @@ class StempelWerk:
         # NOTE: Jinja loads templates from sub-directories;
         # NOTE: stencils will also be included
         #
-        # cache stencils and templates to improve performance
+        # cache stencils and templates to improve performance; this loads
+        # *every* template in the template directory; "process_templates()"
+        # decides which of these will be processed
         template_loader = jinja2.FileSystemLoader(
             self.settings.template_dir,
             encoding='utf-8')
@@ -677,28 +679,7 @@ class StempelWerk:
                           custom_global_namespace=None):
         start_of_processing = datetime.datetime.now()
 
-        dirwalk_inclusions = {
-            'excluded_directory_names': [
-                # do not render stencils
-                self.settings.stencil_dir_name
-            ],
-            'excluded_file_names': [],
-            'included_suffixes': self.settings.included_suffixes,
-        }
-
-        modified_after = None
-        if process_only_modified:
-            # get time of last run
-            try:
-                modified_after = self.settings.last_run_file.read_text()
-                modified_after = modified_after.strip()
-            except IOError:
-                modified_after = None
-
-        # find all Jinja2 files in template directory
-        template_filenames = dirwalk(self.settings.template_dir,
-                                     included=dirwalk_inclusions,
-                                     modified_after=modified_after)
+        template_filenames = self._choose_templates(process_only_modified)
 
         processed_templates = 0
         saved_files = 0
@@ -758,6 +739,33 @@ class StempelWerk:
             'processed_templates': processed_templates,
             'saved_files': saved_files
         }
+
+
+    def _choose_templates(self, process_only_modified):
+        dirwalk_inclusions = {
+            # do not render stencils
+            'excluded_directory_names': [
+                self.settings.stencil_dir_name
+            ],
+            'excluded_file_names': [],
+            'included_suffixes': self.settings.included_suffixes,
+        }
+
+        modified_after = None
+        if process_only_modified:
+            try:
+                # get time of last run
+                modified_after = self.settings.last_run_file.read_text()
+                modified_after = modified_after.strip()
+            except IOError:
+                modified_after = None
+
+        # find matching files in template directory
+        template_filenames = dirwalk(self.settings.template_dir,
+                                     included=dirwalk_inclusions,
+                                     modified_after=modified_after)
+
+        return template_filenames
 
 
 if __name__ == '__main__':
