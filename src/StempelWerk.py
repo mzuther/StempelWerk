@@ -510,13 +510,6 @@ class StempelWerk:
         template_path = template_path.relative_to(
             self.settings.template_dir)
 
-        # Jinja2 cannot handle Windows paths
-        template_filename = template_path.as_posix()
-
-        if self.verbosity >= -1:
-            # print template name in the way it is used in Jinja2
-            print('- {}'.format(template_filename))
-
         global_namespace = self._prepare_global_namespace(
             custom_global_namespace)
 
@@ -524,7 +517,36 @@ class StempelWerk:
         if not hasattr(self, 'jinja_environment'):
             self.create_environment()
 
-        # render template
+        content_of_multiple_files = self._render_content(
+            template_path, global_namespace)
+
+        return self._save_content(content_of_multiple_files)
+
+
+    def _prepare_global_namespace(self, custom_global_namespace):
+        # get default global variables
+        global_namespace = self.settings.global_namespace
+
+        # add custom global variables, overwriting existing entries
+        #
+        # this allows processing the same template in different ways without
+        # creating a new instance of StempelWerk
+        if custom_global_namespace:
+            global_namespace.update(custom_global_namespace)
+
+        # force users to explicitly mark global variables in code
+        return {
+            'globals': global_namespace
+        }
+
+
+    def _render_content(self, template_path, global_namespace):
+        if self.verbosity >= -1:
+            print('- {}'.format(template_path))
+
+        # Jinja2 cannot handle Windows paths
+        template_filename = template_path.as_posix()
+
         try:
             template = self.jinja_environment.get_template(
                 template_filename,
@@ -543,6 +565,7 @@ class StempelWerk:
             self.printer.error(f'{err.message} (line {err.lineno})')
             self.printer.error()
 
+            # show full backtrace to simplify debugging templates
             raise err
 
         except Exception as err:
@@ -553,9 +576,14 @@ class StempelWerk:
 
             self.printer.error()
 
+            # show full backtrace to simplify debugging templates
             raise err
 
-        # split content of multiple files
+        return content_of_multiple_files
+
+
+    def _save_content(self, content_of_multiple_files):
+        # split content into multiple files
         split_contents = content_of_multiple_files.split(
             self.settings.marker_new_file)
 
@@ -571,23 +599,6 @@ class StempelWerk:
         return {
             'processed_templates': processed_templates,
             'saved_files': saved_files
-        }
-
-
-    def _prepare_global_namespace(self, custom_global_namespace):
-        # get default global variables
-        global_namespace = self.settings.global_namespace
-
-        # add custom global variables, overwriting existing entries
-        #
-        # this allows processing the same template in different ways without
-        # creating a new instance of StempelWerk
-        if custom_global_namespace:
-            global_namespace.update(custom_global_namespace)
-
-        # force users to explicitly mark global variables in code
-        return {
-            'globals': global_namespace
         }
 
 
