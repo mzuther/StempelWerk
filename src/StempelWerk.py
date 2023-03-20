@@ -697,7 +697,7 @@ class StempelWerk:
             saved_files += run_results['saved_files']
 
             if self.verbosity < -1:
-                self._show_progress(processed_templates)
+                self._show_progress(processed_templates, is_finished=False)
 
         # only save time of current run and show statistics when files have
         # actually been processed
@@ -712,13 +712,18 @@ class StempelWerk:
         }
 
 
-    def _show_progress(self, processed_templates):
-        print('.', end='')
+    def _show_progress(self, processed_templates, is_finished):
+        if is_finished:
+            # finish last line
+            remaining_dots = processed_templates % 10
+            print('.' * remaining_dots, end='')
 
-        if (processed_templates % 40) == 0:
-            print()
+            if (processed_templates % 40) != 0:
+                print()
+        elif (processed_templates % 40) == 0:
+            print('..........', end='\n')
         elif (processed_templates % 10) == 0:
-            print(' ', end='')
+            print('..........', end=' ')
 
 
     def _get_last_run(self):
@@ -749,13 +754,12 @@ class StempelWerk:
         self.printer.debug(f'Time per output file:   {time_per_file}')
         self.printer.debug()
 
+        if self.verbosity < -1:
+            # finish last line
+            self._show_progress(processed_templates, is_finished=True)
+
         if self.verbosity < 0:
             print()
-
-            # start new output line
-            if self.verbosity < -1 and (processed_templates % 40) != 0:
-                print()
-
             print(f'{processed_templates } =>',
                   f'{saved_files} in {processing_time}')
             print()
