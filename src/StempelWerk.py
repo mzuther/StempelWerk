@@ -52,7 +52,7 @@ import pathlib
 import sys
 
 import jinja2
-from src.DirWalk.DirWalk import dirwalk
+from .DirWalk.DirWalk import dirwalk  # noqa: WPS130 (local import is needed)
 
 
 class StempelWerk:
