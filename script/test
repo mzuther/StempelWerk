@@ -2,7 +2,7 @@
 
 echo
 
-python -m pytest --ignore="./.git" --ignore="./.venv" "$@"
+poetry run python -m pytest --ignore="./.git" "$@"
 EXIT_CODE=$?
 
 if [ $EXIT_CODE -ne 0 ]; then

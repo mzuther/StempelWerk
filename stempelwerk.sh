@@ -1,2 +1,2 @@
 #! /usr/bin/bash
-python3 -m src.StempelWerk "$@"
+poetry run python -m src.StempelWerk "$@"

@@ -1,1 +1,1 @@
-python -m src.StempelWerk $args
+poetry run python -m src.StempelWerk $args

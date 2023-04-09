@@ -36,6 +36,7 @@ Here are some more "selling points":
 - permissive licensing:
   - StempelWerk: [BSD 3-Clause License](./LICENSE.md)
   - Jinja2: [BSD 3-Clause License](https://jinja.palletsprojects.com/en/3.1.x/license/)
+  - Poetry: [MIT License](https://github.com/python-poetry/poetry/blob/master/LICENSE)
   - Python: [PSF licencse](https://docs.python.org/3/license.html)
 
 ### Case study
@@ -45,12 +46,28 @@ and even part of the documentation (Markdown). I offset time gained against time
 spent: after nine months, I had saved over 100 hours of working time!
 
 ## Installation
+It is recommended to install StempelWerk into a virtual environment.
 
-StempelWerk was developed using Python v3.10, so an older version might not
-work.
+_StempelWerk was developed using Python v3.10, so an older version might not
+work._
 
-Run the following lines - possibly in a virtual environment - to upgrade `pip`
-and install the dependencies:
+### Virtual environment
+
+Install [poetry](https://python-poetry.org/docs/#installation) and run:
+
+```bash
+poetry install --sync
+```
+
+This does **not** install the development dependencies. If you need these,
+please run:
+
+```bash
+poetry install --with dev --sync
+```
+### Manual installation
+
+Run the following lines to upgrade `pip` and install the dependencies:
 
 ```bash
 python3 -m pip install --user --upgrade pip
@@ -58,6 +75,11 @@ python3 -m pip install --user --upgrade pip
 # the "namespace()" function was introduced in v2.1.0
 python3 -m pip install --user --upgrade "Jinja2>=2.1.0"
 ```
+
+For development dependencies, please see [pyproject.toml](./pyproject.toml).
+
+_The shell scripts that come with StempelWerk assume that you use a virtual
+environment. This is easy to fix, but you have to do it on your own._
 
 ## Execution
 

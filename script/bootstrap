@@ -2,54 +2,21 @@
 
 echo
 
-# assert that Python is installed
-PYTHON_PATH=$(command -v python3)
-if [ -z "$PYTHON_PATH" ]; then
-   PYTHON_PATH=$(command -v python)
-fi
+# install poetry
+curl -sSL https://install.python-poetry.org | python3 -
 
-if [ -z "$PYTHON_PATH" ]; then
-    echo "ERR: could not find Python on your system"
-    echo
-    exit 1
-fi
-
-# assert that version 3 of Python is installed
-if ! ("$PYTHON_PATH" --version | grep "^Python 3" > /dev/null); then
-    echo "ERR: could not find Python version 3 on your system"
-    echo
-    exit 1
-fi
-
-
-if [ -d "./.venv" ]; then
-    echo "  Environment has already been set up."
-    echo "  Delete directory \"./.venv\" to start from scratch."
-    echo
-    exit 0
-fi
-
-
-echo "  Creating new environment ..."
-
-"$PYTHON_PATH" -m venv "./.venv"
-
-if [ -f "requirements.txt" ]; then
-
-    echo "  Installing required libraries ..."
-    echo
-
-    source "./.venv/bin/activate"
-    pip install -r "requirements.txt"
-
-    echo
-    echo '  Storing installed versions ...'
-
-    pip freeze > "VERSIONS"
-fi
-
-
-echo "  Done."
+echo
+echo "------------------------------------------------------------------------"
 echo
 
-exit 0
+# create virtual environment
+poetry env use python3
+poetry env info
+
+echo
+echo "------------------------------------------------------------------------"
+echo
+
+# install dependencies
+poetry install --with dev --sync
+echo

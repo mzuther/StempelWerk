@@ -2,34 +2,5 @@
 
 echo
 
-if [ ! -d "./.venv" ]; then
-    echo "  Environment has not yet been set up."
-    echo "  Please call \"./script/bootstrap\" first."
-    echo
-    exit 1
-fi
-
-
-echo "  Updating Python environment ..."
-
-python3 -m venv --upgrade "./.venv"
-
-if [ -f "requirements.txt" ]; then
-
-    echo "  Installing required libraries ..."
-    echo
-
-    source "./.venv/bin/activate"
-    pip install --upgrade -r "requirements.txt"
-
-    echo
-    echo '  Storing installed versions ...'
-
-    pip freeze > "VERSIONS"
-fi
-
-
-echo "  Done."
+poetry update
 echo
-
-exit 0
