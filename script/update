@@ -2,5 +2,5 @@
 
 echo
 
-poetry update
+"$HOME/.local/bin/poetry" update
 echo

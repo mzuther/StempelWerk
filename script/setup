@@ -1,11 +1,11 @@
 #! /bin/bash
 
 echo
-poetry show
+"$HOME/.local/bin/poetry" show
 
 echo
 echo "------------------------------------------------------------------------"
 echo
 
-poetry show --only dev
+"$HOME/.local/bin/poetry" show --only dev
 echo

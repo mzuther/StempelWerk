@@ -10,13 +10,13 @@ echo "------------------------------------------------------------------------"
 echo
 
 # create virtual environment
-poetry env use python3
-poetry env info
+"$HOME/.local/bin/poetry" env use python3
+"$HOME/.local/bin/poetry" env info
 
 echo
 echo "------------------------------------------------------------------------"
 echo
 
 # install dependencies
-poetry install --with dev --sync
+"$HOME/.local/bin/poetry" install --with dev --sync
 echo

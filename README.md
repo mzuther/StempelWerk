@@ -67,6 +67,9 @@ or
 
 If you need more control over the installation, please read on.
 
+_The shell scripts that come with StempelWerk assume that you use a virtual
+environment and install poetry into its default path._
+
 ### Virtual environment
 
 Install [poetry](https://python-poetry.org/docs/#installation) and run:
@@ -94,9 +97,6 @@ python3 -m pip install --user --upgrade "Jinja2>=2.1.0"
 ```
 
 For development dependencies, please see [pyproject.toml](./pyproject.toml).
-
-_The shell scripts that come with StempelWerk assume that you use a virtual
-environment. This is easy to fix, but you have to do it on your own._
 
 ## Execution
 
