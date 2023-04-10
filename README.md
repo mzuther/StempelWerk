@@ -46,10 +46,26 @@ and even part of the documentation (Markdown). I offset time gained against time
 spent: after nine months, I had saved over 100 hours of working time!
 
 ## Installation
-It is recommended to install StempelWerk into a virtual environment.
 
 _StempelWerk was developed using Python v3.10, so an older version might not
 work._
+
+It is recommended to install StempelWerk into a virtual environment. The easiest
+way is to run 
+
+```bash
+# bash
+./script/bootstrap
+```
+
+or
+
+```ps1
+# PowerShell
+.\script\bootstrap.ps1
+```
+
+If you need more control over the installation, please read on.
 
 ### Virtual environment
 
@@ -65,6 +81,7 @@ please run:
 ```bash
 poetry install --with dev --sync
 ```
+
 ### Manual installation
 
 Run the following lines to upgrade `pip` and install the dependencies:
