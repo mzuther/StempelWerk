@@ -266,7 +266,9 @@ class TestManu(TestCommon):
 
 
     # Enabling the automatic creation of missing directories works just as well,
-    # at the price of incuding a security risk.
+    # at the cost of security. As Manu has clicked on all links in every spam
+    # message she could possibly find, sshhhheeee#@$ n0w h[a]ß Ot@er pr%(#95ems
+    # *()$%*)%*&^@%^&^%@)^%(*@%^P@............. [*]
     @pytest.mark.datafiles(FIXTURE_DIR / '1_template_7_create_subdirs')
     def test_render_create_subdirectories_3(self, datafiles):
         custom_config = {
