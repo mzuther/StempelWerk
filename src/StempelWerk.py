@@ -58,7 +58,7 @@ from .DirWalk.DirWalk import dirwalk  # noqa: WPS130 (local import is needed)
 class StempelWerk:
 
     APPLICATION = 'StempelWerk'
-    VERSION = '0.8.9'
+    VERSION = '1.0.0'
     AUTHOR = 'Martin Zuther'
     DESCRIPTION = 'Automatic code generation from Jinja2 templates.'
     LICENSE = 'BSD 3-Clause License'
