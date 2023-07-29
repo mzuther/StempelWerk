@@ -2,7 +2,7 @@
 
 echo
 
-"$HOME/.local/bin/poetry" run python -m flake8 --config="./.flake8" src/
+"./script/_poetry" run python -m flake8 --config="./.flake8" src/
 EXIT_CODE=$?
 
 if [ $EXIT_CODE -ne 0 ]; then

@@ -1,11 +1,24 @@
 #! /bin/bash
 
 echo
-"$HOME/.local/bin/poetry" show
+"./script/_poetry" show
+EXIT_CODE=$?
+
+if [ $EXIT_CODE -ne 0 ]; then
+   echo
+   exit $EXIT_CODE
+fi
 
 echo
 echo "------------------------------------------------------------------------"
 echo
 
-"$HOME/.local/bin/poetry" show --only dev
+"./script/_poetry" show --only dev
+EXIT_CODE=$?
+
+if [ $EXIT_CODE -ne 0 ]; then
+   echo
+   exit $EXIT_CODE
+fi
+
 echo

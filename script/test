@@ -2,7 +2,7 @@
 
 echo
 
-"$HOME/.local/bin/poetry" run python -m pytest --ignore="./.git" "$@"
+"./script/_poetry" run python -m pytest --ignore="./.git" "$@"
 EXIT_CODE=$?
 
 if [ $EXIT_CODE -ne 0 ]; then
@@ -11,3 +11,8 @@ if [ $EXIT_CODE -ne 0 ]; then
 fi
 
 ./script/lint
+EXIT_CODE=$?
+
+if [ $EXIT_CODE -ne 0 ]; then
+   exit $EXIT_CODE
+fi
