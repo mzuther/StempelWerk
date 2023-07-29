@@ -52,7 +52,7 @@ import pathlib
 import sys
 
 import jinja2
-from .DirWalk.DirWalk import dirwalk  # noqa: WPS130 (local import is needed)
+from .DirWalk.DirWalk import dirwalk
 
 
 class StempelWerk:
@@ -187,7 +187,7 @@ class StempelWerk:
     # ---------------------------------------------------------------------
 
     # Template class for customizing the Jinja environment
-    class CustomCodeTemplate:  # noqa: E301
+    class CustomCodeTemplate:
         def __init__(self, copy_of_settings, printer):
             # this is only a copy; changing this variable does *not* change the
             # settings of StempelWerk
@@ -515,7 +515,7 @@ class StempelWerk:
             custom_global_namespace)
 
         # create environment automatically
-        if not hasattr(self, 'jinja_environment'):  # noqa: WPS110
+        if not hasattr(self, 'jinja_environment'):
             self.create_environment()
 
         raw_content_of_multiple_files = self._render_content(
