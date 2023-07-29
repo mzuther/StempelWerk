@@ -66,9 +66,15 @@ class StempelWerk:
     APPLICATION_VERSION = f'{APPLICATION} v{VERSION}'
     COPYRIGHT = f'{APPLICATION_VERSION:20} (c) 2020-2023 {AUTHOR}'
 
+    # a lower verbosity value means less output on the console
+    VERBOSITY_HIGH = 1
+    VERBOSITY_NORMAL = 0
+    VERBOSITY_LOW = -1
+    VERBOSITY_VERY_LOW = -2
+
     @staticmethod
-    def format_version(verbosity=0):
-        if verbosity < 0:
+    def format_version(verbosity=VERBOSITY_NORMAL):
+        if verbosity < StempelWerk.VERBOSITY_NORMAL:
             return StempelWerk.APPLICATION_VERSION
         else:
             return (
@@ -77,17 +83,17 @@ class StempelWerk:
             )
 
     @staticmethod
-    def format_description(verbosity=0):
+    def format_description(verbosity=VERBOSITY_NORMAL):
         return (
             StempelWerk.format_version(verbosity) + '\n\n' +
             StempelWerk.DESCRIPTION
         )
 
-    def _display_version(self, verbosity=0):
+    def _display_version(self, verbosity=VERBOSITY_NORMAL):
         version_message = self.format_version(verbosity)
 
         print()
-        if verbosity < 0:
+        if verbosity < self.VERBOSITY_NORMAL:
             print(version_message)
         else:
             for line in version_message.split('\n'):
@@ -112,7 +118,7 @@ class StempelWerk:
 
 
         def debug(self, message=''):
-            if self.verbosity > 0:
+            if self.verbosity > StempelWerk.VERBOSITY_NORMAL:
                 self._print_context('DEBUG', message)
 
     # ---------------------------------------------------------------------
@@ -254,8 +260,8 @@ class StempelWerk:
                 '-qq',
                 '--ultraquiet',
                 action='store_const',
-                const=-2,
-                default=0,
+                const=StempelWerk.VERBOSITY_VERY_LOW,
+                default=StempelWerk.VERBOSITY_NORMAL,
                 help='display minimal output',
                 dest='verbosity')
 
@@ -263,8 +269,8 @@ class StempelWerk:
                 '-q',
                 '--quiet',
                 action='store_const',
-                const=-1,
-                default=0,
+                const=StempelWerk.VERBOSITY_LOW,
+                default=StempelWerk.VERBOSITY_NORMAL,
                 help='display less output',
                 dest='verbosity')
 
@@ -272,8 +278,8 @@ class StempelWerk:
                 '-v',
                 '--verbose',
                 action='store_const',
-                const=1,
-                default=0,
+                const=StempelWerk.VERBOSITY_HIGH,
+                default=StempelWerk.VERBOSITY_NORMAL,
                 help='display more output and include debug information',
                 dest='verbosity')
 
@@ -351,7 +357,7 @@ class StempelWerk:
 
     # ---------------------------------------------------------------------
 
-    def __init__(self, settings, verbosity=0):
+    def __init__(self, settings, verbosity=VERBOSITY_NORMAL):
         self.settings = settings
 
         self.verbosity = verbosity
@@ -438,7 +444,7 @@ class StempelWerk:
             exit(1)
 
         # list all templates in cache
-        if self.verbosity > 0:
+        if self.verbosity > StempelWerk.VERBOSITY_NORMAL:
             self.printer.debug(' ')
             self.printer.debug('Available stencils:')
             self.printer.debug(' ')
@@ -545,7 +551,7 @@ class StempelWerk:
 
 
     def _render_content(self, template_path, global_namespace):
-        if self.verbosity >= -1:
+        if self.verbosity >= self.VERBOSITY_LOW:
             print(f'- {template_path}')
 
         # Jinja2 cannot handle Windows paths
@@ -565,7 +571,7 @@ class StempelWerk:
                 jinja2.exceptions.TemplateAssertionError) as err:
             self.printer.error()
 
-            if self.verbosity < -1:
+            if self.verbosity < self.VERBOSITY_LOW:
                 self.printer.error()
                 self.printer.error(f'in file "{template_filename}"')
 
@@ -576,7 +582,7 @@ class StempelWerk:
             raise err
 
         except Exception as err:
-            if self.verbosity < -1:
+            if self.verbosity < self.VERBOSITY_LOW:
                 self.printer.error()
                 self.printer.error()
                 self.printer.error(f'in file "{template_filename}"')
@@ -605,7 +611,7 @@ class StempelWerk:
 
             saved_files += self._save_single_file(raw_content_of_single_file)
 
-        if self.verbosity >= 0:
+        if self.verbosity >= self.VERBOSITY_NORMAL:
             print()
 
         return {
@@ -618,7 +624,7 @@ class StempelWerk:
         output_file_name, processed_content = self._process_raw_content(
             raw_content)
 
-        if self.verbosity >= 0:
+        if self.verbosity >= self.VERBOSITY_NORMAL:
             print(f'  - {output_file_name}')
 
         output_file_path = self.Settings.finalize_path(self.settings.output_dir,
@@ -668,7 +674,7 @@ class StempelWerk:
 
         if self.settings.create_directories:
             output_directory.mkdir(parents=True)
-            if self.verbosity >= 0:
+            if self.verbosity >= self.VERBOSITY_NORMAL:
                 print(f'  - created directory "{output_directory}"')
         else:
             self.printer.error(
@@ -696,7 +702,7 @@ class StempelWerk:
             processed_templates += run_results['processed_templates']
             saved_files += run_results['saved_files']
 
-            if self.verbosity < -1:
+            if self.verbosity < self.VERBOSITY_LOW:
                 self._show_progress(processed_templates, is_finished=False)
 
         # only save time of current run and show statistics when files have
@@ -754,11 +760,11 @@ class StempelWerk:
         self.printer.debug(f'Time per output file:   {time_per_file}')
         self.printer.debug()
 
-        if self.verbosity < -1:
+        if self.verbosity < self.VERBOSITY_LOW:
             # finish last line
             self._show_progress(processed_templates, is_finished=True)
 
-        if self.verbosity < 0:
+        if self.verbosity < self.VERBOSITY_NORMAL:
             print()
             print(f'{processed_templates } =>',
                   f'{saved_files} in {processing_time}')
