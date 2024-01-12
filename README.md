@@ -91,8 +91,7 @@ Run the following lines to upgrade `pip` and install the dependencies:
 ```bash
 python3 -m pip install --user --upgrade pip
 
-# the "namespace()" function was introduced in v2.1.0
-python3 -m pip install --user --upgrade "Jinja2>=2.1.0"
+python3 -m pip install --user --upgrade "Jinja2>=3.1.0"
 ```
 
 For development dependencies, please see [pyproject.toml](./pyproject.toml).
