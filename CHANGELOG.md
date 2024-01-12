@@ -16,6 +16,19 @@ happens._
 
 <!--- ---------------------------------------------------------------------- -->
 
+## [1.0.1] - 2024-01-12
+
+### Security
+- update Jinja2 dependency to fix security vulnerability
+
+### Changed
+- move poetry calls to separate Bash script
+- refactor code
+- update dependencies
+- update documentation
+
+<!--- ---------------------------------------------------------------------- -->
+
 ## [1.0.0] - 2023-07-24
 
 - This is the first stable release (although I have been using StempelWerk professionally for over a year now).
