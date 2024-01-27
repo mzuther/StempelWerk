@@ -48,15 +48,16 @@ class TestMonster(TestCommon):
 
     @pytest.mark.datafiles(FIXTURE_DIR)
     def test_no_options(self, datafiles):
-        found_paths = dirwalk(datafiles)
+        found_paths = dirwalk(
+            datafiles)
 
         self.assert_dirwalk(datafiles, found_paths, TEST_FILES,
                             ignore_order=True)
 
 
     @pytest.mark.datafiles(FIXTURE_DIR)
-    def test_inclusions_empty(self, datafiles):
-        INCLUSIONS = {
+    def test_selector_empty(self, datafiles):
+        SELECTOR = {
             'excluded_directory_names': [
             ],
             'excluded_file_names': [
@@ -65,16 +66,17 @@ class TestMonster(TestCommon):
             ],
         }
 
-        found_paths = dirwalk(datafiles,
-                              included=INCLUSIONS)
+        found_paths = dirwalk(
+            datafiles,
+            selector=SELECTOR)
 
         self.assert_dirwalk(datafiles, found_paths, TEST_FILES,
                             ignore_order=True)
 
 
     @pytest.mark.datafiles(FIXTURE_DIR)
-    def test_inclusions_star(self, datafiles):
-        INCLUSIONS = {
+    def test_selector_star(self, datafiles):
+        SELECTOR = {
             'excluded_directory_names': [
             ],
             'excluded_file_names': [
@@ -84,8 +86,9 @@ class TestMonster(TestCommon):
             ],
         }
 
-        found_paths = dirwalk(datafiles,
-                              included=INCLUSIONS)
+        found_paths = dirwalk(
+            datafiles,
+            selector=SELECTOR)
 
         self.assert_dirwalk(datafiles, found_paths, TEST_FILES,
                             ignore_order=True)

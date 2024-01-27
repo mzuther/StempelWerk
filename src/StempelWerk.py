@@ -776,7 +776,7 @@ class StempelWerk:
 
 
     def _find_templates(self, process_only_modified):
-        dirwalk_inclusions = {
+        dirwalk_selector = {
             # do not render stencils
             'excluded_directory_names': [
                 self.settings.stencil_dir_name
@@ -795,7 +795,7 @@ class StempelWerk:
 
         # find matching files in template directory
         template_filenames = dirwalk(self.settings.template_dir,
-                                     included=dirwalk_inclusions,
+                                     selector=dirwalk_selector,
                                      modified_after=modified_after)
 
         return template_filenames

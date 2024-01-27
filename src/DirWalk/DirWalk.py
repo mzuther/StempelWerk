@@ -48,28 +48,28 @@ import sys
 
 
 def is_directory_included(current_path, dir_entry, follow_symlinks,
-                          included, modified_after):
+                          selector, modified_after):
     if not dir_entry.is_dir(follow_symlinks=follow_symlinks):
         return False
 
     # exclude directories
-    if current_path.name in included['excluded_directory_names']:
+    if current_path.name in selector['excluded_directory_names']:
         return False
 
     return True
 
 
 def is_file_included(current_path, dir_entry, follow_symlinks,
-                     included, modified_after):
+                     selector, modified_after):
     if not dir_entry.is_file(follow_symlinks=follow_symlinks):
         return False
 
     # exclude files
-    if current_path.name in included['excluded_file_names']:
+    if current_path.name in selector['excluded_file_names']:
         return False
 
     # only include some file suffixes
-    for suffix in included['included_suffixes']:
+    for suffix in selector['included_suffixes']:
         if current_path.match(suffix):
             break
     else:
@@ -94,37 +94,37 @@ def is_file_included(current_path, dir_entry, follow_symlinks,
     return modification_time_in_seconds >= modified_after
 
 
-def dirwalk_prepare(root_directory, included, modified_after):
+def dirwalk_prepare(root_directory, selector, modified_after):
     root_directory = pathlib.Path(root_directory)
 
-    if not included:
-        included = {}
+    if not selector:
+        selector = {}
 
-    if not included.get('excluded_directory_names'):
-        included['excluded_directory_names'] = []
+    if not selector.get('excluded_directory_names'):
+        selector['excluded_directory_names'] = []
 
-    if not included.get('excluded_file_names'):
-        included['excluded_file_names'] = []
+    if not selector.get('excluded_file_names'):
+        selector['excluded_file_names'] = []
 
     # include all files if no suffixes are specified
-    if not included.get('included_suffixes'):
-        included['included_suffixes'] = ['*']
+    if not selector.get('included_suffixes'):
+        selector['included_suffixes'] = ['*']
 
     # UNIX timestamp, remove digital places after period
     if modified_after:
         modified_after = int(modified_after)
 
-    return (root_directory, included, modified_after)
+    return (root_directory, selector, modified_after)
 
 
 def dirwalk(root_directory, directories_first=True, include_directories=False,
-            follow_symlinks=False, included=None, modified_after=None):
-    root_directory, included, modified_after = dirwalk_prepare(
-        root_directory, included, modified_after)
+            follow_symlinks=False, selector=None, modified_after=None):
+    root_directory, selector, modified_after = dirwalk_prepare(
+        root_directory, selector, modified_after)
 
     directories, files = dirwalk_process(root_directory, directories_first,
                                          include_directories, follow_symlinks,
-                                         included, modified_after)
+                                         selector, modified_after)
 
     # sort results
     directories.sort()
@@ -140,7 +140,7 @@ def dirwalk(root_directory, directories_first=True, include_directories=False,
     for current_directory in directories:
         deep_found_items = dirwalk(current_directory, directories_first,
                                    include_directories, follow_symlinks,
-                                   included, modified_after)
+                                   selector, modified_after)
 
         if include_directories:
             found_items.append(current_directory + os.sep)
@@ -155,7 +155,7 @@ def dirwalk(root_directory, directories_first=True, include_directories=False,
 
 def dirwalk_process(root_directory, directories_first,
                     include_directories, follow_symlinks,
-                    included, modified_after):
+                    selector, modified_after):
     directories = []
     files = []
 
@@ -166,11 +166,11 @@ def dirwalk_process(root_directory, directories_first,
 
         # process directories
         if is_directory_included(current_path, dir_entry, follow_symlinks,
-                                 included, modified_after):
+                                 selector, modified_after):
             directories.append(current_path)
         # process files
         elif is_file_included(current_path, dir_entry, follow_symlinks,
-                              included, modified_after):
+                              selector, modified_after):
             files.append(current_path)
 
     return directories, files
@@ -190,7 +190,7 @@ if __name__ == '__main__':
 
     SOURCE_DIR = sys.argv[1]
 
-    INCLUSIONS = {
+    SELECTOR = {
         'excluded_directory_names': [
         ],
         'excluded_file_names': [
@@ -206,6 +206,6 @@ if __name__ == '__main__':
 
     for current_path_name in dirwalk(
             SOURCE_DIR,
-            included=INCLUSIONS,
+            selector=SELECTOR,
             modified_after=MODIFIED_AFTER):
         print(current_path_name)
