@@ -166,7 +166,7 @@ class TestMonster(TestCommon):
             'included_suffixes': [
                 '*.txt',
                 '*.longext',
-                '*.noexist',
+                '*.ext',
             ],
         }
 
@@ -184,7 +184,7 @@ class TestMonster(TestCommon):
     def test_included_suffixes_4(self, datafiles):
         SELECTOR = {
             'included_suffixes': [
-                '*.noexist',
+                '*.ext',
             ],
         }
 
@@ -193,4 +193,131 @@ class TestMonster(TestCommon):
             selector=SELECTOR)
 
         expected_files = []
+        self.assert_dirwalk(datafiles, expected_files, actual_paths)
+
+
+    @pytest.mark.datafiles(FIXTURE_DIR)
+    def test_excluded_files_1(self, datafiles):
+        SELECTOR = {
+            'excluded_directory_names': [
+            ],
+            'excluded_file_names': [
+                'normal.txt',
+            ],
+            'included_suffixes': [
+            ],
+        }
+
+        actual_paths = dirwalk(
+            datafiles,
+            selector=SELECTOR)
+
+        expected_files = [f for f in TEST_FILES
+                          if not f.endswith('normal.txt')]
+        self.assert_dirwalk(datafiles, expected_files, actual_paths)
+
+
+    @pytest.mark.datafiles(FIXTURE_DIR)
+    def test_excluded_files_2(self, datafiles):
+        SELECTOR = {
+            'excluded_directory_names': [
+            ],
+            'excluded_file_names': [
+                '.hidden',
+            ],
+            'included_suffixes': [
+            ],
+        }
+
+        actual_paths = dirwalk(
+            datafiles,
+            selector=SELECTOR)
+
+        expected_files = [f for f in TEST_FILES
+                          if not f.endswith('.hidden')]
+        self.assert_dirwalk(datafiles, expected_files, actual_paths)
+
+
+    @pytest.mark.datafiles(FIXTURE_DIR)
+    def test_excluded_files_3(self, datafiles):
+        SELECTOR = {
+            'excluded_directory_names': [
+            ],
+            'excluded_file_names': [
+                '.hidden.txt',
+            ],
+            'included_suffixes': [
+            ],
+        }
+
+        actual_paths = dirwalk(
+            datafiles,
+            selector=SELECTOR)
+
+        expected_files = [f for f in TEST_FILES
+                          if not f.endswith('.hidden.txt')]
+        self.assert_dirwalk(datafiles, expected_files, actual_paths)
+
+
+    @pytest.mark.datafiles(FIXTURE_DIR)
+    def test_excluded_files_4(self, datafiles):
+        SELECTOR = {
+            'excluded_directory_names': [
+            ],
+            'excluded_file_names': [
+                '.hidden.txt',
+            ],
+            'included_suffixes': [
+                '*.txt',
+            ],
+        }
+
+        actual_paths = dirwalk(
+            datafiles,
+            selector=SELECTOR)
+
+        expected_files = [f for f in TEST_FILES
+                          if f.endswith('.txt')
+                          and not f.endswith('.hidden.txt')]
+        self.assert_dirwalk(datafiles, expected_files, actual_paths)
+
+
+    @pytest.mark.datafiles(FIXTURE_DIR)
+    def test_excluded_files_5(self, datafiles):
+        SELECTOR = {
+            'excluded_directory_names': [
+            ],
+            'excluded_file_names': [
+                'dir.ext',
+            ],
+            'included_suffixes': [
+            ],
+        }
+
+        actual_paths = dirwalk(
+            datafiles,
+            selector=SELECTOR)
+
+        expected_files = TEST_FILES
+        self.assert_dirwalk(datafiles, expected_files, actual_paths)
+
+
+    @pytest.mark.datafiles(FIXTURE_DIR)
+    def test_excluded_files_6(self, datafiles):
+        SELECTOR = {
+            'excluded_directory_names': [
+            ],
+            'excluded_file_names': [
+                'hid*.txt',
+            ],
+            'included_suffixes': [
+            ],
+        }
+
+        actual_paths = dirwalk(
+            datafiles,
+            selector=SELECTOR)
+
+        expected_files = [f for f in TEST_FILES
+                          if not f.endswith('hidden.txt')]
         self.assert_dirwalk(datafiles, expected_files, actual_paths)
