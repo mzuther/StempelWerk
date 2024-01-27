@@ -88,7 +88,7 @@ class TestMonster(TestCommon):
 
 
     @pytest.mark.datafiles(FIXTURE_DIR)
-    def test_selector_star(self, datafiles):
+    def test_included_suffixes_star_1(self, datafiles):
         SELECTOR = {
             'excluded_directory_names': [
             ],
@@ -104,4 +104,93 @@ class TestMonster(TestCommon):
             selector=SELECTOR)
 
         expected_files = TEST_FILES
+        self.assert_dirwalk(datafiles, expected_files, actual_paths)
+
+
+    @pytest.mark.datafiles(FIXTURE_DIR)
+    def test_included_suffixes_star_2(self, datafiles):
+        SELECTOR = {
+            'included_suffixes': [
+                '*',
+                '*.txt',
+            ],
+        }
+
+        actual_paths = dirwalk(
+            datafiles,
+            selector=SELECTOR)
+
+        expected_files = TEST_FILES
+        self.assert_dirwalk(datafiles, expected_files, actual_paths)
+
+
+    @pytest.mark.datafiles(FIXTURE_DIR)
+    def test_included_suffixes_1(self, datafiles):
+        SELECTOR = {
+            'included_suffixes': [
+                '*.txt',
+            ],
+        }
+
+        actual_paths = dirwalk(
+            datafiles,
+            selector=SELECTOR)
+
+        expected_files = [f for f in TEST_FILES
+                          if f.endswith('.txt')]
+        self.assert_dirwalk(datafiles, expected_files, actual_paths)
+
+
+    @pytest.mark.datafiles(FIXTURE_DIR)
+    def test_included_suffixes_2(self, datafiles):
+        SELECTOR = {
+            'included_suffixes': [
+                '*.txt',
+                '*.longext',
+            ],
+        }
+
+        actual_paths = dirwalk(
+            datafiles,
+            selector=SELECTOR)
+
+        expected_files = [f for f in TEST_FILES
+                          if f.endswith('.txt')
+                          or f.endswith('.longext')]
+        self.assert_dirwalk(datafiles, expected_files, actual_paths)
+
+
+    @pytest.mark.datafiles(FIXTURE_DIR)
+    def test_included_suffixes_3(self, datafiles):
+        SELECTOR = {
+            'included_suffixes': [
+                '*.txt',
+                '*.longext',
+                '*.noexist',
+            ],
+        }
+
+        actual_paths = dirwalk(
+            datafiles,
+            selector=SELECTOR)
+
+        expected_files = [f for f in TEST_FILES
+                          if f.endswith('.txt')
+                          or f.endswith('.longext')]
+        self.assert_dirwalk(datafiles, expected_files, actual_paths)
+
+
+    @pytest.mark.datafiles(FIXTURE_DIR)
+    def test_included_suffixes_4(self, datafiles):
+        SELECTOR = {
+            'included_suffixes': [
+                '*.noexist',
+            ],
+        }
+
+        actual_paths = dirwalk(
+            datafiles,
+            selector=SELECTOR)
+
+        expected_files = []
         self.assert_dirwalk(datafiles, expected_files, actual_paths)
