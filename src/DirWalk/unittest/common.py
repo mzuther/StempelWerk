@@ -1,4 +1,5 @@
 import contextlib
+import pathlib
 
 import pytest
 
@@ -18,8 +19,10 @@ class TestCommon:
         found_files = []
 
         for file_path in found_paths:
-            found_files.append(
-                str(file_path.relative_to(root_path)))
+            assert isinstance(file_path, pathlib.Path)
+
+            file_path_relative = file_path.relative_to(root_path)
+            found_files.append(str(file_path_relative))
 
         if ignore_order:
             found_files = sorted(found_files)

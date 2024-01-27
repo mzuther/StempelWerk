@@ -51,7 +51,8 @@ class TestMonster(TestCommon):
         found_paths = dirwalk(
             datafiles)
 
-        self.assert_dirwalk(datafiles, found_paths, TEST_FILES,
+        expected_files = TEST_FILES
+        self.assert_dirwalk(datafiles, found_paths, expected_files,
                             ignore_order=True)
 
 
@@ -70,7 +71,8 @@ class TestMonster(TestCommon):
             datafiles,
             selector=SELECTOR)
 
-        self.assert_dirwalk(datafiles, found_paths, TEST_FILES,
+        expected_files = TEST_FILES
+        self.assert_dirwalk(datafiles, found_paths, expected_files,
                             ignore_order=True)
 
 
@@ -90,5 +92,6 @@ class TestMonster(TestCommon):
             datafiles,
             selector=SELECTOR)
 
-        self.assert_dirwalk(datafiles, found_paths, TEST_FILES,
+        expected_files = TEST_FILES
+        self.assert_dirwalk(datafiles, found_paths, expected_files,
                             ignore_order=True)
