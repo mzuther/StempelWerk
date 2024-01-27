@@ -65,8 +65,9 @@ def is_file_included(current_path, dir_entry, follow_symlinks,
         return False
 
     # exclude files
-    if current_path.name in selector['excluded_file_names']:
-        return False
+    for file_name_pattern in selector['excluded_file_names']:
+        if current_path.match(file_name_pattern):
+            return False
 
     # only include some file suffixes
     for suffix in selector['included_suffixes']:
