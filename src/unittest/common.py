@@ -139,7 +139,7 @@ class TestCommon:
 
             print('------------------------------------------------------')
             print()
-            print('Difference between expected output and result:')
+            print('Difference between expected and actual output:')
             print()
             sys.stdout.writelines(diff_result)
             print()

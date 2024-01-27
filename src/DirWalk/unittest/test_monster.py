@@ -49,23 +49,23 @@ class TestMonster(TestCommon):
 
     @pytest.mark.datafiles(FIXTURE_DIR)
     def test_default_options(self, datafiles):
-        found_paths = dirwalk(
+        actual_paths = dirwalk(
             datafiles)
 
         expected_files = TEST_FILES
-        self.assert_dirwalk(datafiles, found_paths, expected_files)
+        self.assert_dirwalk(datafiles, expected_files, actual_paths)
 
 
     @pytest.mark.datafiles(FIXTURE_DIR)
     def test_directories_in_between(self, datafiles):
-        found_paths = dirwalk(
+        actual_paths = dirwalk(
             datafiles,
             directories_first=False)
 
         expected_files = TEST_FILES[-4:]
         expected_files.extend(TEST_FILES[:-4])
 
-        self.assert_dirwalk(datafiles, found_paths, expected_files)
+        self.assert_dirwalk(datafiles, expected_files, actual_paths)
 
 
     @pytest.mark.datafiles(FIXTURE_DIR)
@@ -79,12 +79,12 @@ class TestMonster(TestCommon):
             ],
         }
 
-        found_paths = dirwalk(
+        actual_paths = dirwalk(
             datafiles,
             selector=SELECTOR)
 
         expected_files = TEST_FILES
-        self.assert_dirwalk(datafiles, found_paths, expected_files)
+        self.assert_dirwalk(datafiles, expected_files, actual_paths)
 
 
     @pytest.mark.datafiles(FIXTURE_DIR)
@@ -99,9 +99,9 @@ class TestMonster(TestCommon):
             ],
         }
 
-        found_paths = dirwalk(
+        actual_paths = dirwalk(
             datafiles,
             selector=SELECTOR)
 
         expected_files = TEST_FILES
-        self.assert_dirwalk(datafiles, found_paths, expected_files)
+        self.assert_dirwalk(datafiles, expected_files, actual_paths)

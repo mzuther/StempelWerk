@@ -1,5 +1,7 @@
 import contextlib
+import difflib
 import pathlib
+import sys
 
 import pytest
 
@@ -14,34 +16,35 @@ class TestCommon:
             raise pytest.fail(f'raised unwanted exception {exception}')
 
 
-    def assert_dirwalk(self, root_path, found_paths, expected_files,
+    def assert_dirwalk(self, root_path, expected_files, actual_paths,
                        ignore_order=False):
-        found_files = []
-
-        for file_path in found_paths:
+        actual_files = []
+        for file_path in actual_paths:
             assert isinstance(file_path, pathlib.Path)
 
             file_path_relative = file_path.relative_to(root_path)
-            found_files.append(str(file_path_relative))
+            actual_files.append(str(file_path_relative))
 
         if ignore_order:
-            found_files = sorted(found_files)
             expected_files = sorted(expected_files)
+            actual_files = sorted(actual_files)
 
-        if found_files != expected_files:
-            print()
-            print()
-            print(f'EXPECTED ({len(expected_files)}):')
-            print()
-            for file_name in expected_files:
-                print('*', file_name)
+        if actual_files != expected_files:
+            # force well-formatted diff output
+            expected_files = '\n'.join(expected_files) + '\n'
+            actual_files = '\n'.join(actual_files) + '\n'
 
+            diff_result = difflib.unified_diff(
+                expected_files.splitlines(keepends=True),
+                actual_files.splitlines(keepends=True),
+                fromfile='EXPECTED',
+                tofile='ACTUAL')
+
+            print('------------------------------------------------------')
             print()
+            print('Difference between expected and actual output:')
             print()
-            print(f'FOUND ({len(found_files)}):')
-            print()
-            for file_name in found_files:
-                print('*', file_name)
+            sys.stdout.writelines(diff_result)
             print()
 
-            assert False, 'found files differ from expected files'
+            assert False, 'Found differing files.'
