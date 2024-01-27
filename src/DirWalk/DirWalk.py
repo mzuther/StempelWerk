@@ -53,7 +53,7 @@ def is_directory_included(current_path, dir_entry, follow_symlinks,
         return False
 
     # exclude directories
-    if current_path.name in included.get('excluded_directory_names', []):
+    if current_path.name in included['excluded_directory_names']:
         return False
 
     return True
@@ -65,11 +65,11 @@ def is_file_included(current_path, dir_entry, follow_symlinks,
         return False
 
     # exclude files
-    if current_path.name in included.get('excluded_file_names', []):
+    if current_path.name in included['excluded_file_names']:
         return False
 
     # only include some file suffixes
-    for suffix in included.get('included_suffixes', []):
+    for suffix in included['included_suffixes']:
         if current_path.match(suffix):
             break
     else:
@@ -99,6 +99,16 @@ def dirwalk_prepare(root_directory, included, modified_after):
 
     if not included:
         included = {}
+
+    if not included.get('excluded_directory_names'):
+        included['excluded_directory_names'] = []
+
+    if not included.get('excluded_file_names'):
+        included['excluded_file_names'] = []
+
+    # include all files if no suffixes are specified
+    if not included.get('included_suffixes'):
+        included['included_suffixes'] = ['*']
 
     # UNIX timestamp, remove digital places after period
     if modified_after:
