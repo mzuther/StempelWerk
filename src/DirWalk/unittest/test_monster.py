@@ -17,43 +17,55 @@ from src.DirWalk.DirWalk import dirwalk
 FIXTURE_DIR = pathlib.Path('src/DirWalk/unittest/') / 'monster'
 
 TEST_FILES = [
-    '.hidden',
-    '.hidden.txt',
-    'normal.txt',
-    'multi.dot.longext',
-
-    'directory/.hidden',
-    'directory/.hidden.txt',
-    'directory/normal.txt',
-    'directory/multi.dot.longext',
-
-    'dir.ext/.hidden',
-    'dir.ext/.hidden.txt',
-    'dir.ext/normal.txt',
-    'dir.ext/multi.dot.longext',
-
     '.hiddendir/.hidden',
     '.hiddendir/.hidden.txt',
-    '.hiddendir/normal.txt',
     '.hiddendir/multi.dot.longext',
+    '.hiddendir/normal.txt',
 
     '.hiddendir.ext/.hidden',
     '.hiddendir.ext/.hidden.txt',
-    '.hiddendir.ext/normal.txt',
     '.hiddendir.ext/multi.dot.longext',
+    '.hiddendir.ext/normal.txt',
+
+    'dir.ext/.hidden',
+    'dir.ext/.hidden.txt',
+    'dir.ext/multi.dot.longext',
+    'dir.ext/normal.txt',
+
+    'directory/.hidden',
+    'directory/.hidden.txt',
+    'directory/multi.dot.longext',
+    'directory/normal.txt',
+
+    '.hidden',
+    '.hidden.txt',
+    'multi.dot.longext',
+    'normal.txt',
+
 ]
 
 
 class TestMonster(TestCommon):
 
     @pytest.mark.datafiles(FIXTURE_DIR)
-    def test_no_options(self, datafiles):
+    def test_default_options(self, datafiles):
         found_paths = dirwalk(
             datafiles)
 
         expected_files = TEST_FILES
-        self.assert_dirwalk(datafiles, found_paths, expected_files,
-                            ignore_order=True)
+        self.assert_dirwalk(datafiles, found_paths, expected_files)
+
+
+    @pytest.mark.datafiles(FIXTURE_DIR)
+    def test_directories_in_between(self, datafiles):
+        found_paths = dirwalk(
+            datafiles,
+            directories_first=False)
+
+        expected_files = TEST_FILES[-4:]
+        expected_files.extend(TEST_FILES[:-4])
+
+        self.assert_dirwalk(datafiles, found_paths, expected_files)
 
 
     @pytest.mark.datafiles(FIXTURE_DIR)
@@ -72,8 +84,7 @@ class TestMonster(TestCommon):
             selector=SELECTOR)
 
         expected_files = TEST_FILES
-        self.assert_dirwalk(datafiles, found_paths, expected_files,
-                            ignore_order=True)
+        self.assert_dirwalk(datafiles, found_paths, expected_files)
 
 
     @pytest.mark.datafiles(FIXTURE_DIR)
@@ -93,5 +104,4 @@ class TestMonster(TestCommon):
             selector=SELECTOR)
 
         expected_files = TEST_FILES
-        self.assert_dirwalk(datafiles, found_paths, expected_files,
-                            ignore_order=True)
+        self.assert_dirwalk(datafiles, found_paths, expected_files)

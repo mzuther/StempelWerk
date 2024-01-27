@@ -28,4 +28,20 @@ class TestCommon:
             found_files = sorted(found_files)
             expected_files = sorted(expected_files)
 
-        assert found_files == expected_files
+        if found_files != expected_files:
+            print()
+            print()
+            print(f'EXPECTED ({len(expected_files)}):')
+            print()
+            for file_name in expected_files:
+                print('*', file_name)
+
+            print()
+            print()
+            print(f'FOUND ({len(found_files)}):')
+            print()
+            for file_name in found_files:
+                print('*', file_name)
+            print()
+
+            assert False, 'found files differ from expected files'
