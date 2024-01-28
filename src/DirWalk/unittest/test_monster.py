@@ -41,8 +41,14 @@ TEST_FILES = [
     '.hidden.txt',
     'multi.dot.longext',
     'normal.txt',
-
 ]
+
+TEST_FILES_AND_DIRS = []
+
+for entry in TEST_FILES:
+    if entry.endswith('/.hidden'):
+        TEST_FILES_AND_DIRS.append(entry.removesuffix('/.hidden'))
+    TEST_FILES_AND_DIRS.append(entry)
 
 
 class TestMonster(TestCommon):
@@ -64,6 +70,30 @@ class TestMonster(TestCommon):
 
         expected_files = TEST_FILES[-4:]
         expected_files.extend(TEST_FILES[:-4])
+
+        self.assert_dirwalk(datafiles, expected_files, actual_paths)
+
+
+    @pytest.mark.datafiles(FIXTURE_DIR)
+    def test_directories_included(self, datafiles):
+        actual_paths = dirwalk(
+            datafiles,
+            include_directories=True,
+            directories_first=True)
+
+        expected_files = TEST_FILES_AND_DIRS
+        self.assert_dirwalk(datafiles, expected_files, actual_paths)
+
+
+    @pytest.mark.datafiles(FIXTURE_DIR)
+    def test_directories_included_in_between(self, datafiles):
+        actual_paths = dirwalk(
+            datafiles,
+            include_directories=True,
+            directories_first=False)
+
+        expected_files = TEST_FILES_AND_DIRS[-4:]
+        expected_files.extend(TEST_FILES_AND_DIRS[:-4])
 
         self.assert_dirwalk(datafiles, expected_files, actual_paths)
 
