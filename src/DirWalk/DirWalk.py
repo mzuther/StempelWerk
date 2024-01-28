@@ -154,7 +154,7 @@ def dirwalk(root_directory,
                                    selector, modified_after)
 
         if include_directories:
-            found_items.append(current_directory + os.sep)
+            found_items.append(current_directory)
 
         found_items.extend(deep_found_items)
 
