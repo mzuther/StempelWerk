@@ -47,8 +47,10 @@ import pathlib
 import sys
 
 
-def is_directory_included(current_path, dir_entry, follow_symlinks,
-                          selector, modified_after):
+def is_directory_included(current_path,
+                          dir_entry,
+                          follow_symlinks,
+                          selector):
     if not dir_entry.is_dir(follow_symlinks=follow_symlinks):
         return False
 
@@ -59,8 +61,11 @@ def is_directory_included(current_path, dir_entry, follow_symlinks,
     return True
 
 
-def is_file_included(current_path, dir_entry, follow_symlinks,
-                     selector, modified_after):
+def is_file_included(current_path,
+                     dir_entry,
+                     follow_symlinks,
+                     selector,
+                     modified_after):
     if not dir_entry.is_file(follow_symlinks=follow_symlinks):
         return False
 
@@ -95,7 +100,9 @@ def is_file_included(current_path, dir_entry, follow_symlinks,
     return modification_time_in_seconds >= modified_after
 
 
-def dirwalk_prepare(root_directory, selector, modified_after):
+def dirwalk_prepare(root_directory,
+                    selector,
+                    modified_after):
     root_directory = pathlib.Path(root_directory)
 
     if not selector:
@@ -118,14 +125,17 @@ def dirwalk_prepare(root_directory, selector, modified_after):
     return (root_directory, selector, modified_after)
 
 
-def dirwalk(root_directory, directories_first=True, include_directories=False,
-            follow_symlinks=False, selector=None, modified_after=None):
+def dirwalk(root_directory,
+            directories_first=True,
+            include_directories=False,
+            follow_symlinks=False,
+            selector=None,
+            modified_after=None):
     root_directory, selector, modified_after = dirwalk_prepare(
         root_directory, selector, modified_after)
 
-    directories, files = dirwalk_process(root_directory, directories_first,
-                                         include_directories, follow_symlinks,
-                                         selector, modified_after)
+    directories, files = dirwalk_process(
+        root_directory, follow_symlinks, selector, modified_after)
 
     # sort results
     directories.sort()
@@ -154,9 +164,10 @@ def dirwalk(root_directory, directories_first=True, include_directories=False,
     return found_items
 
 
-def dirwalk_process(root_directory, directories_first,
-                    include_directories, follow_symlinks,
-                    selector, modified_after):
+def dirwalk_process(root_directory,
+                    follow_symlinks,
+                    selector,
+                    modified_after):
     directories = []
     files = []
 
@@ -167,7 +178,7 @@ def dirwalk_process(root_directory, directories_first,
 
         # process directories
         if is_directory_included(current_path, dir_entry, follow_symlinks,
-                                 selector, modified_after):
+                                 selector):
             directories.append(current_path)
         # process files
         elif is_file_included(current_path, dir_entry, follow_symlinks,
