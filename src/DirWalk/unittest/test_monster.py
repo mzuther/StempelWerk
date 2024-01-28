@@ -440,7 +440,7 @@ class TestMonster(TestCommon):
             datafiles,
             directories_first=False,
             include_directories=True,
-            modified_since=modified_since.timestamp())
+            modified_since=modified_since)
 
         expected_files = TEST_FILES_AND_DIRS[-4:]
         expected_files.extend(TEST_FILES_AND_DIRS[:-4])
@@ -456,7 +456,7 @@ class TestMonster(TestCommon):
         actual_paths = dirwalk(
             datafiles,
             include_directories=True,
-            modified_since=modified_since.timestamp())
+            modified_since=modified_since)
 
         expected_files = []
         self.assert_dirwalk(datafiles, expected_files, actual_paths)
@@ -478,7 +478,7 @@ class TestMonster(TestCommon):
         actual_paths = dirwalk(
             datafiles,
             include_directories=True,
-            modified_since=modified_since.timestamp())
+            modified_since=modified_since)
 
         expected_files = [
             'new.dir',

@@ -52,7 +52,7 @@ def is_directory_included(current_path,
                           dir_entry,
                           follow_symlinks,
                           selector,
-                          modification_threshold):
+                          modified_since):
     if not dir_entry.is_dir(follow_symlinks=follow_symlinks):
         return False
 
@@ -60,14 +60,14 @@ def is_directory_included(current_path,
     if current_path.name in selector['excluded_directory_names']:
         return False
 
-    return has_been_modified(dir_entry, modification_threshold)
+    return has_been_modified(dir_entry, modified_since)
 
 
 def is_file_included(current_path,
                      dir_entry,
                      follow_symlinks,
                      selector,
-                     modification_threshold):
+                     modified_since):
     if not dir_entry.is_file(follow_symlinks=follow_symlinks):
         return False
 
@@ -83,12 +83,12 @@ def is_file_included(current_path,
     else:
         return False
 
-    return has_been_modified(dir_entry, modification_threshold)
+    return has_been_modified(dir_entry, modified_since)
 
 
-def has_been_modified(dir_entry, modification_threshold):
+def has_been_modified(dir_entry, modified_since):
     # "stat" is costly
-    if not modification_threshold:
+    if not modified_since:
         return True
 
     # only include paths modified after a given date; get timestamp of linked
@@ -103,7 +103,7 @@ def has_been_modified(dir_entry, modification_threshold):
     # cases are included
     modification_time_in_seconds = math.ceil(modification_time_in_seconds)
 
-    return modification_time_in_seconds >= modification_threshold
+    return modification_time_in_seconds >= modified_since
 
 
 def dirwalk_prepare(root_directory,
@@ -125,6 +125,9 @@ def dirwalk_prepare(root_directory,
         selector['included_suffixes'] = ['*']
 
     # UNIX timestamp, remove digital places after period
+    if isinstance(modified_since, datetime.datetime):
+        modified_since = modified_since.timestamp()
+
     if modified_since:
         modified_since = int(modified_since)
 
