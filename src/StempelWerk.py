@@ -744,9 +744,9 @@ class StempelWerk:
         # convert datetime to UNIX time
         last_run_timestamp = last_run.timestamp()
 
-        # round down to ensure that files with inaccurate timestamps and other
-        # edge cases are included
-        last_run_timestamp = math.floor(last_run_timestamp)
+        # take care of file systems with inaccurate timestamps (Microsoft,
+        # I mean you!) and other edge cases
+        last_run_timestamp = math.floor(last_run_timestamp) - 2
 
         self.settings.last_run_file.write_text(
             str(last_run_timestamp))

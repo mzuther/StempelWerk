@@ -42,7 +42,6 @@
 # ----------------------------------------------------------------------------
 
 import datetime
-import math
 import os
 import pathlib
 import sys
@@ -96,12 +95,9 @@ def has_been_modified(dir_entry, modified_since):
     stat_result = dir_entry.stat(follow_symlinks=True)
 
     # "st_mtime_ns" gets the exact timestamp, although nanoseconds may be
-    # missing or inexact
+    # missing or inexact; any file system idiosyncracies (Microsoft, I mean
+    # you!) shall be handled in the client code
     modification_time_in_seconds = stat_result.st_mtime_ns / 1e9
-
-    # round up to ensure that paths with inaccurate timestamps and other edge
-    # cases are included
-    modification_time_in_seconds = math.ceil(modification_time_in_seconds)
 
     return modification_time_in_seconds >= modified_since
 

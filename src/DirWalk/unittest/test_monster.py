@@ -451,7 +451,7 @@ class TestMonster(TestCommon):
     @pytest.mark.datafiles(FIXTURE_DIR)
     def test_modified_2(self, datafiles):
         # wait for fixture data to settle down
-        modified_since = datetime.datetime.now() + datetime.timedelta(seconds=2)
+        modified_since = datetime.datetime.now() + datetime.timedelta(seconds=1)
 
         actual_paths = dirwalk(
             datafiles,
@@ -466,8 +466,8 @@ class TestMonster(TestCommon):
     @pytest.mark.datafiles(FIXTURE_DIR)
     def test_modified_3(self, datafiles):
         # wait for fixture data to settle down
-        modified_since = datetime.datetime.now() + datetime.timedelta(seconds=2)
-        time.sleep(2)
+        modified_since = datetime.datetime.now() + datetime.timedelta(seconds=1)
+        time.sleep(1.0)
 
         new_dir = datafiles.joinpath('new.dir')
         new_dir.mkdir(parents=True)
