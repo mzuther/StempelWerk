@@ -445,6 +445,7 @@ class TestMonster(TestCommon):
         self.assert_dirwalk(datafiles, expected_files, actual_paths)
 
 
+    @pytest.mark.slow
     @pytest.mark.datafiles(FIXTURE_DIR)
     def test_modified_3(self, datafiles):
         # wait for fixture data to settle down

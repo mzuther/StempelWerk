@@ -21,6 +21,12 @@ flake8-pytest-style = "^1.7.2"
 pytest = "^7.3.0"
 pytest-datafiles = "^3.0.0"
 
+[tool.pytest.ini_options]
+markers = [
+    "current: marks tests as current (select with '-m current')",
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+]
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
