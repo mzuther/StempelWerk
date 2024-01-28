@@ -733,8 +733,11 @@ class StempelWerk:
 
 
     def _get_last_run(self):
-        last_run_timestamp = self.settings.last_run_file.read_text()
-        return last_run_timestamp.strip()
+        try:
+            last_run_timestamp = self.settings.last_run_file.read_text()
+            return last_run_timestamp.strip()
+        except IOError:
+            return None
 
 
     def _store_last_run(self, last_run):
@@ -787,11 +790,8 @@ class StempelWerk:
 
         modified_after = None
         if process_only_modified:
-            try:
-                # get time of last run
-                modified_after = self._get_last_run()
-            except IOError:
-                modified_after = None
+            # get time of last run
+            modified_after = self._get_last_run()
 
         # find matching files in template directory
         template_filenames = dirwalk(self.settings.template_dir,
