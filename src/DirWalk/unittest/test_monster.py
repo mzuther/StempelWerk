@@ -7,6 +7,8 @@
 # names, but all personality traits have been made up. I hope they have as much
 # fun reading these tests as I had in writing them!
 
+import datetime
+import time
 import pathlib
 import pytest
 
@@ -412,4 +414,56 @@ class TestMonster(TestCommon):
             selector=SELECTOR)
 
         expected_files = TEST_FILES
+        self.assert_dirwalk(datafiles, expected_files, actual_paths)
+
+
+    @pytest.mark.datafiles(FIXTURE_DIR)
+    def test_modified_1(self, datafiles):
+        # work around the peculiarities of "pytest-datafiles"
+        checking_time = datetime.datetime.now() - datetime.timedelta(days=2)
+
+        actual_paths = dirwalk(
+            datafiles,
+            include_directories=True,
+            modified_after=checking_time.timestamp())
+
+        expected_files = TEST_FILES_AND_DIRS
+        self.assert_dirwalk(datafiles, expected_files, actual_paths)
+
+
+    @pytest.mark.datafiles(FIXTURE_DIR)
+    def test_modified_2(self, datafiles):
+        # wait for fixture data to settle down
+        checking_time = datetime.datetime.now() + datetime.timedelta(seconds=2)
+
+        actual_paths = dirwalk(
+            datafiles,
+            include_directories=True,
+            modified_after=checking_time.timestamp())
+
+        expected_files = []
+        self.assert_dirwalk(datafiles, expected_files, actual_paths)
+
+
+    @pytest.mark.datafiles(FIXTURE_DIR)
+    def test_modified_3(self, datafiles):
+        # wait for fixture data to settle down
+        checking_time = datetime.datetime.now() + datetime.timedelta(seconds=2)
+        time.sleep(2)
+
+        new_dir = datafiles.joinpath('new.dir')
+        new_dir.mkdir(parents=True)
+
+        new_file = new_dir.joinpath('new.file.txt')
+        new_file.write_text('NEW')
+
+        actual_paths = dirwalk(
+            datafiles,
+            include_directories=True,
+            modified_after=checking_time.timestamp())
+
+        expected_files = [
+            'new.dir',
+            'new.dir/new.file.txt',
+        ]
         self.assert_dirwalk(datafiles, expected_files, actual_paths)
