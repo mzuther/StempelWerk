@@ -788,15 +788,15 @@ class StempelWerk:
             'included_suffixes': self.settings.included_suffixes,
         }
 
-        modified_after = None
+        modified_since = None
         if process_only_modified:
             # get time of last run
-            modified_after = self._get_last_run()
+            modified_since = self._get_last_run()
 
         # find matching files in template directory
         template_filenames = dirwalk(self.settings.template_dir,
                                      selector=dirwalk_selector,
-                                     modified_after=modified_after)
+                                     modified_since=modified_since)
 
         return template_filenames
 

@@ -41,6 +41,7 @@
 #
 # ----------------------------------------------------------------------------
 
+import datetime
 import math
 import os
 import pathlib
@@ -107,7 +108,7 @@ def has_been_modified(dir_entry, modification_threshold):
 
 def dirwalk_prepare(root_directory,
                     selector,
-                    modified_after):
+                    modified_since):
     root_directory = pathlib.Path(root_directory)
 
     if not selector:
@@ -124,10 +125,10 @@ def dirwalk_prepare(root_directory,
         selector['included_suffixes'] = ['*']
 
     # UNIX timestamp, remove digital places after period
-    if modified_after:
-        modified_after = int(modified_after)
+    if modified_since:
+        modified_since = int(modified_since)
 
-    return (root_directory, selector, modified_after)
+    return (root_directory, selector, modified_since)
 
 
 def dirwalk(root_directory,
@@ -135,12 +136,12 @@ def dirwalk(root_directory,
             include_directories=False,
             follow_symlinks=False,
             selector=None,
-            modified_after=None):
-    root_directory, selector, modified_after = dirwalk_prepare(
-        root_directory, selector, modified_after)
+            modified_since=None):
+    root_directory, selector, modified_since = dirwalk_prepare(
+        root_directory, selector, modified_since)
 
     directories, files = dirwalk_process(
-        root_directory, follow_symlinks, selector, modified_after)
+        root_directory, follow_symlinks, selector, modified_since)
 
     # sort results
     directories.sort()
@@ -156,7 +157,7 @@ def dirwalk(root_directory,
     for current_directory in directories:
         deep_found_items = dirwalk(current_directory, directories_first,
                                    include_directories, follow_symlinks,
-                                   selector, modified_after)
+                                   selector, modified_since)
 
         if include_directories:
             found_items.append(current_directory)
@@ -172,7 +173,7 @@ def dirwalk(root_directory,
 def dirwalk_process(root_directory,
                     follow_symlinks,
                     selector,
-                    modified_after):
+                    modified_since):
     directories = []
     files = []
 
@@ -183,11 +184,11 @@ def dirwalk_process(root_directory,
 
         # process directories
         if is_directory_included(current_path, dir_entry, follow_symlinks,
-                                 selector, modified_after):
+                                 selector, modified_since):
             directories.append(current_path)
         # process files
         elif is_file_included(current_path, dir_entry, follow_symlinks,
-                              selector, modified_after):
+                              selector, modified_since):
             files.append(current_path)
 
     return directories, files
@@ -216,13 +217,13 @@ if __name__ == '__main__':
         ],
     }
 
-    MODIFIED_AFTER = None
+    MODIFIED_SINCE = None
 
     # import datetime
-    # MODIFIED_AFTER = datetime.datetime(2022, 12, 1).timestamp()
+    # MODIFIED_SINCE = datetime.datetime(2022, 12, 1).timestamp()
 
     for current_path_name in dirwalk(
             SOURCE_DIR,
             selector=SELECTOR,
-            modified_after=MODIFIED_AFTER):
+            modified_since=MODIFIED_SINCE):
         print(current_path_name)
