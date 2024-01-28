@@ -50,7 +50,8 @@ import sys
 def is_directory_included(current_path,
                           dir_entry,
                           follow_symlinks,
-                          selector):
+                          selector,
+                          modification_threshold):
     if not dir_entry.is_dir(follow_symlinks=follow_symlinks):
         return False
 
@@ -58,14 +59,14 @@ def is_directory_included(current_path,
     if current_path.name in selector['excluded_directory_names']:
         return False
 
-    return True
+    return has_been_modified(dir_entry, modification_threshold)
 
 
 def is_file_included(current_path,
                      dir_entry,
                      follow_symlinks,
                      selector,
-                     modified_after):
+                     modification_threshold):
     if not dir_entry.is_file(follow_symlinks=follow_symlinks):
         return False
 
@@ -81,23 +82,27 @@ def is_file_included(current_path,
     else:
         return False
 
+    return has_been_modified(dir_entry, modification_threshold)
+
+
+def has_been_modified(dir_entry, modification_threshold):
     # "stat" is costly
-    if not modified_after:
+    if not modification_threshold:
         return True
 
-    # only include files modified after a given date; get timestamp of linked
-    # file, not of symlink
+    # only include paths modified after a given date; get timestamp of linked
+    # path, not of symlink
     stat_result = dir_entry.stat(follow_symlinks=True)
 
     # "st_mtime_ns" gets the exact timestamp, although nanoseconds may be
     # missing or inexact
     modification_time_in_seconds = stat_result.st_mtime_ns / 1e9
 
-    # round up to ensure that files with inaccurate timestamps and other edge
+    # round up to ensure that paths with inaccurate timestamps and other edge
     # cases are included
     modification_time_in_seconds = math.ceil(modification_time_in_seconds)
 
-    return modification_time_in_seconds >= modified_after
+    return modification_time_in_seconds >= modification_threshold
 
 
 def dirwalk_prepare(root_directory,
@@ -178,7 +183,7 @@ def dirwalk_process(root_directory,
 
         # process directories
         if is_directory_included(current_path, dir_entry, follow_symlinks,
-                                 selector):
+                                 selector, modified_after):
             directories.append(current_path)
         # process files
         elif is_file_included(current_path, dir_entry, follow_symlinks,
