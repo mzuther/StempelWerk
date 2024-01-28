@@ -2,7 +2,19 @@
 
 echo
 
-"./script/_poetry" run python -m pytest --ignore="./.git" "$@"
+# run quick tests first
+"./script/_poetry" run python -m pytest --ignore="./.git" -m "not slow" "$@"
+EXIT_CODE=$?
+
+if [ $EXIT_CODE -ne 0 ]; then
+   echo
+   exit $EXIT_CODE
+fi
+
+echo
+
+# run slow tests only when all other tests have passed
+"./script/_poetry" run python -m pytest --ignore="./.git" -m "slow" "$@"
 EXIT_CODE=$?
 
 if [ $EXIT_CODE -ne 0 ]; then
