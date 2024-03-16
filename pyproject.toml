@@ -5,6 +5,9 @@ description = "Automatic code generation from Jinja2 templates"
 authors = ["Martin Zuther <code@mzuther.de>"]
 license = "BSD 3-Clause License"
 readme = "README.md"
+packages = [
+    { include = "src" }
+]
 
 [tool.poetry.dependencies]
 python = "^3.10"
