@@ -7,7 +7,7 @@ import sys
 import shutil
 
 import pytest
-from src.StempelWerk import StempelWerk
+from stempelwerk.StempelWerk import StempelWerk
 
 
 class TestCommon:

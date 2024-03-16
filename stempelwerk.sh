@@ -1,2 +1,2 @@
 #! /usr/bin/bash
-"./script/_poetry" run python -m src.StempelWerk "$@"
+"./script/_poetry" run python -m stempelwerk.StempelWerk "$@"

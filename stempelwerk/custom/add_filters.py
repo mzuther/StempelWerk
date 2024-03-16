@@ -1,4 +1,4 @@
-from src.StempelWerk import StempelWerk
+from stempelwerk.StempelWerk import StempelWerk
 
 
 class CustomCode(StempelWerk.CustomCodeTemplate):

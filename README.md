@@ -102,13 +102,13 @@ For development dependencies, please see [pyproject.toml](./pyproject.toml).
 Generate your code from templates by running the following command:
 
 ```bash
-python3 -m src.StempelWerk [ARGUMENTS] CONFIG_FILE_PATH
+python3 -m stempelwerk.StempelWerk [ARGUMENTS] CONFIG_FILE_PATH
 ```
 
 For help, simply call:
 
 ```bash
-python3 -m src.StempelWerk --help
+python3 -m stempelwerk.StempelWerk --help
 ```
 
 ### Command line argument `--globals`

@@ -14,8 +14,8 @@
     "jinja2.ext.debug"
   ],
   "custom_modules": [
-    "src.custom.add_filters",
-    "src.custom.add_tests"
+    "stempelwerk.custom.add_filters",
+    "stempelwerk.custom.add_tests"
   ],
   "last_run_file": ".last_run",
   "marker_new_file": "### New file:",

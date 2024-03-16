@@ -49,8 +49,8 @@ class TestTinTin(TestCommon):
         custom_config = {
             'stencil_dir_name': 'stencils',
             'custom_modules': [
-                'src.custom.add_filters',
-                'src.custom.add_tests',
+                'stempelwerk.custom.add_filters',
+                'stempelwerk.custom.add_tests',
             ],
         }
 

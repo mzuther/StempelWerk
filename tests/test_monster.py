@@ -13,7 +13,7 @@ import pathlib
 import pytest
 
 from .common import TestCommon
-from src.DirWalk.DirWalk import dirwalk
+from stempelwerk.DirWalk.DirWalk import dirwalk
 
 
 FIXTURE_DIR = pathlib.Path('tests') / 'monster'
