@@ -11,9 +11,9 @@ import pathlib
 
 import jinja2
 import pytest
-from src.unittest.common import TestCommon
+from .common import TestCommon
 
-FIXTURE_DIR = pathlib.Path('src/unittest/') / 'mascara'
+FIXTURE_DIR = pathlib.Path('tests') / 'mascara'
 
 
 class TestMascara(TestCommon):

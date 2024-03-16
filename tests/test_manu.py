@@ -10,9 +10,9 @@
 import pathlib
 
 import pytest
-from src.unittest.common import TestCommon
+from .common import TestCommon
 
-FIXTURE_DIR = pathlib.Path('src/unittest/') / 'manu'
+FIXTURE_DIR = pathlib.Path('tests') / 'manu'
 
 
 class TestManu(TestCommon):

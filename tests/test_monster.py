@@ -12,11 +12,11 @@ import time
 import pathlib
 import pytest
 
-from src.DirWalk.unittest.common import TestCommon
+from .common import TestCommon
 from src.DirWalk.DirWalk import dirwalk
 
 
-FIXTURE_DIR = pathlib.Path('src/DirWalk/unittest/') / 'monster'
+FIXTURE_DIR = pathlib.Path('tests') / 'monster'
 
 TEST_FILES = [
     '.hiddendir/.hidden',
