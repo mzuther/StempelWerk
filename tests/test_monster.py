@@ -8,9 +8,10 @@
 # fun reading these tests as I had in writing them!
 
 import datetime
-import time
+import os
 import pathlib
 import pytest
+import time
 
 from .common import TestCommon
 from stempelwerk.DirWalk.DirWalk import dirwalk
@@ -51,6 +52,11 @@ for entry in TEST_FILES:
     if entry.endswith('/.hidden'):
         TEST_FILES_AND_DIRS.append(entry.removesuffix('/.hidden'))
     TEST_FILES_AND_DIRS.append(entry)
+
+
+def set_mtime_to_current_time(dir_path):
+    for path_in_directory in dirwalk(dir_path, include_directories=True):
+        os.utime(path_in_directory, times=None)
 
 
 class TestMonster(TestCommon):
@@ -419,8 +425,8 @@ class TestMonster(TestCommon):
 
     @pytest.mark.datafiles(FIXTURE_DIR)
     def test_modified_1(self, datafiles):
-        # work around the peculiarities of "pytest-datafiles"
-        modified_since = datetime.datetime.now() - datetime.timedelta(days=2)
+        modified_since = datetime.datetime.now()
+        set_mtime_to_current_time(datafiles)
 
         actual_paths = dirwalk(
             datafiles,
@@ -433,8 +439,8 @@ class TestMonster(TestCommon):
 
     @pytest.mark.datafiles(FIXTURE_DIR)
     def test_modified_1_in_between(self, datafiles):
-        # work around the peculiarities of "pytest-datafiles"
-        modified_since = datetime.datetime.now() - datetime.timedelta(days=2)
+        modified_since = datetime.datetime.now()
+        set_mtime_to_current_time(datafiles)
 
         actual_paths = dirwalk(
             datafiles,
