@@ -16,6 +16,25 @@ happens._
 
 <!--- ---------------------------------------------------------------------- -->
 
+## [1.0.2] - 2024-05-07
+
+### Security
+- update Jinja2 dependency (again) to fix security vulnerability
+
+### Changed
+- rename some `DirWalk` parameters
+- add unit tests for `DirWalk` class
+- run slow tests when all other tests have passed
+- refactor code
+- change directory layout of source code 
+
+### Fixed
+- fix: no files are included in case no suffixes are specified
+- fix: excluded file names cannot use globs
+- fix: poetry cannot find root folder
+
+<!--- ---------------------------------------------------------------------- -->
+
 ## [1.0.1] - 2024-01-12
 
 ### Security
