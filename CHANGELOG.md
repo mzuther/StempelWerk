@@ -16,6 +16,16 @@ happens._
 
 <!--- ---------------------------------------------------------------------- -->
 
+## [1.0.3] - 2024-07-17
+
+### Security
+- update setuptools dependency to fix security vulnerability
+
+### Fixed
+- fix: README contains vulnerable Jinja2 version
+
+<!--- ---------------------------------------------------------------------- -->
+
 ## [1.0.2] - 2024-05-07
 
 ### Security
