@@ -137,7 +137,7 @@ class StempelWerk:
         template_dir: str
         output_dir: str
         # ----------------------------------------
-        included_suffixes: list
+        included_file_names: list
         stencil_dir_name: str = ''
         create_directories: bool = False
         # ----------------------------------------
@@ -632,7 +632,8 @@ class StempelWerk:
 
         self._create_output_directory(output_file_path)
 
-        # use default newline character unless there is an exception
+        # use default newline character unless there is an exception (such as
+        # for Windows batch files)
         newline = self.newline_exceptions.get(output_file_path.suffix,
                                               self.settings.newline)
 
@@ -785,7 +786,7 @@ class StempelWerk:
                 self.settings.stencil_dir_name
             ],
             'excluded_file_names': [],
-            'included_suffixes': self.settings.included_suffixes,
+            'included_file_names': self.settings.included_file_names,
         }
 
         modified_since = None

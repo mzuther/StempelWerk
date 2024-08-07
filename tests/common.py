@@ -71,7 +71,7 @@ class TestCommon:
             'template_dir': '10-templates',
             'output_dir': '20-output',
             # ----------------------------------------
-            'included_suffixes': [
+            'included_file_names': [
                 '*.jinja'
             ],
             'stencil_dir_name': '',

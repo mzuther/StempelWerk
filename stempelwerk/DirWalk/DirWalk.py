@@ -75,9 +75,9 @@ def is_file_included(current_path,
         if current_path.match(file_name_pattern):
             return False
 
-    # only include some file suffixes
-    for suffix in selector['included_suffixes']:
-        if current_path.match(suffix):
+    # only include some files
+    for fileglob in selector['included_file_names']:
+        if current_path.match(fileglob):
             break
     else:
         return False
@@ -116,9 +116,9 @@ def dirwalk_prepare(root_directory,
     if not selector.get('excluded_file_names'):
         selector['excluded_file_names'] = []
 
-    # include all files if no suffixes are specified
-    if not selector.get('included_suffixes'):
-        selector['included_suffixes'] = ['*']
+    # include all files if no globs are specified
+    if not selector.get('included_file_names'):
+        selector['included_file_names'] = ['*']
 
     # UNIX timestamp, remove digital places after period
     if isinstance(modified_since, datetime.datetime):
@@ -212,7 +212,7 @@ if __name__ == '__main__':
         ],
         'excluded_file_names': [
         ],
-        'included_suffixes': [
+        'included_file_names': [
         ],
     }
 

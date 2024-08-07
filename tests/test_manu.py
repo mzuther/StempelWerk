@@ -150,7 +150,7 @@ class TestManu(TestCommon):
 
         custom_config = {
             'root_dir': str(root_dir),
-            'included_suffixes': [
+            'included_file_names': [
                 '*.included.jinja',
             ],
         }

@@ -113,7 +113,7 @@ class TestMonster(TestCommon):
             ],
             'excluded_file_names': [
             ],
-            'included_suffixes': [
+            'included_file_names': [
             ],
         }
 
@@ -126,13 +126,13 @@ class TestMonster(TestCommon):
 
 
     @pytest.mark.datafiles(FIXTURE_DIR)
-    def test_included_suffixes_star_1(self, datafiles):
+    def test_included_files_star_1(self, datafiles):
         SELECTOR = {
             'excluded_directory_names': [
             ],
             'excluded_file_names': [
             ],
-            'included_suffixes': [
+            'included_file_names': [
                 '*',
             ],
         }
@@ -146,9 +146,9 @@ class TestMonster(TestCommon):
 
 
     @pytest.mark.datafiles(FIXTURE_DIR)
-    def test_included_suffixes_star_2(self, datafiles):
+    def test_included_files_star_2(self, datafiles):
         SELECTOR = {
-            'included_suffixes': [
+            'included_file_names': [
                 '*',
                 '*.txt',
             ],
@@ -163,9 +163,9 @@ class TestMonster(TestCommon):
 
 
     @pytest.mark.datafiles(FIXTURE_DIR)
-    def test_included_suffixes_1(self, datafiles):
+    def test_included_files_1(self, datafiles):
         SELECTOR = {
-            'included_suffixes': [
+            'included_file_names': [
                 '*.txt',
             ],
         }
@@ -180,9 +180,9 @@ class TestMonster(TestCommon):
 
 
     @pytest.mark.datafiles(FIXTURE_DIR)
-    def test_included_suffixes_2(self, datafiles):
+    def test_included_files_2(self, datafiles):
         SELECTOR = {
-            'included_suffixes': [
+            'included_file_names': [
                 '*.txt',
                 '*.longext',
             ],
@@ -199,9 +199,9 @@ class TestMonster(TestCommon):
 
 
     @pytest.mark.datafiles(FIXTURE_DIR)
-    def test_included_suffixes_3(self, datafiles):
+    def test_included_files_3(self, datafiles):
         SELECTOR = {
-            'included_suffixes': [
+            'included_file_names': [
                 '*.txt',
                 '*.longext',
                 '*.ext',
@@ -219,9 +219,9 @@ class TestMonster(TestCommon):
 
 
     @pytest.mark.datafiles(FIXTURE_DIR)
-    def test_included_suffixes_4(self, datafiles):
+    def test_included_files_4(self, datafiles):
         SELECTOR = {
-            'included_suffixes': [
+            'included_file_names': [
                 '*.ext',
             ],
         }
@@ -235,6 +235,25 @@ class TestMonster(TestCommon):
 
 
     @pytest.mark.datafiles(FIXTURE_DIR)
+    def test_included_files_6(self, datafiles):
+        SELECTOR = {
+            'excluded_directory_names': [
+            ],
+            'included_file_names': [
+                'norm*.*',
+            ],
+        }
+
+        actual_paths = dirwalk(
+            datafiles,
+            selector=SELECTOR)
+
+        expected_files = [f for f in TEST_FILES
+                          if f.endswith('normal.txt')]
+        self.assert_dirwalk(datafiles, expected_files, actual_paths)
+
+
+    @pytest.mark.datafiles(FIXTURE_DIR)
     def test_excluded_files_1(self, datafiles):
         SELECTOR = {
             'excluded_directory_names': [
@@ -242,7 +261,7 @@ class TestMonster(TestCommon):
             'excluded_file_names': [
                 'normal.txt',
             ],
-            'included_suffixes': [
+            'included_file_names': [
             ],
         }
 
@@ -263,7 +282,7 @@ class TestMonster(TestCommon):
             'excluded_file_names': [
                 '.hidden',
             ],
-            'included_suffixes': [
+            'included_file_names': [
             ],
         }
 
@@ -284,7 +303,7 @@ class TestMonster(TestCommon):
             'excluded_file_names': [
                 '.hidden.txt',
             ],
-            'included_suffixes': [
+            'included_file_names': [
             ],
         }
 
@@ -305,7 +324,7 @@ class TestMonster(TestCommon):
             'excluded_file_names': [
                 '.hidden.txt',
             ],
-            'included_suffixes': [
+            'included_file_names': [
                 '*.txt',
             ],
         }
@@ -328,7 +347,7 @@ class TestMonster(TestCommon):
             'excluded_file_names': [
                 'dir.ext',
             ],
-            'included_suffixes': [
+            'included_file_names': [
             ],
         }
 
@@ -348,7 +367,7 @@ class TestMonster(TestCommon):
             'excluded_file_names': [
                 'norm*.*',
             ],
-            'included_suffixes': [
+            'included_file_names': [
             ],
         }
 
@@ -369,7 +388,7 @@ class TestMonster(TestCommon):
             'excluded_file_names': [
                 '.hid*.txt',
             ],
-            'included_suffixes': [
+            'included_file_names': [
             ],
         }
 
@@ -390,7 +409,7 @@ class TestMonster(TestCommon):
             'excluded_file_names': [
                 '*.ext/.hid*.txt',
             ],
-            'included_suffixes': [
+            'included_file_names': [
             ],
         }
 
@@ -411,7 +430,7 @@ class TestMonster(TestCommon):
             'excluded_file_names': [
                 'dir.ext',
             ],
-            'included_suffixes': [
+            'included_file_names': [
             ],
         }
 
