@@ -14,7 +14,7 @@ import pytest
 import time
 
 from .common import TestCommon
-from stempelwerk.DirWalk.DirWalk import dirwalk
+from dirwalk.DirWalk import dirwalk
 
 
 FIXTURE_DIR = pathlib.Path('tests') / 'monster'

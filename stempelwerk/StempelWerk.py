@@ -52,7 +52,7 @@ import pathlib
 import sys
 
 import jinja2
-from .DirWalk.DirWalk import dirwalk
+from .dirwalk.dirwalk.DirWalk import dirwalk
 
 
 class StempelWerk:

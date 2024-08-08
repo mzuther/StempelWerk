@@ -1,14 +1,13 @@
 [tool.poetry]
-name = "StempelWerk"
-version = "1.0.3"
-description = "Automatic code generation from Jinja2 templates"
+name = "DirWalk"
+version = "1.0.0"
+description = "Crawl directories with style"
 authors = ["Martin Zuther <code@mzuther.de>"]
 license = "BSD-3-Clause"
 readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.10"
-Jinja2 = "^3.1.4"
 
 [tool.poetry.group.dev]
 optional = true

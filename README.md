@@ -47,7 +47,7 @@ spent: after nine months, I had saved over 100 hours of working time!
 
 ## Installation
 
-_StempelWerk was developed using Python v3.10, so an older version might not
+_StempelWerk was developed using Python v3.10+, so an older version might not
 work. The shell scripts that come with StempelWerk assume that you use a virtual
 environment and install [poetry](https://python-poetry.org/docs/#installation)
 into its default path._
