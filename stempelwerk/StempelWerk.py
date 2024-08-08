@@ -52,7 +52,7 @@ import pathlib
 import sys
 
 import jinja2
-from .dirwalk.dirwalk.DirWalk import dirwalk
+from .herkules.herkules.Herkules import herkules
 
 
 class StempelWerk:
@@ -780,7 +780,7 @@ class StempelWerk:
 
 
     def _find_templates(self, process_only_modified):
-        dirwalk_selector = {
+        herkules_selector = {
             # do not render stencils
             'excluded_directory_names': [
                 self.settings.stencil_dir_name
@@ -795,9 +795,9 @@ class StempelWerk:
             modified_since = self._get_last_run()
 
         # find matching files in template directory
-        template_filenames = dirwalk(self.settings.template_dir,
-                                     selector=dirwalk_selector,
-                                     modified_since=modified_since)
+        template_filenames = herkules(self.settings.template_dir,
+                                      selector=herkules_selector,
+                                      modified_since=modified_since)
 
         return template_filenames
 

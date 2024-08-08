@@ -1,4 +1,4 @@
-# DirWalk
+# Herkules
 
 _Crawl directories with style_
 
@@ -18,16 +18,17 @@ _Crawl directories with style_
 
 ## Introduction
 
-DirWalk provides a recursive, filtered and sorted list of the contents of a
-given root directory. I find it easier to use than Python's `os.scandir`, but
-your mileage may differ.
+Herkules is named after the beautiful large Hercules beetle (Dynastes hercules).
+It provides a recursive, filtered and sorted list of the contents of a given
+root directory. I find it easier to use than Python's `os.scandir`, but your
+mileage may differ.
 
 ## Installation
 
-_DirWalk was developed using Python v3.10+, so an older version might not
+_Herkules was developed using Python v3.10+, so an older version might not
 work._
 
-Unless you want to test DirWalk, simply store it somewhere and import it. For
+Unless you want to test Herkules, simply store it somewhere and import it. For
 testing, you must install it into a virtual environment. The easiest way is to
 run
 
@@ -54,7 +55,7 @@ filing bug reports or contributing to this project. Thanks!
 
 ## License
 
-Copyright (c) 2020-2024 [Martin Zuther](https://www.mzuther.de/)
+Copyright (c) 2022-2024 [Martin Zuther](https://www.mzuther.de/)
 
 This program is free software and licensed under the terms of the [BSD 3-Clause
 License](./LICENSE.md).

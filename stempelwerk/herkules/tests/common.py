@@ -16,8 +16,8 @@ class TestCommon:
             raise pytest.fail(f'raised unwanted exception {exception}')
 
 
-    def assert_dirwalk(self, root_path, expected_files, actual_paths,
-                       ignore_order=False):
+    def assert_herkules(self, root_path, expected_files, actual_paths,
+                        ignore_order=False):
         actual_files = []
         for file_path in actual_paths:
             assert isinstance(file_path, pathlib.Path)

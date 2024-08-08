@@ -14,7 +14,7 @@ import pytest
 import time
 
 from .common import TestCommon
-from dirwalk.DirWalk import dirwalk
+from herkules.Herkules import herkules
 
 
 FIXTURE_DIR = pathlib.Path('tests') / 'monster'
@@ -55,7 +55,7 @@ for entry in TEST_FILES:
 
 
 def set_mtime_to_current_time(dir_path):
-    for path_in_directory in dirwalk(dir_path, include_directories=True):
+    for path_in_directory in herkules(dir_path, include_directories=True):
         os.utime(path_in_directory, times=None)
 
 
@@ -63,39 +63,39 @@ class TestMonster(TestCommon):
 
     @pytest.mark.datafiles(FIXTURE_DIR)
     def test_default_options(self, datafiles):
-        actual_paths = dirwalk(
+        actual_paths = herkules(
             datafiles)
 
         expected_files = TEST_FILES
-        self.assert_dirwalk(datafiles, expected_files, actual_paths)
+        self.assert_herkules(datafiles, expected_files, actual_paths)
 
 
     @pytest.mark.datafiles(FIXTURE_DIR)
     def test_directories_in_between(self, datafiles):
-        actual_paths = dirwalk(
+        actual_paths = herkules(
             datafiles,
             directories_first=False)
 
         expected_files = TEST_FILES[-4:]
         expected_files.extend(TEST_FILES[:-4])
 
-        self.assert_dirwalk(datafiles, expected_files, actual_paths)
+        self.assert_herkules(datafiles, expected_files, actual_paths)
 
 
     @pytest.mark.datafiles(FIXTURE_DIR)
     def test_directories_included(self, datafiles):
-        actual_paths = dirwalk(
+        actual_paths = herkules(
             datafiles,
             include_directories=True,
             directories_first=True)
 
         expected_files = TEST_FILES_AND_DIRS
-        self.assert_dirwalk(datafiles, expected_files, actual_paths)
+        self.assert_herkules(datafiles, expected_files, actual_paths)
 
 
     @pytest.mark.datafiles(FIXTURE_DIR)
     def test_directories_included_in_between(self, datafiles):
-        actual_paths = dirwalk(
+        actual_paths = herkules(
             datafiles,
             include_directories=True,
             directories_first=False)
@@ -103,7 +103,7 @@ class TestMonster(TestCommon):
         expected_files = TEST_FILES_AND_DIRS[-4:]
         expected_files.extend(TEST_FILES_AND_DIRS[:-4])
 
-        self.assert_dirwalk(datafiles, expected_files, actual_paths)
+        self.assert_herkules(datafiles, expected_files, actual_paths)
 
 
     @pytest.mark.datafiles(FIXTURE_DIR)
@@ -117,12 +117,12 @@ class TestMonster(TestCommon):
             ],
         }
 
-        actual_paths = dirwalk(
+        actual_paths = herkules(
             datafiles,
             selector=SELECTOR)
 
         expected_files = TEST_FILES
-        self.assert_dirwalk(datafiles, expected_files, actual_paths)
+        self.assert_herkules(datafiles, expected_files, actual_paths)
 
 
     @pytest.mark.datafiles(FIXTURE_DIR)
@@ -137,12 +137,12 @@ class TestMonster(TestCommon):
             ],
         }
 
-        actual_paths = dirwalk(
+        actual_paths = herkules(
             datafiles,
             selector=SELECTOR)
 
         expected_files = TEST_FILES
-        self.assert_dirwalk(datafiles, expected_files, actual_paths)
+        self.assert_herkules(datafiles, expected_files, actual_paths)
 
 
     @pytest.mark.datafiles(FIXTURE_DIR)
@@ -154,12 +154,12 @@ class TestMonster(TestCommon):
             ],
         }
 
-        actual_paths = dirwalk(
+        actual_paths = herkules(
             datafiles,
             selector=SELECTOR)
 
         expected_files = TEST_FILES
-        self.assert_dirwalk(datafiles, expected_files, actual_paths)
+        self.assert_herkules(datafiles, expected_files, actual_paths)
 
 
     @pytest.mark.datafiles(FIXTURE_DIR)
@@ -170,13 +170,13 @@ class TestMonster(TestCommon):
             ],
         }
 
-        actual_paths = dirwalk(
+        actual_paths = herkules(
             datafiles,
             selector=SELECTOR)
 
         expected_files = [f for f in TEST_FILES
                           if f.endswith('.txt')]
-        self.assert_dirwalk(datafiles, expected_files, actual_paths)
+        self.assert_herkules(datafiles, expected_files, actual_paths)
 
 
     @pytest.mark.datafiles(FIXTURE_DIR)
@@ -188,14 +188,14 @@ class TestMonster(TestCommon):
             ],
         }
 
-        actual_paths = dirwalk(
+        actual_paths = herkules(
             datafiles,
             selector=SELECTOR)
 
         expected_files = [f for f in TEST_FILES
                           if f.endswith('.txt')
                           or f.endswith('.longext')]
-        self.assert_dirwalk(datafiles, expected_files, actual_paths)
+        self.assert_herkules(datafiles, expected_files, actual_paths)
 
 
     @pytest.mark.datafiles(FIXTURE_DIR)
@@ -208,14 +208,14 @@ class TestMonster(TestCommon):
             ],
         }
 
-        actual_paths = dirwalk(
+        actual_paths = herkules(
             datafiles,
             selector=SELECTOR)
 
         expected_files = [f for f in TEST_FILES
                           if f.endswith('.txt')
                           or f.endswith('.longext')]
-        self.assert_dirwalk(datafiles, expected_files, actual_paths)
+        self.assert_herkules(datafiles, expected_files, actual_paths)
 
 
     @pytest.mark.datafiles(FIXTURE_DIR)
@@ -226,12 +226,12 @@ class TestMonster(TestCommon):
             ],
         }
 
-        actual_paths = dirwalk(
+        actual_paths = herkules(
             datafiles,
             selector=SELECTOR)
 
         expected_files = []
-        self.assert_dirwalk(datafiles, expected_files, actual_paths)
+        self.assert_herkules(datafiles, expected_files, actual_paths)
 
 
     @pytest.mark.datafiles(FIXTURE_DIR)
@@ -244,13 +244,13 @@ class TestMonster(TestCommon):
             ],
         }
 
-        actual_paths = dirwalk(
+        actual_paths = herkules(
             datafiles,
             selector=SELECTOR)
 
         expected_files = [f for f in TEST_FILES
                           if f.endswith('normal.txt')]
-        self.assert_dirwalk(datafiles, expected_files, actual_paths)
+        self.assert_herkules(datafiles, expected_files, actual_paths)
 
 
     @pytest.mark.datafiles(FIXTURE_DIR)
@@ -265,13 +265,13 @@ class TestMonster(TestCommon):
             ],
         }
 
-        actual_paths = dirwalk(
+        actual_paths = herkules(
             datafiles,
             selector=SELECTOR)
 
         expected_files = [f for f in TEST_FILES
                           if not f.endswith('normal.txt')]
-        self.assert_dirwalk(datafiles, expected_files, actual_paths)
+        self.assert_herkules(datafiles, expected_files, actual_paths)
 
 
     @pytest.mark.datafiles(FIXTURE_DIR)
@@ -286,13 +286,13 @@ class TestMonster(TestCommon):
             ],
         }
 
-        actual_paths = dirwalk(
+        actual_paths = herkules(
             datafiles,
             selector=SELECTOR)
 
         expected_files = [f for f in TEST_FILES
                           if not f.endswith('.hidden')]
-        self.assert_dirwalk(datafiles, expected_files, actual_paths)
+        self.assert_herkules(datafiles, expected_files, actual_paths)
 
 
     @pytest.mark.datafiles(FIXTURE_DIR)
@@ -307,13 +307,13 @@ class TestMonster(TestCommon):
             ],
         }
 
-        actual_paths = dirwalk(
+        actual_paths = herkules(
             datafiles,
             selector=SELECTOR)
 
         expected_files = [f for f in TEST_FILES
                           if not f.endswith('.hidden.txt')]
-        self.assert_dirwalk(datafiles, expected_files, actual_paths)
+        self.assert_herkules(datafiles, expected_files, actual_paths)
 
 
     @pytest.mark.datafiles(FIXTURE_DIR)
@@ -329,14 +329,14 @@ class TestMonster(TestCommon):
             ],
         }
 
-        actual_paths = dirwalk(
+        actual_paths = herkules(
             datafiles,
             selector=SELECTOR)
 
         expected_files = [f for f in TEST_FILES
                           if f.endswith('.txt')
                           and not f.endswith('.hidden.txt')]
-        self.assert_dirwalk(datafiles, expected_files, actual_paths)
+        self.assert_herkules(datafiles, expected_files, actual_paths)
 
 
     @pytest.mark.datafiles(FIXTURE_DIR)
@@ -351,12 +351,12 @@ class TestMonster(TestCommon):
             ],
         }
 
-        actual_paths = dirwalk(
+        actual_paths = herkules(
             datafiles,
             selector=SELECTOR)
 
         expected_files = TEST_FILES
-        self.assert_dirwalk(datafiles, expected_files, actual_paths)
+        self.assert_herkules(datafiles, expected_files, actual_paths)
 
 
     @pytest.mark.datafiles(FIXTURE_DIR)
@@ -371,13 +371,13 @@ class TestMonster(TestCommon):
             ],
         }
 
-        actual_paths = dirwalk(
+        actual_paths = herkules(
             datafiles,
             selector=SELECTOR)
 
         expected_files = [f for f in TEST_FILES
                           if not f.endswith('normal.txt')]
-        self.assert_dirwalk(datafiles, expected_files, actual_paths)
+        self.assert_herkules(datafiles, expected_files, actual_paths)
 
 
     @pytest.mark.datafiles(FIXTURE_DIR)
@@ -392,13 +392,13 @@ class TestMonster(TestCommon):
             ],
         }
 
-        actual_paths = dirwalk(
+        actual_paths = herkules(
             datafiles,
             selector=SELECTOR)
 
         expected_files = [f for f in TEST_FILES
                           if not f.endswith('.hidden.txt')]
-        self.assert_dirwalk(datafiles, expected_files, actual_paths)
+        self.assert_herkules(datafiles, expected_files, actual_paths)
 
 
     @pytest.mark.datafiles(FIXTURE_DIR)
@@ -413,13 +413,13 @@ class TestMonster(TestCommon):
             ],
         }
 
-        actual_paths = dirwalk(
+        actual_paths = herkules(
             datafiles,
             selector=SELECTOR)
 
         expected_files = [f for f in TEST_FILES
                           if not f.endswith('dir.ext/.hidden.txt')]
-        self.assert_dirwalk(datafiles, expected_files, actual_paths)
+        self.assert_herkules(datafiles, expected_files, actual_paths)
 
 
     @pytest.mark.datafiles(FIXTURE_DIR)
@@ -434,12 +434,12 @@ class TestMonster(TestCommon):
             ],
         }
 
-        actual_paths = dirwalk(
+        actual_paths = herkules(
             datafiles,
             selector=SELECTOR)
 
         expected_files = TEST_FILES
-        self.assert_dirwalk(datafiles, expected_files, actual_paths)
+        self.assert_herkules(datafiles, expected_files, actual_paths)
 
 
     @pytest.mark.datafiles(FIXTURE_DIR)
@@ -447,13 +447,13 @@ class TestMonster(TestCommon):
         modified_since = datetime.datetime.now()
         set_mtime_to_current_time(datafiles)
 
-        actual_paths = dirwalk(
+        actual_paths = herkules(
             datafiles,
             include_directories=True,
             modified_since=modified_since.timestamp())
 
         expected_files = TEST_FILES_AND_DIRS
-        self.assert_dirwalk(datafiles, expected_files, actual_paths)
+        self.assert_herkules(datafiles, expected_files, actual_paths)
 
 
     @pytest.mark.datafiles(FIXTURE_DIR)
@@ -461,7 +461,7 @@ class TestMonster(TestCommon):
         modified_since = datetime.datetime.now()
         set_mtime_to_current_time(datafiles)
 
-        actual_paths = dirwalk(
+        actual_paths = herkules(
             datafiles,
             directories_first=False,
             include_directories=True,
@@ -470,7 +470,7 @@ class TestMonster(TestCommon):
         expected_files = TEST_FILES_AND_DIRS[-4:]
         expected_files.extend(TEST_FILES_AND_DIRS[:-4])
 
-        self.assert_dirwalk(datafiles, expected_files, actual_paths)
+        self.assert_herkules(datafiles, expected_files, actual_paths)
 
 
     @pytest.mark.datafiles(FIXTURE_DIR)
@@ -478,13 +478,13 @@ class TestMonster(TestCommon):
         # wait for fixture data to settle down
         modified_since = datetime.datetime.now() + datetime.timedelta(seconds=1)
 
-        actual_paths = dirwalk(
+        actual_paths = herkules(
             datafiles,
             include_directories=True,
             modified_since=modified_since)
 
         expected_files = []
-        self.assert_dirwalk(datafiles, expected_files, actual_paths)
+        self.assert_herkules(datafiles, expected_files, actual_paths)
 
 
     @pytest.mark.slow
@@ -500,7 +500,7 @@ class TestMonster(TestCommon):
         new_file = new_dir.joinpath('new.file.txt')
         new_file.write_text('NEW')
 
-        actual_paths = dirwalk(
+        actual_paths = herkules(
             datafiles,
             include_directories=True,
             modified_since=modified_since)
@@ -509,4 +509,4 @@ class TestMonster(TestCommon):
             'new.dir',
             'new.dir/new.file.txt',
         ]
-        self.assert_dirwalk(datafiles, expected_files, actual_paths)
+        self.assert_herkules(datafiles, expected_files, actual_paths)

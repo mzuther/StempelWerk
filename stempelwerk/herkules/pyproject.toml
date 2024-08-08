@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "DirWalk"
+name = "Herkules"
 version = "1.0.0"
 description = "Crawl directories with style"
 authors = ["Martin Zuther <code@mzuther.de>"]

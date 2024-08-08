@@ -23,5 +23,5 @@ happens._
 <!--- ---------------------------------------------------------------------- -->
 
 [keepachangelog.com]: http://keepachangelog.com/
-[unreleased]: https://github.com/mzuther/DirWalk/tree/develop
-[1.0.0]: https://github.com/mzuther/DirWalk/commits/v1.0.0
+[unreleased]: https://github.com/mzuther/Herkules/tree/develop
+[1.0.0]: https://github.com/mzuther/Herkules/commits/v1.0.0
