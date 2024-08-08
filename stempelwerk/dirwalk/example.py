@@ -43,6 +43,7 @@ MODIFIED_SINCE = datetime.datetime(2024, 8, 1, 8, 30, 0)
 
 
 # %% Crawl directory & display results
+# "dirwalk()" returns a list of "pathlib.Path" objects
 contents = dirwalk(
     ROOT_DIRECTORY, DIRECTORIES_FIRST, INCLUDE_DIRECTORIES,
     FOLLOW_SYMLINKS, SELECTOR, MODIFIED_SINCE)
