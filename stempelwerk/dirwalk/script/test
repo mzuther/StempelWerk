@@ -3,6 +3,9 @@
 echo
 
 # run quick tests first
+echo "[QUICK TESTS]"
+echo
+
 "./script/_poetry" run python -m pytest --ignore="./.git" -m "not slow" "$@"
 EXIT_CODE=$?
 
@@ -14,6 +17,9 @@ fi
 echo
 
 # run slow tests only when all other tests have passed
+echo "[SLOW TESTS]"
+echo
+
 "./script/_poetry" run python -m pytest --ignore="./.git" -m "slow" "$@"
 EXIT_CODE=$?
 
