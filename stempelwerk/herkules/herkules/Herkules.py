@@ -196,7 +196,7 @@ def herkules_process(root_directory,
 if __name__ == '__main__':
     if len(sys.argv) < 2:
         print()
-        print('MONSTER:   ME WANT EAT DIRECTORIES.  PLEASE SHOW PLACE.  '
+        print('HERKULES:  ME WANT EAT DIRECTORIES.  PLEASE SHOW PLACE.  '
               'THEN ME START EAT.')
         print()
         print('engineer:  please provide the root directory as first '

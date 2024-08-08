@@ -17,7 +17,7 @@ from .common import TestCommon
 from herkules.Herkules import herkules
 
 
-FIXTURE_DIR = pathlib.Path('tests') / 'monster'
+FIXTURE_DIR = pathlib.Path('tests') / 'beetle'
 
 TEST_FILES = [
     '.hiddendir/.hidden',
@@ -59,7 +59,7 @@ def set_mtime_to_current_time(dir_path):
         os.utime(path_in_directory, times=None)
 
 
-class TestMonster(TestCommon):
+class TestBeetle(TestCommon):
 
     @pytest.mark.datafiles(FIXTURE_DIR)
     def test_default_options(self, datafiles):
