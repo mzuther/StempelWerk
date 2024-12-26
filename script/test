@@ -10,8 +10,8 @@ echo
 EXIT_CODE=$?
 
 if [ $EXIT_CODE -ne 0 ]; then
-   echo
-   exit $EXIT_CODE
+	echo
+	exit $EXIT_CODE
 fi
 
 echo
@@ -23,14 +23,20 @@ echo
 "./script/_poetry" run python -m pytest --ignore="./.git" -m "slow" "$@"
 EXIT_CODE=$?
 
+if [ $EXIT_CODE -eq 5 ]; then
+	echo
+	echo "No tests selected."
+	EXIT_CODE=0
+fi
+
 if [ $EXIT_CODE -ne 0 ]; then
-   echo
-   exit $EXIT_CODE
+	echo
+	exit $EXIT_CODE
 fi
 
 ./script/lint
 EXIT_CODE=$?
 
 if [ $EXIT_CODE -ne 0 ]; then
-   exit $EXIT_CODE
+	exit $EXIT_CODE
 fi
