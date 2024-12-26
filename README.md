@@ -92,7 +92,7 @@ Run the following lines to upgrade `pip` and install the dependencies:
 python3 -m pip install --user --upgrade pip
 
 # older versions should work, but will contain security vulnerabilities
-python3 -m pip install --user --upgrade "Jinja2>=3.1.4"
+python3 -m pip install --user --upgrade "Jinja2>=3.1.5"
 ```
 
 For development dependencies, please see [pyproject.toml](./pyproject.toml).
