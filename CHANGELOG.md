@@ -16,6 +16,22 @@ happens._
 
 <!--- ---------------------------------------------------------------------- -->
 
+## [1.0.4] - 2024-12-26
+
+### Security
+- update Jinja2 dependency to fix security vulnerability
+
+### Changed
+- include files by matching glob, not only suffix
+- factor out `DirWalk` into separate module and rename to `Hercules`
+- add library to check licenses of dependencies
+
+### Fixed
+- fix: pass test script when no slow tests found
+- fix: license is not recognized in poetry
+
+<!--- ---------------------------------------------------------------------- -->
+
 ## [1.0.3] - 2024-07-17
 
 ### Security

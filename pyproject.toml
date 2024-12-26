@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "StempelWerk"
-version = "1.0.3"
+version = "1.0.4"
 description = "Automatic code generation from Jinja2 templates"
 authors = ["Martin Zuther <code@mzuther.de>"]
 license = "BSD-3-Clause"
