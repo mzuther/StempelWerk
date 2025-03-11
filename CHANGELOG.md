@@ -16,6 +16,19 @@ happens._
 
 <!--- ---------------------------------------------------------------------- -->
 
+## [1.0.5] - 2025-03-11
+
+### Security
+- update Jinja2 dependency to fix security vulnerability
+
+### Changed
+- update copyrights
+
+### Fixed
+- fix: linter errors
+
+<!--- ---------------------------------------------------------------------- -->
+
 ## [1.0.4] - 2024-12-26
 
 ### Security
