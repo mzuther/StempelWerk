@@ -487,7 +487,7 @@ class TestBeetle(TestCommon):
         self.assert_herkules(datafiles, expected_files, actual_paths)
 
 
-    @pytest.mark.slow
+    @pytest.mark.slow()
     @pytest.mark.datafiles(FIXTURE_DIR)
     def test_modified_3(self, datafiles):
         # wait for fixture data to settle down

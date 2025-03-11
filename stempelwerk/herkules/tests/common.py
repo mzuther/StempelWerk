@@ -47,4 +47,4 @@ class TestCommon:
             sys.stdout.writelines(diff_result)
             print()
 
-            assert False, 'Found differing files.'
+            pytest.fail('Found differing files.')
