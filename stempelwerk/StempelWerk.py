@@ -58,7 +58,7 @@ from .herkules.herkules.Herkules import herkules
 class StempelWerk:
 
     APPLICATION = 'StempelWerk'
-    VERSION = '1.0.5'
+    VERSION = '1.0.6'
     AUTHOR = 'Martin Zuther'
     DESCRIPTION = 'Automatic code generation from Jinja2 templates.'
     LICENSE = 'BSD 3-Clause License'
