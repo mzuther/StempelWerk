@@ -1,4 +1,7 @@
 Write-Output ""
 
-. "$env:APPDATA\Python\Scripts\poetry.exe" update
+# upgrade poetry
+pipx install poetry
+
+poetry update
 Write-Output ""

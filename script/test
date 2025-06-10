@@ -6,7 +6,7 @@ echo
 echo "[QUICK TESTS]"
 echo
 
-"./script/_poetry" run python -m pytest --ignore="./.git" -m "not slow" "$@"
+poetry run python -m pytest --ignore="./.git" -m "not slow" "$@"
 EXIT_CODE=$?
 
 if [ $EXIT_CODE -ne 0 ]; then
@@ -20,7 +20,7 @@ echo
 echo "[SLOW TESTS]"
 echo
 
-"./script/_poetry" run python -m pytest --ignore="./.git" -m "slow" "$@"
+poetry run python -m pytest --ignore="./.git" -m "slow" "$@"
 EXIT_CODE=$?
 
 if [ $EXIT_CODE -eq 5 ]; then

@@ -1,9 +1,9 @@
 Write-Output ""
-. "$env:APPDATA\Python\Scripts\poetry.exe" show
+poetry show
 
 Write-Output ""
 Write-Output "------------------------------------------------------------------------"
 Write-Output ""
 
-. "$env:APPDATA\Python\Scripts\poetry.exe" show --only dev
+poetry show --only dev
 Write-Output ""

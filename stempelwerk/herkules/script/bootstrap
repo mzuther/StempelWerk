@@ -2,15 +2,16 @@
 
 echo
 
-# install poetry
-curl -sSL https://install.python-poetry.org | python3 -
+# install and upgrade poetry
+pipx install poetry
+pipx upgrade poetry
 
 echo
 echo "------------------------------------------------------------------------"
 echo
 
 # create virtual environment
-"./script/_poetry" env use python3
+poetry env use python3
 EXIT_CODE=$?
 
 if [ $EXIT_CODE -ne 0 ]; then
@@ -18,7 +19,7 @@ if [ $EXIT_CODE -ne 0 ]; then
    exit $EXIT_CODE
 fi
 
-"./script/_poetry" env info
+poetry env info
 EXIT_CODE=$?
 
 if [ $EXIT_CODE -ne 0 ]; then
@@ -32,7 +33,7 @@ echo "------------------------------------------------------------------------"
 echo
 
 # install dependencies
-"./script/_poetry" install --with dev --sync
+poetry sync --no-root --with dev
 EXIT_CODE=$?
 
 if [ $EXIT_CODE -ne 0 ]; then

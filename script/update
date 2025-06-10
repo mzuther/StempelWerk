@@ -2,7 +2,10 @@
 
 echo
 
-"./script/_poetry" update
+# upgrade poetry
+pipx install poetry
+
+poetry update
 EXIT_CODE=$?
 
 if [ $EXIT_CODE -ne 0 ]; then

@@ -36,6 +36,7 @@ Here are some more "selling points":
 - permissive licensing:
   - StempelWerk: [BSD 3-Clause License](./LICENSE.md)
   - Jinja2: [BSD 3-Clause License](https://jinja.palletsprojects.com/en/3.1.x/license/)
+  - pipx: [MIT License](https://github.com/pypa/pipx/blob/main/LICENSE)
   - Poetry: [MIT License](https://github.com/python-poetry/poetry/blob/master/LICENSE)
   - Python: [PSF licencse](https://docs.python.org/3/license.html)
 
@@ -43,14 +44,14 @@ Here are some more "selling points":
 
 I have used StempelWerk in a professional project to generate most code (SQL)
 and even part of the documentation (Markdown). I offset time gained against time
-spent: after nine months, I had saved over 100 hours of working time!
+spent: after nine months, I had saved 100+ hours of working time!
 
 ## Installation
 
-_StempelWerk was developed using Python v3.10+, so an older version might not
-work. The shell scripts that come with StempelWerk assume that you use a virtual
-environment and install [poetry](https://python-poetry.org/docs/#installation)
-into its default path._
+_StempelWerk is now developed using Python v3.12. Older versions of Python used
+to work and will probably still do, but you are on your own here. The shell
+scripts that come with StempelWerk assume that you use a virtual environment
+and the tool [poetry](https://python-poetry.org/docs/#installation)._
 
 It is recommended to install StempelWerk into a virtual environment. The easiest
 way is to run 
@@ -74,14 +75,14 @@ If you need more control over the installation, please read on.
 Install [poetry](https://python-poetry.org/docs/#installation) and run:
 
 ```bash
-poetry install --sync
+poetry sync --no-root
 ```
 
 This does **not** install the development dependencies. If you need these,
 please run:
 
 ```bash
-poetry install --with dev --sync
+poetry sync --no-root --with dev
 ```
 
 ### Manual installation

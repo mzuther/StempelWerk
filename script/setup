@@ -1,7 +1,7 @@
 #! /bin/bash
 
 echo
-"./script/_poetry" show
+poetry show
 EXIT_CODE=$?
 
 if [ $EXIT_CODE -ne 0 ]; then
@@ -13,7 +13,7 @@ echo
 echo "------------------------------------------------------------------------"
 echo
 
-"./script/_poetry" show --only dev
+poetry show --only dev
 EXIT_CODE=$?
 
 if [ $EXIT_CODE -ne 0 ]; then
