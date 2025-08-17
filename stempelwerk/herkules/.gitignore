@@ -1,7 +1,18 @@
+# environments
+.envrc
+.venv
+
+# Python
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# pytest
 .pytest_cache/
 
-.envrc
-VERSIONS
-
+# Stempelwerk
 *_Debug.txt
 .last_run
