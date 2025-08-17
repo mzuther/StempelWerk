@@ -21,19 +21,18 @@ _Automatic code generation from Jinja templates_
 StempelWerk has been created to prevent copy-and-paste errors and reduce tedious
 manual work. This can lead to a tremendous saving in development time and cost.
 
-Here are some more "selling points":
-
-- the template system is extremely lightweight and easy to understand
-- templates can be introduced gradually
-- StempelWerk may be removed at any time - simply delete the respective template
-  file and edit the code by hand
-- templates can undertake surprisingly complex tasks, and StempelWerk can be
-  extended using Python
-- the template language Jinja2 is very mature and its [Template Designer
-  Documentation](https://jinja.palletsprojects.com/en/3.1.x/templates/) of
-  excellent quality
-- all functionality is covered by unit tests
-- permissive licensing:
+- **Lean and easy to use**
+  - Template system is easy to understand and lightweight
+  - Templates can be introduced gradually
+  - Any file can be switched back to manual editing by deleting its template
+- **Mature and powerful**
+  - All functionality is covered by unit tests
+  - The template language Jinja2 is very mature, and has an excellent
+    [Template Designer
+    Documentation](https://jinja.palletsprojects.com/en/3.1.x/templates/)
+  - Templates can undertake surprisingly complex tasks, and StempelWerk can be
+    extended using Python
+- **Permissive licensing**
   - StempelWerk: [BSD 3-Clause License](./LICENSE.md)
   - Jinja2: [BSD 3-Clause License](https://jinja.palletsprojects.com/en/3.1.x/license/)
   - Python: [PSF licencse](https://docs.python.org/3/license.html)
@@ -42,8 +41,10 @@ Here are some more "selling points":
 ### Case study
 
 I have used StempelWerk in a professional project to generate most code (SQL)
-and even part of the documentation (Markdown). I offset time gained against time
-spent: after nine months, I had saved 100+ hours of working time!
+and part of the documentation (Markdown). StempelWerk even helped me during a
+migration by creating code for two different types of database. I logged and
+offset time gained against time spent: after nine months, I had saved 100+ hours
+of working time!
 
 ## Installation
 
