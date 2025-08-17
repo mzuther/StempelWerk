@@ -1,1 +1,1 @@
-uv run python -m stempelwerk.StempelWerk $args
+uv run python -m src.stempelwerk.StempelWerk $args

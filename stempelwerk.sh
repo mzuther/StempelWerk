@@ -1,2 +1,2 @@
 #! /usr/bin/bash
-uv run python -m stempelwerk.StempelWerk "$@"
+uv run python -m src.stempelwerk.StempelWerk "$@"

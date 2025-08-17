@@ -1,4 +1,4 @@
-from stempelwerk.StempelWerk import StempelWerk
+from src.stempelwerk.StempelWerk import StempelWerk
 
 
 class CustomCode(StempelWerk.CustomCodeTemplate):
@@ -22,22 +22,15 @@ class CustomCode(StempelWerk.CustomCodeTemplate):
             jinja_environment)
 
 
-        def uppercase_first(string):
-            return string[0].upper() + string[1:].lower()
+        def is_spanish(string):
+            return 'este es' in string
 
 
-        def add_exclamation_mark(string, is_spanish=False):
-            if is_spanish:
-                string = '¡' + string
-            return string + '!'
+        old_tests = set(jinja_environment.tests)
 
+        jinja_environment.tests["spanish"] = is_spanish
 
-        old_filters = set(jinja_environment.filters)
-
-        jinja_environment.filters["upper_first"] = uppercase_first
-        jinja_environment.filters["add_exclamation_mark"] = add_exclamation_mark
-
-        new_filters = set(jinja_environment.filters)
-        self._display_environment_change(new_filters, old_filters, 'filters')
+        new_tests = set(jinja_environment.tests)
+        self._display_environment_change(new_tests, old_tests, 'tests')
 
         return jinja_environment

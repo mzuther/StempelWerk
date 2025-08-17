@@ -100,13 +100,13 @@ For development dependencies, please see [pyproject.toml](./pyproject.toml).
 Generate your code from templates by running the following command:
 
 ```bash
-python3 -m stempelwerk.StempelWerk [ARGUMENTS] CONFIG_FILE_PATH
+python3 -m src.stempelwerk.StempelWerk [ARGUMENTS] CONFIG_FILE_PATH
 ```
 
 For help, simply call:
 
 ```bash
-python3 -m stempelwerk.StempelWerk --help
+python3 -m src.stempelwerk.StempelWerk --help
 ```
 
 ### Command line argument `--globals`
@@ -239,7 +239,8 @@ List containing Jinja extensions that will be loaded into the Jinja environment.
 **Default value: []**
 
 List of Python modules, each containing a `CustomCode` class that inherits
-`StempelWerk.CustomCodeTemplate`.
+`StempelWerk.CustomCodeTemplate`. See directory `tests/tintin/custom` for
+examples.
 
 After creating the Jinja environment and loading Jinja extensions, each module
 will be imported, an instance of `CustomCode` created and its method
