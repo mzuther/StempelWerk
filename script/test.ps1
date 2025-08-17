@@ -3,7 +3,7 @@ Write-Output "[QUICK TESTS]"
 Write-Output ""
 
 # run quick tests first
-poetry run python -m pytest --ignore=".\.git" -m "not slow" $args
+uv run pytest --ignore=".\.git" -m "not slow" $args
 
 If (-Not $?)
 {
@@ -15,7 +15,7 @@ Write-Output "[SLOW TESTS]"
 Write-Output ""
 
 # run slow tests only when all other tests have passed
-poetry run python -m pytest --ignore=".\.git" -m "slow" $args
+uv run pytest --ignore=".\.git" -m "slow" $args
 
 If (-Not $?)
 {

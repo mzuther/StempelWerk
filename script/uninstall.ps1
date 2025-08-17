@@ -1,6 +1,0 @@
-Write-Output ""
-
-# remove virtual environment
-# (https://github.com/orgs/python-poetry/discussions/3690#discussioncomment-5293709)
-poetry env remove python3
-Write-Output ""

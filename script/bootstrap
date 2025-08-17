@@ -2,38 +2,8 @@
 
 echo
 
-# install and upgrade poetry
-pipx install poetry
-pipx upgrade poetry
-
-echo
-echo "------------------------------------------------------------------------"
-echo
-
-# create virtual environment
-poetry env use python3
-EXIT_CODE=$?
-
-if [ $EXIT_CODE -ne 0 ]; then
-   echo
-   exit $EXIT_CODE
-fi
-
-poetry env info
-EXIT_CODE=$?
-
-if [ $EXIT_CODE -ne 0 ]; then
-   echo
-   exit $EXIT_CODE
-fi
-
-
-echo
-echo "------------------------------------------------------------------------"
-echo
-
-# install dependencies
-poetry sync --no-root --with dev
+# create virtual environment and install dependencies
+uv sync --no-managed-python
 EXIT_CODE=$?
 
 if [ $EXIT_CODE -ne 0 ]; then

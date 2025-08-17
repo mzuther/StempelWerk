@@ -1,2 +1,2 @@
 #! /usr/bin/bash
-poetry run python -m stempelwerk.StempelWerk "$@"
+uv run python -m stempelwerk.StempelWerk "$@"

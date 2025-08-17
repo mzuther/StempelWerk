@@ -1,26 +1,27 @@
-[tool.poetry]
+[project]
 name = "StempelWerk"
 version = "1.0.6"
 description = "Automatic code generation from Jinja2 templates"
-authors = ["Martin Zuther <code@mzuther.de>"]
-license = "BSD-3-Clause"
+authors = [{ name = "Martin Zuther", email = "code@mzuther.de" }]
+requires-python = ">=3.10,<4.0"
 readme = "README.md"
+license = "BSD-3-Clause"
+dependencies = ["Jinja2>=3.1.6,<4"]
 
-[tool.poetry.dependencies]
-python = "^3.10"
-Jinja2 = "^3.1.6"
+[dependency-groups]
+dev = [
+    "flake8>=6.0.0,<7",
+    "flake8-cognitive-complexity>=0.1.0,<0.2",
+    "flake8-fixme>=1.1.1,<2",
+    "flake8-pytest-style>=1.7.2,<2",
+    "pip-licenses>=5.0.0,<6",
+    "pytest>=7.3.0,<8",
+    "pytest-datafiles>=3.0.0,<4",
+]
 
-[tool.poetry.group.dev]
-optional = true
-
-[tool.poetry.group.dev.dependencies]
-flake8 = "^6.0.0"
-flake8-cognitive-complexity = "^0.1.0"
-flake8-fixme = "^1.1.1"
-flake8-pytest-style = "^1.7.2"
-pip-licenses = "^5.0.0"
-pytest = "^7.3.0"
-pytest-datafiles = "^3.0.0"
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [tool.pytest.ini_options]
 minversion = "6.0"
@@ -31,7 +32,3 @@ markers = [
 testpaths = [
     "tests",
 ]
-
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"

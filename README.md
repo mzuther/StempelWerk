@@ -36,9 +36,8 @@ Here are some more "selling points":
 - permissive licensing:
   - StempelWerk: [BSD 3-Clause License](./LICENSE.md)
   - Jinja2: [BSD 3-Clause License](https://jinja.palletsprojects.com/en/3.1.x/license/)
-  - pipx: [MIT License](https://github.com/pypa/pipx/blob/main/LICENSE)
-  - Poetry: [MIT License](https://github.com/python-poetry/poetry/blob/master/LICENSE)
   - Python: [PSF licencse](https://docs.python.org/3/license.html)
+  - uv: [MIT License](https://github.com/astral-sh/uv/blob/main/LICENSE-MIT)
 
 ### Case study
 
@@ -50,11 +49,12 @@ spent: after nine months, I had saved 100+ hours of working time!
 
 _StempelWerk is now developed using Python v3.12. Older versions of Python used
 to work and will probably still do, but you are on your own here. The shell
-scripts that come with StempelWerk assume that you use a virtual environment
-and the tool [poetry](https://python-poetry.org/docs/#installation)._
+scripts that come with StempelWerk assume that you use the package manager
+[uv](https://docs.astral.sh/uv/)._
 
 It is recommended to install StempelWerk into a virtual environment. The easiest
-way is to run 
+way is to install [uv](https://docs.astral.sh/uv/getting-started/installation/),
+open the project directory and run:
 
 ```bash
 # bash
@@ -72,17 +72,13 @@ If you need more control over the installation, please read on.
 
 ### Virtual environment
 
-Install [poetry](https://python-poetry.org/docs/#installation) and run:
+Install [uv](https://docs.astral.sh/uv/getting-started/installation/), open the
+project directory and run:
 
 ```bash
-poetry sync --no-root
-```
-
-This does **not** install the development dependencies. If you need these,
-please run:
-
-```bash
-poetry sync --no-root --with dev
+# edit `.python-version` to match your installed Python version, or remove
+# `--no-managed-python` for uv to download and install Python
+uv sync --no-managed-python
 ```
 
 ### Manual installation

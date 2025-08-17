@@ -2,10 +2,7 @@
 
 echo
 
-# upgrade poetry
-pipx install poetry
-
-poetry update
+uv sync --upgrade
 EXIT_CODE=$?
 
 if [ $EXIT_CODE -ne 0 ]; then

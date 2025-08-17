@@ -1,7 +1,5 @@
 Write-Output ""
 
-# upgrade poetry
-pipx install poetry
+uv sync --upgrade
 
-poetry update
 Write-Output ""
