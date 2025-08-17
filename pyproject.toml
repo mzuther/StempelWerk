@@ -24,6 +24,11 @@ dev = [
 requires = ["uv_build>=0.8.11,<0.9.0"]
 build-backend = "uv_build"
 
+[tool.uv.build-backend]
+module-root = "src"
+module-name = ["stempelwerk", "herkules"]
+source-exclude = ["example_herkules.py"]
+
 [tool.pytest.ini_options]
 minversion = "6.0"
 markers = [

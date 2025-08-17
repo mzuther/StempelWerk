@@ -52,7 +52,7 @@ import pathlib
 import sys
 
 import jinja2
-from .herkules.herkules.Herkules import herkules
+from src.herkules.Herkules import herkules
 
 
 class StempelWerk:

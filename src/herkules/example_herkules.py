@@ -4,12 +4,12 @@
 import datetime
 import pathlib
 
-from herkules.Herkules import herkules
+from Herkules import herkules
 
 
 # %% Initialization
 # directory to be crawled (can also be a string)
-ROOT_DIRECTORY = pathlib.Path('.')
+ROOT_DIRECTORY = pathlib.Path('../../tests')
 
 # optional: return directories and their contents before regular files
 DIRECTORIES_FIRST = True

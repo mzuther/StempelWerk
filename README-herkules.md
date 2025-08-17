@@ -25,8 +25,8 @@ mileage may differ.
 
 ## Installation
 
-_Herkules was developed using Python v3.10+, so an older version might not
-work._
+_Herkules is now developed using Python v3.12. Older versions of Python used to
+work and will probably still do, but you are on your own here._
 
 Unless you want to test Herkules, simply store it somewhere and import it. For
 testing, you must install it into a virtual environment. The easiest way is to

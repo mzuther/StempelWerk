@@ -14,10 +14,10 @@ import pytest
 import time
 
 from .common import TestCommon
-from herkules.Herkules import herkules
+from src.herkules.Herkules import herkules
 
 
-FIXTURE_DIR = pathlib.Path('tests') / 'beetle'
+FIXTURE_DIR = pathlib.Path('tests') / 'herkules' / 'beetle'
 
 TEST_FILES = [
     '.hiddendir/.hidden',
