@@ -87,6 +87,15 @@ wheels = [
 ]
 
 [[package]]
+name = "herkules"
+version = "1.0.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/34/2a/cbdf9754cf79474b2b3de651be88c8cc6669435f7c68ce02a609ebf8d58f/herkules-1.0.0.tar.gz", hash = "sha256:979d0e6e5714a2d4ca27b47bc7d943a7b541b08160d3cb8c95c44dbd5035214e", size = 229574, upload-time = "2025-08-19T18:58:02.954Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/b1/d3/56e09421e0412a8a2ce3208ee80109cc4366089d6bd6e80a523a79ab2734/herkules-1.0.0-py3-none-any.whl", hash = "sha256:cd5755f2ea33f1f694b67712cec296a5e05314feff7685cfc7792a62d23e1096", size = 6047, upload-time = "2025-08-19T18:58:01.089Z" },
+]
+
+[[package]]
 name = "iniconfig"
 version = "2.1.0"
 source = { registry = "https://pypi.org/simple" }
@@ -275,9 +284,9 @@ wheels = [
 
 [[package]]
 name = "stempelwerk"
-version = "1.0.6"
 source = { editable = "." }
 dependencies = [
+    { name = "herkules" },
     { name = "jinja2" },
 ]
 
@@ -293,7 +302,10 @@ dev = [
 ]
 
 [package.metadata]
-requires-dist = [{ name = "jinja2", specifier = ">=3.1.6,<4" }]
+requires-dist = [
+    { name = "herkules", specifier = ">=1.0.0,<2" },
+    { name = "jinja2", specifier = ">=3.1.6,<4" },
+]
 
 [package.metadata.requires-dev]
 dev = [

@@ -55,6 +55,9 @@ import jinja2
 from src.herkules.Herkules import herkules
 
 
+__version__ = '1.0.6'
+
+
 class StempelWerk:
 
     APPLICATION = 'StempelWerk'
@@ -802,7 +805,7 @@ class StempelWerk:
         return template_filenames
 
 
-if __name__ == '__main__':
+def main_cli():
     command_line_arguments = sys.argv
     parsed_args = StempelWerk.CommandLineParser(command_line_arguments)
 
@@ -815,3 +818,7 @@ if __name__ == '__main__':
 
     sw.render_all_templates(parsed_args.process_only_modified,
                             custom_global_namespace)
+
+
+if __name__ == '__main__':
+    main_cli()

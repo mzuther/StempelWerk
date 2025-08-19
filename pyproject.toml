@@ -1,13 +1,38 @@
 [project]
 name = "StempelWerk"
-version = "1.0.6"
+dynamic = ["version"]
 description = "Automatic code generation from Jinja2 templates"
+keywords = ["template", "jinja", "code generation", "metaprogramming", "powerful", "lean"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: BSD License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Topic :: Software Development :: Code Generators",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Software Development :: Pre-processors",
+    "Topic :: Text Processing",
+    "Topic :: Utilities",
+]
 authors = [{ name = "Martin Zuther", email = "code@mzuther.de" }]
 requires-python = ">=3.10,<4.0"
 readme = "README.md"
 license = "BSD-3-Clause"
 license-files = ["LICENSE.md"]
-dependencies = ["Jinja2>=3.1.6,<4"]
+dependencies = [
+    "Jinja2>=3.1.6,<4",
+    "Herkules>=1.0.0,<2",
+]
+
+[project.scripts]
+stempelwerk= "stempelwerk.StempelWerk:main_cli"
+
+[project.urls]
+Homepage = "https://github.com/mzuther/StempelWerk"
+Repository = "https://github.com/mzuther/StempelWerk.git"
+Changelog = "https://github.com/mzuther/StempelWerk/blob/develop/CHANGELOG.md"
 
 [dependency-groups]
 dev = [
@@ -21,13 +46,11 @@ dev = [
 ]
 
 [build-system]
-requires = ["uv_build>=0.8.11,<0.9.0"]
-build-backend = "uv_build"
+requires = ["hatchling >= 1.27"]
+build-backend = "hatchling.build"
 
-[tool.uv.build-backend]
-module-root = "src"
-module-name = ["stempelwerk", "herkules"]
-source-exclude = ["example_herkules.py"]
+[tool.hatch.version]
+path = "src/stempelwerk/StempelWerk.py"
 
 [tool.pytest.ini_options]
 minversion = "6.0"
