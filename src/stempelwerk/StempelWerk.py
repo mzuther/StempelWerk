@@ -52,7 +52,7 @@ import pathlib
 import sys
 
 import jinja2
-from src.herkules.Herkules import herkules
+from herkules.Herkules import herkules
 
 
 __version__ = '1.0.6'
@@ -61,12 +61,11 @@ __version__ = '1.0.6'
 class StempelWerk:
 
     APPLICATION = 'StempelWerk'
-    VERSION = '1.0.6'
     AUTHOR = 'Martin Zuther'
     DESCRIPTION = 'Automatic code generation from Jinja2 templates.'
     LICENSE = 'BSD 3-Clause License'
 
-    APPLICATION_VERSION = f'{APPLICATION} v{VERSION}'
+    APPLICATION_VERSION = f'{APPLICATION} v{__version__}'
     COPYRIGHT = f'{APPLICATION_VERSION:20} (c) 2020-2025 {AUTHOR}'
 
     # a lower verbosity value means less output on the console

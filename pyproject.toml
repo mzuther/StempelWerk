@@ -23,7 +23,7 @@ license = "BSD-3-Clause"
 license-files = ["LICENSE.md"]
 dependencies = [
     "Jinja2>=3.1.6,<4",
-    "Herkules>=1.0.0,<2",
+    "herkules>=1.0.0,<2",
 ]
 
 [project.scripts]
