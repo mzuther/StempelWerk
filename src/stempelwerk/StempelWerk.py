@@ -48,6 +48,7 @@ import datetime
 import importlib
 import json
 import math
+import os.path
 import pathlib
 import sys
 
@@ -481,6 +482,20 @@ class StempelWerk:
         if not self.settings.custom_modules:
             return
 
+        self.printer.debug('Appending root directory to module search path:')
+        self.printer.debug(' ')
+
+        # NOTE: "abspath" normalizes the path (seems to be required
+        # NOTE  when loading modules), but may interfere with the
+        # NOTE  interpretation of symlinks
+        root_dir_module = os.path.abspath(self.settings.root_dir)
+
+        self.printer.debug(f'  {root_dir_module}')
+        self.printer.debug(' ')
+
+        # allow loading modules from shell client
+        sys.path.append(root_dir_module)
+
         self.printer.debug('Loading custom modules:')
         self.printer.debug(' ')
 
@@ -772,11 +787,11 @@ class StempelWerk:
 
         if self.verbosity < self.VERBOSITY_NORMAL:
             print()
-            print(f'{processed_templates } =>',
+            print(f'{processed_templates} =>',
                   f'{saved_files} in {processing_time}')
             print()
         else:
-            print(f'TOTAL: {processed_templates } templates =>',
+            print(f'TOTAL: {processed_templates} templates =>',
                   f'{saved_files} files in {processing_time}')
             print()
 
