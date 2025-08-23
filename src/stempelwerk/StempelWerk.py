@@ -466,6 +466,10 @@ class StempelWerk:
             loader=template_loader,
             **self.settings.jinja_options)
 
+        # load Jinja extensions first so they can be used in custom modules
+        self._load_jinja_extensions()
+        self._execute_custom_modules()
+
         template_paths = self._get_templates()
         self._check_templates(template_paths)
 
@@ -474,10 +478,6 @@ class StempelWerk:
 
         self.printer.debug('Done.')
         self.printer.debug()
-
-        # load Jinja extensions first so they can be used in custom modules
-        self._load_jinja_extensions()
-        self._execute_custom_modules()
 
 
     def _get_templates(self):
