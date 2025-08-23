@@ -333,6 +333,9 @@ class StempelWerk:
 
         def _load_json_file(self, json_file_path):
             try:
+                # "json_file_path" may be a string, so convert it to a path
+                json_file_path = pathlib.Path(json_file_path)
+
                 json_string = json_file_path.read_text()
                 parsed_json = json.loads(json_string)
 

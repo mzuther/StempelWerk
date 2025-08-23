@@ -19,26 +19,46 @@ class TestTinTin(TestCommon):
     # Tin Tin lead a double life: he was both developer and a chairman of the
     # UTP (Union of Technology Purloiners). After "obtaining" StempelWerk from a
     # project, he noticed with horror that he had stolen free software - a faux
-    # pas of the highest degree.
+    # pas of the highest degree for any thief, let alone a chairman.
     #
     # Not much has changed - Tin Tin still leads a double life. He is now both
     # prison inmate and UTP outcast. To reduce his sentence (150 years) by a few
     # days, he agreed to test the more intricate parts of StempelWerk.
     #
-    # As a thief who made the global news, he obviously starts by testing global
-    # variables.
+    # As thief who appeared in the global news, he obviously starts by testing
+    # global variables.
     @pytest.mark.datafiles(FIXTURE_DIR / '1_global_variables')
-    def test_global_variables(self, datafiles):
+    def test_global_variables_from_string(self, datafiles):
         custom_config = {
             'stencil_dir_name': 'stencils',
         }
 
-        global_namespace = '{"NO_cast": true}'
+        global_namespace_string = '{"NO_cast": true}'
 
         # set up StempelWerk and execute full run
         config_path = datafiles / 'settings.json'
         self.run_and_compare(custom_config, config_path,
-                             global_namespace=global_namespace)
+                             global_namespace=global_namespace_string)
+
+
+    # Being a... Wait. Having been a chairman, Tin Tin is used to others doing
+    # the dirty work. Pretending to still be in charge, he commands StempelWerk
+    # to load global data from a JSON file.
+    @pytest.mark.datafiles(FIXTURE_DIR / '1_global_variables')
+    def test_global_variables_from_file(self, datafiles):
+        custom_config = {
+            'stencil_dir_name': 'stencils',
+        }
+
+        global_namespace_file = datafiles / '20-data' / 'global.json'
+
+        # paths are passed to client application as string
+        global_namespace_file = str(global_namespace_file)
+
+        # set up StempelWerk and execute full run
+        config_path = datafiles / 'settings.json'
+        self.run_and_compare(custom_config, config_path,
+                             global_namespace=global_namespace_file)
 
 
     # After a year of intense testing, Tin Tin moved on to custom modules. He
