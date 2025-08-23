@@ -197,9 +197,13 @@ into Jinja and can be referenced from templates at runtime._
 
 **Default value: False**
 
-StempelWerk automatically creates `template_dir` and `output_dir`. When this
-option is set to yes, all missing directories will be created to ensure that
-rendered files can be written.
+StempelWerk ensures that `template_dir` and `output_dir` exist (previously,
+these directories were created automatically, but that made trouble shooting
+more difficult).
+
+When this option is set to yes, all missing directories in the output directory
+will be created automatically. This ensures that rendered files can always be
+written.
 
 _Depending on your use case, automatically creating directories for output files
 may be just awkward or a full-blown security issue. This option is therefore

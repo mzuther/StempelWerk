@@ -181,14 +181,8 @@ class StempelWerk:
                 self.root_dir,
                 self.template_dir)
 
-            # automatically create template folder
-            self.template_dir.mkdir(parents=True, exist_ok=True)
-
             self.output_dir = self.finalize_path(
                 self.root_dir, self.output_dir)
-
-            # automatically create output folder
-            self.output_dir.mkdir(parents=True, exist_ok=True)
 
             self.last_run_file = self.finalize_path(
                 self.root_dir, self.last_run_file)
@@ -363,7 +357,8 @@ class StempelWerk:
 
     # ---------------------------------------------------------------------
 
-    def __init__(self, settings, verbosity=VERBOSITY_NORMAL):
+    def __init__(self, settings, verbosity=VERBOSITY_NORMAL,
+                 _testing_autocreate_main_directories=False):
         self.settings = settings
 
         self.verbosity = verbosity
@@ -377,6 +372,28 @@ class StempelWerk:
             '.ps1': '\r\n',
             '.sh': '\n',
         }
+
+        # ease testing
+        if _testing_autocreate_main_directories:
+            self.settings.template_dir.mkdir(parents=True, exist_ok=True)
+            self.settings.output_dir.mkdir(parents=True, exist_ok=True)
+        # ease trouble shooting
+        else:
+            if not self.settings.template_dir.exists():
+                self.printer.error(
+                    f'template directory "{self.settings.template_dir}"')
+                self.printer.error(
+                    'does not exist.')
+                self.printer.error()
+                exit(1)
+
+            if not self.settings.output_dir.exists():
+                self.printer.error(
+                    f'output directory "{self.settings.output_dir}"')
+                self.printer.error(
+                    'does not exist.')
+                self.printer.error()
+                exit(1)
 
 
     def create_environment(self):

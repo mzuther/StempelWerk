@@ -19,22 +19,6 @@ class TestCommon:
         except exception:
             raise pytest.fail(f'raised unwanted exception {exception}')
 
-
-    def assert_autocreated_paths(self, config, pre_check):
-        root_dir = pathlib.Path(config['root_dir'])
-        autocreated_paths = ['template_dir', 'output_dir']
-
-        for dir_key in autocreated_paths:
-            dir_path = root_dir / config[dir_key]
-            # directories that should be autocreated do not exist yet
-            if pre_check:
-                assert not dir_path.is_dir(), \
-                    f'directory "{dir_path}" already exists'
-            # directories were autocreated
-            else:
-                assert dir_path.is_dir(), \
-                    f'directory "{dir_path}" was not created'
-
     # ------------------------------------------------------------------------
 
     def modify_file(self, config, file_path):
@@ -149,7 +133,8 @@ class TestCommon:
     # ------------------------------------------------------------------------
 
     def init_stempelwerk(self, config_path=None, global_namespace=None,
-                         process_only_modified=False):
+                         process_only_modified=False,
+                         autocreate_main_directories=True):
         script_path = sys.argv[0]
         command_line_arguments = [script_path]
 
@@ -165,15 +150,20 @@ class TestCommon:
             command_line_arguments.append(str(config_path))
 
         parsed_args = StempelWerk.CommandLineParser(command_line_arguments)
-        instance = StempelWerk(parsed_args.settings, parsed_args.verbosity)
+        instance = StempelWerk(
+            parsed_args.settings,
+            parsed_args.verbosity,
+            _testing_autocreate_main_directories=autocreate_main_directories)
 
         return instance, parsed_args
 
 
     def run(self, config_path=None, global_namespace=None,
-            process_only_modified=False):
+            process_only_modified=False,
+            autocreate_main_directories=True):
         instance, parsed_args = self.init_stempelwerk(
-            config_path, global_namespace, process_only_modified)
+            config_path, global_namespace, process_only_modified,
+            autocreate_main_directories=autocreate_main_directories)
 
         assert parsed_args.process_only_modified == \
             process_only_modified

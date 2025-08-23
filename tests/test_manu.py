@@ -17,17 +17,6 @@ FIXTURE_DIR = pathlib.Path('tests') / 'manu'
 
 class TestManu(TestCommon):
 
-    def check_path_autocreation(self, config, config_path):
-        self.assert_autocreated_paths(config, pre_check=True)
-
-        with self.does_not_raise(SystemExit):
-            run_results = self.run(config_path)
-
-        self.assert_autocreated_paths(config, pre_check=False)
-        return run_results
-
-    # ------------------------------------------------------------------------
-
     # Manu is an inquisitive developer and loves to try new things. She found
     # StempelWerk on GitHub, cloned it and wants to get her hands dirty.
     #
@@ -53,10 +42,50 @@ class TestManu(TestCommon):
         assert 'not found' in captured.out
 
 
-    # After creating a config file, Manu is impressed that StempelWerk saves her
-    # some work by automatically creating the template and output directories.
-    # She is also pleased that she is able to concentrate on the task and does
-    # not have to provide any templates.
+    # After creating a config file, Manu is impressed that StempelWerk helps her
+    # by pointing out that the template directory is missing.
+    def test_error_on_missing_template_directory(self, capsys, tmp_path):
+        custom_config = {}
+
+        config_path = tmp_path / 'nested/uncommon/location_and.suffix'
+        config_dir_path = config_path.parent
+        config_dir_path.mkdir(parents=True)
+
+        config = self.create_config(custom_config, config_path)
+
+        with pytest.raises(SystemExit):
+            self.run(config_path, autocreate_main_directories=False)
+
+        captured = capsys.readouterr()
+        assert 'does not exist' in captured.out
+        assert 'template directory' in captured.out
+
+
+    # She joyfully creates the template directory. In turn, StempelWerk notifies
+    # her that she also has to create the output directory.
+    def test_error_on_missing_template_directory(self, capsys, tmp_path):
+        custom_config = {}
+
+        config_path = tmp_path / 'nested/yet/another/location_and.suffix'
+        config_dir_path = config_path.parent
+        config_dir_path.mkdir(parents=True)
+
+        config = self.create_config(custom_config, config_path)
+
+        # template directory exists
+        template_path = config_dir_path / config['template_dir']
+        template_path.mkdir()
+
+        with pytest.raises(SystemExit):
+            self.run(config_path, autocreate_main_directories=False)
+
+        captured = capsys.readouterr()
+        assert 'does not exist' in captured.out
+        assert 'output directory' in captured.out
+
+
+    # Manu is pleased that she is able to concentrate on the task and does not
+    # have to provide any templates.
     def test_autocreation_of_directories(self, tmp_path):
         custom_config = {}
 
@@ -65,8 +94,9 @@ class TestManu(TestCommon):
 
         config = self.create_config(custom_config, config_path)
 
-        # implicitly check that StempelWerk runs without any templates
-        self.check_path_autocreation(config, config_path)
+        # check that StempelWerk runs without any templates
+        with self.does_not_raise(SystemExit):
+            run_results = self.run(config_path)
 
 
     # Manu finally reads (a small part of) the documentation. She dreams of
@@ -85,8 +115,9 @@ class TestManu(TestCommon):
         config = self.create_config(custom_config, config_path,
                                     common_path_separator=True)
 
-        # implicitly check that StempelWerk runs without any templates
-        self.check_path_autocreation(config, config_path)
+        # check that StempelWerk runs without any templates
+        with self.does_not_raise(SystemExit):
+            run_results = self.run(config_path)
 
 
     # She also dislikes trailing path separators (if DOS does not need them, why
@@ -104,8 +135,9 @@ class TestManu(TestCommon):
         config = self.create_config(custom_config, config_path,
                                     common_path_separator=True)
 
-        # implicitly check that StempelWerk runs without any templates
-        self.check_path_autocreation(config, config_path)
+        # check that StempelWerk runs without any templates
+        with self.does_not_raise(SystemExit):
+            run_results = self.run(config_path)
 
     # ------------------------------------------------------------------------
 
@@ -266,9 +298,10 @@ class TestManu(TestCommon):
 
 
     # Enabling the automatic creation of missing directories works just as well,
-    # at the cost of security. As Manu has clicked on all links in every spam
-    # message she could possibly find, sshhhheeee#@$ n0w h[a]ß Ot@er pr%(#95ems
-    # *()$%*)%*&^@%^&^%@)^%(*@%^P@............. [*]
+    # at the cost of security. In return, Manu has received a lot of spam
+    # messages. After dutifully clicking on every single link she found in them,
+    # sshhhheeee#@$ n0w h[a]S$ Ot@er pr%(#95ems *()$%*)%*&^@%^&^%@)^%(*@%^P@
+    # ..........(*&)...... (()..   ...  . .   .      ..        .
     @pytest.mark.datafiles(FIXTURE_DIR / '1_template_7_create_subdirs')
     def test_render_create_subdirectories_3(self, datafiles):
         custom_config = {
