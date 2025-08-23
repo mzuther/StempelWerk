@@ -48,7 +48,7 @@ import datetime
 import importlib
 import json
 import math
-import os.path
+import os
 import pathlib
 import sys
 
@@ -170,11 +170,11 @@ class StempelWerk:
 
 
         def __post_init__(self):
-            # root directory is relative to the location of this file
-            script_dir = pathlib.Path(__file__).parent
+            # root directory is relative to the current directory
+            current_dir = pathlib.Path.cwd()
 
             self.root_dir = self.finalize_path(
-                script_dir, self.root_dir)
+                current_dir, self.root_dir)
 
             # all other paths are relative to the root directory
             self.template_dir = self.finalize_path(

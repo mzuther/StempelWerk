@@ -1,5 +1,5 @@
 {
-  "root_dir": "../../",
+  "root_dir": "./",
   "template_dir": "10-templates/",
   "output_dir": "20-output/",
   "stencil_dir_name": "00-stencils",
@@ -21,4 +21,4 @@
   "marker_new_file": "### New file:",
   "marker_content": "### Content:",
   "newline": "\n"
- }
+}

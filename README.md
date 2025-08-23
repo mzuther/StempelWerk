@@ -165,8 +165,9 @@ separator conversions for you._
 
 ### `root_dir`
 
-Path to root directory. All other paths are relative to this directory. This
-keeps setting up paths simple, and allows you to call StempelWerk from anywhere.
+Path to root directory, relative to the current working directory. All other
+paths are relative to this directory. This keeps setting up paths simple, and
+allows you to call StempelWerk from anywhere.
 
 ### `template_dir`
 
