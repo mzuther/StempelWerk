@@ -187,6 +187,49 @@ class StempelWerk:
             self.last_run_file = self.finalize_path(
                 self.root_dir, self.last_run_file)
 
+
+        def __str__(self):
+            output = []
+            separator = ' '
+
+            settings = [
+                'root_dir',
+                'template_dir',
+                'output_dir',
+                separator,
+                'included_file_names',
+                'stencil_dir_name',
+                'create_directories',
+                separator,
+                'global_namespace',
+                'jinja_options',
+                'jinja_extensions',
+                'custom_modules',
+                separator,
+                'last_run_file',
+                'marker_new_file',
+                'marker_content',
+                'newline',
+            ]
+
+            for setting in settings:
+                if setting == separator:
+                    output.append(separator)
+                    continue
+
+                setting_name = f'{setting + ":":<20s}'
+                setting_value = getattr(self, setting)
+
+                if isinstance(setting_value, pathlib.Path):
+                    setting_value = os.path.abspath(setting_value)
+                else:
+                    setting_value = repr(setting_value)
+
+                output.append(f'{setting_name}  {setting_value}')
+
+            output = '\n'.join(output)
+            return output
+
     # ---------------------------------------------------------------------
 
     # Template class for customizing the Jinja environment
@@ -359,11 +402,21 @@ class StempelWerk:
 
     def __init__(self, settings, verbosity=VERBOSITY_NORMAL,
                  _testing_autocreate_main_directories=False):
-        self.settings = settings
-
         self.verbosity = verbosity
         self.printer = self.LinePrinter(self.verbosity)
         self._display_version(self.verbosity)
+
+        self.printer.debug('Loading configuration:')
+        self.printer.debug(' ')
+
+        self.settings = settings
+
+        for setting in str(self.settings).splitlines():
+            self.printer.debug(f'  {setting}')
+
+        self.printer.debug(' ')
+        self.printer.debug('Done.')
+        self.printer.debug()
 
         self.newline_exceptions = {
             # ensure Batch files use Windows newlines, otherwise seemingly
