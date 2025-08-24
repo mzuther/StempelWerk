@@ -16,6 +16,8 @@ _Automatic code generation from Jinja templates_
   </figurecaption>
 </figure>
 
+
+
 ## Introduction
 
 StempelWerk has been created to prevent copy-and-paste errors and reduce tedious
@@ -30,6 +32,7 @@ manual work. This can lead to a tremendous saving in development time and cost.
   - The template language Jinja2 is very mature, and has an excellent
     [Template Designer
     Documentation](https://jinja.palletsprojects.com/en/3.1.x/templates/)
+  - A single template can create multiple files
   - Templates can undertake surprisingly complex tasks, and StempelWerk can be
     extended using Python
 - **Permissive licensing**
@@ -38,13 +41,17 @@ manual work. This can lead to a tremendous saving in development time and cost.
   - Python: [PSF licencse](https://docs.python.org/3/license.html)
   - uv: [MIT License](https://github.com/astral-sh/uv/blob/main/LICENSE-MIT)
 
-### Case study
+
+
+## Case study
 
 I have used StempelWerk in a professional project to generate most code (SQL)
 and part of the documentation (Markdown). StempelWerk even helped me during a
 migration by creating code for two different types of database. I logged and
 offset time gained against time spent: after nine months, I had saved 100+ hours
 of working time!
+
+
 
 ## Installation
 
@@ -94,6 +101,8 @@ python3 -m pip install --user --upgrade "Jinja2>=3.1.6"
 ```
 
 For development dependencies, please see [pyproject.toml](./pyproject.toml).
+
+
 
 ## Execution
 
@@ -153,10 +162,12 @@ when working on slow consoles / VMs.
 Adding this command line argument will display additional information useful for
 debugging such as loaded templates and added extensions.
 
-## Settings
 
-Settings for StempelWerk are provided in the form of a JSON file (see
-`settings_example.json` for an example) . The path to this file is specified as
+
+## Configuration
+
+Configuration for StempelWerk are provided in the form of a JSON file (see
+`config_example.json` for an example) . The path to this file is specified as
 command line argument, and is relative to the current working directory.
 
 _For cross-platform compatibility, I recommend to use a forward slash as path
@@ -301,10 +312,14 @@ _StempelWerk overrides this setting for certain files, such as Windows Batch
 files. If you want to change this behavior, please create an instance of
 StempelWerk and override its public member variable `newline_exceptions`._
 
+
+
 ## Code of conduct
 
 Please read the [code of conduct](./CODE_OF_CONDUCT.md) before asking for help,
 filing bug reports or contributing to this project. Thanks!
+
+
 
 ## License
 
