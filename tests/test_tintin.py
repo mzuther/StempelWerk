@@ -50,7 +50,7 @@ class TestTinTin(TestCommon):
             'stencil_dir_name': 'stencils',
         }
 
-        global_namespace_file = datafiles / '20-data' / 'global.json'
+        global_namespace_file = datafiles / 'global.json'
 
         # paths are passed to client application as string
         global_namespace_file = str(global_namespace_file)
