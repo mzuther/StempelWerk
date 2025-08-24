@@ -133,24 +133,28 @@ For help on the command line, simply call:
 ### Command line argument `--globals`
 
 Path to a JSON file or a JSON-formatted string containing a dictionary of global
-variables: `{"NO_cast": false}`.
+variables:
 
-Jinja supports several approaches of loading global variables. In case it
+``` json
+{
+  "spam": "eggs"
+}
+```
+
+StempelWerk forces explicit use of globals by grouping them under the
+environment variable `globals`. In other words, you have to use `globals.spam`
+or `globals['spam']` to access your global variable `spam`.
+
+_Jinja supports several approaches of loading global variables. In case it
 matters, StempelWerk loads globals when calling
-`jinja2.Environment.get_template`.
-
-_Personally, I am not fond of global variables. I do not want to be obstinate,
-however, so I provide a way of using them. But I **do** force you to be explicit
-when using globals by grouping them under the variable `globals`. So you'll have
-to use `globals.spam` or `globals['spam']` to access the global variable `spam`
-you have defined._
+`jinja2.Environment.get_template`._
 
 _For a simple demonstration of globals, please render the provided example
 templates with `--globals '{"NO_cast": true}'`._
 
 ### Command line argument `--only-modified`
 
-By default, StempelWerk renders all template files located in the specified
+By default, StempelWerk renders all template files it finds in the specified
 template directory.
 
 When you use the command line argument `--only-modified`, however, StempelWerk
@@ -162,35 +166,34 @@ weird manner, and changes to master templates (called "stencils" in StempelWerk)
 are currently not handled. However, in such a case you can simply use
 StempelWerk without the `--only-modified` argument._
 
-_Use of this command line argument is highly discouraged in CI/CD pipelines!_
+_Do not use this command line argument in CI/CD pipelines!_
 
 ### Command line argument `--ultraquiet` and `--quiet`
 
 Adding one of these command line arguments will display less information. Great
-when working on slow consoles / VMs.
+when working on slow consoles.
 
 ### Command line argument `--verbose`
 
-Adding this command line argument will display additional information useful for
-debugging such as loaded templates and added extensions.
+Adding this command line argument will display additional information, such as
+settings, loaded templates and added extensions. Very useful for debugging.
 
 
 
 ## Settings
 
-Settings for StempelWerk are provided in the form of a JSON file (see
-`settings_example.json` for an example) . The path to this file is specified as
-command line argument, and is relative to the current working directory.
+StempelWerk reads its settings from a JSON file (see `settings_example.json` for
+an example) . The path to this file is specified as command line argument, and
+is relative to the current working directory.
 
-_For cross-platform compatibility, I recommend to use a forward slash as path
-separator on all systems: `/spam/eggs`. StempelWerk will handle all path
-separator conversions for you._
+_For cross-platform compatibility, I recommend using forward slashes in settings
+for path separators: `/spam/eggs`. StempelWerk will handle path separator
+conversions for you._
 
 ### `root_dir`
 
 Path to root directory, relative to the current working directory. All other
-paths are relative to this directory. This keeps setting up paths simple, and
-allows you to call StempelWerk from anywhere.
+paths are relative to this directory. This simplifies the setting up of paths.
 
 ### `template_dir`
 
@@ -207,31 +210,33 @@ saved in this directory.
 
 **Default value: None**
 
-Name of the directory that contains stencils (master templates). The name must
-not contain slashes or backslashes.
+Name of the directory containing stencils (master templates). The name must not
+contain slashes or backslashes.
 
 Files in directories matching this name will not be rendered. If this setting is
 specified and no stencils are found, StempelWerk will exit with an error.
 
-_There may be one or more directories with this name, and all of them must be
-located somewhere under `template_dir`. This ensures that stencils are loaded
-into Jinja and can be referenced from templates at runtime._
+_There may be one or more directories with this name, and they must be located
+somewhere under `template_dir`. This allows stencils to be loaded into Jinja,
+and to be referenced from templates at runtime._
 
 ### `create_directories`
 
 **Default value: False**
 
-StempelWerk ensures that `template_dir` and `output_dir` exist (previously,
-these directories were created automatically, but that made trouble shooting
-more difficult).
+StempelWerk ensures that `template_dir` and `output_dir` exist. In case they are
+not found, StempelWerk will exit with an error.
+
+_Previously, these directories were created automatically, but that interfered
+with debugging._
 
 When this option is set to yes, all missing directories in the output directory
 will be created automatically. This ensures that rendered files can always be
 written.
 
-_Depending on your use case, automatically creating directories for output files
-may be just awkward or a full-blown security issue. This option is therefore
-disabled by default, and it is encouraged to leave it that way._
+_Depending on your use case, automatically created directories may be just
+awkward or a full-blown security issue. This option is therefore disabled by
+default, and I encourage you to leave it that way._
 
 ### `included_file_names`
 
@@ -266,16 +271,17 @@ List containing Jinja extensions that will be loaded into the Jinja environment.
 
 **Default value: []**
 
-List of Python modules, each containing a `CustomCode` class that inherits
+List of Python modules, each containing a `CustomCode` class inheriting from
 `StempelWerk.CustomCodeTemplate`. See directory `tests/tintin/custom` for
 examples.
 
 After creating the Jinja environment and loading Jinja extensions, each module
-will be imported, an instance of `CustomCode` created and its method
-`update_environment()` called. This method must return a Jinja environment.
+will be imported. An instance of `CustomCode` will be created and its method
+`update_environment()` will be called. This method must return a Jinja
+environment.
 
-Use this feature to add filters to the environment, or perform any other task
-Python is capable of.
+Use custom modules to add filters and tests to the environment, or perform any
+other task Python is capable of.
 
 _Warning: there are no security checks to prevent you from deleting all of your
 files and doing other mischief, so please be careful!_
@@ -284,12 +290,13 @@ files and doing other mischief, so please be careful!_
 
 **Default value: `.last_run`**
 
-Path to the file in which the time of the last successful run will be stored,
-relative to `root_dir`.
+Path to the file for storing a time stamp of the last successful run. The path
+is relative to `root_dir`.
 
 _If your operating system handles temporary directories correctly (Windows does
-not), you could store this file in one of them (e.g. `/tmp/`). This way, all
-template files would be rendered once after starting the system._
+not), you could store this file in one of them (e.g. `/tmp/`). With
+`--only-modified`, all template files would be rendered once after starting the
+system, and afterwards only when they are updated._
 
 ### `marker_new_file` and `marker_content`
 
@@ -339,7 +346,8 @@ character. Change this setting to use another newline character, such as `\r\n`.
 
 _StempelWerk overrides this setting for certain files, such as Windows Batch
 files. If you want to change this behavior, please create an instance of
-StempelWerk and override its public member variable `newline_exceptions`._
+StempelWerk in Python and override its public member variable
+`newline_exceptions`._
 
 
 
