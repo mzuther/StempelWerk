@@ -12,11 +12,33 @@ happens._
 
 ## [Unreleased]
 
-### Changed
+
 
 <!--- ---------------------------------------------------------------------- -->
 
-## [1.0.6] - 2025-0520
+## [1.1.0] - 2025-08-24
+### Added
+- release StempelWerk as package on PyPI
+- provide template filter `start_new_file`
+- show loaded settings in verbose mode
+
+### Changed
+- use `uv` as package manager
+- do not automatically create template and output directories
+- load extensions and custom modules as early as possible
+- load `herkules` module from package
+- update libraries
+- update tooling scripts
+- rename example settings file
+- move code to directory `src`
+
+### Fixed
+- fix: `root_dir` is not relative to current directory
+- fix: JSON file with globals not loaded from path given as string
+
+<!--- ---------------------------------------------------------------------- -->
+
+## [1.0.6] - 2025-05-20
 
 ### Security
 - update setuptools dependency to fix security vulnerability
