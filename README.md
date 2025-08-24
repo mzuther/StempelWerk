@@ -33,11 +33,11 @@ manual work. This can lead to a tremendous saving in development time and cost.
     [Template Designer
     Documentation](https://jinja.palletsprojects.com/en/3.1.x/templates/)
   - A single template can create multiple files
-  - Templates can undertake surprisingly complex tasks, and StempelWerk can be
-    extended using Python
+  - Templates can undertake surprisingly complex tasks
+  - Jinja2 (and thus StempelWerk) can be extended using Python
 - **Permissive licensing**
-  - StempelWerk: [BSD 3-Clause License](./LICENSE.md)
-  - Jinja2: [BSD 3-Clause License](https://jinja.palletsprojects.com/en/3.1.x/license/)
+  - StempelWerk: [BSD 3-Clause License](https://github.com/mzuther/StempelWerk/blob/main/LICENSE.md)
+  - Jinja2: [BSD 3-Clause License](https://github.com/pallets/jinja/blob/main/LICENSE.txt)
   - Python: [PSF licencse](https://docs.python.org/3/license.html)
   - uv: [MIT License](https://github.com/astral-sh/uv/blob/main/LICENSE-MIT)
 
@@ -55,67 +55,79 @@ of working time!
 
 ## Installation
 
-_StempelWerk is now developed using Python v3.12. Older versions of Python used
-to work and will probably still do, but you are on your own here. The shell
-scripts that come with StempelWerk assume that you use the package manager
-[uv](https://docs.astral.sh/uv/)._
+StempelWerk is currently developed in **Python 3.12**. Older versions of Python
+used to work, and some probably still do.
 
-It is recommended to install StempelWerk into a virtual environment. The easiest
-way is to install [uv](https://docs.astral.sh/uv/getting-started/installation/),
-open the project directory and run:
+### PyPI package
+
+- For flexibility, use `pip`:
 
 ```bash
 # bash
-./script/bootstrap
+python3 -m pip install stempelwerk
 ```
 
-or
-
-```ps1
-# PowerShell
-.\script\bootstrap.ps1
-```
-
-If you need more control over the installation, please read on.
-
-### Virtual environment
-
-Install [uv](https://docs.astral.sh/uv/getting-started/installation/), open the
-project directory and run:
+- For simplicity, use `pipx`:
 
 ```bash
-# edit `.python-version` to match your installed Python version, or remove
-# `--no-managed-python` for uv to download and install Python
-uv sync --no-managed-python
+# bash
+pipx install --upgrade stempelwerk
 ```
 
-### Manual installation
+### Repository
 
-Run the following lines to upgrade `pip` and install the dependencies:
+1. Install [uv](https://docs.astral.sh/uv/getting-started/installation/)
+2. Open the project directory
+3. Setup the development environment
 
-```bash
-python3 -m pip install --user --upgrade pip
+    - Linux shell:
 
-# older versions should work, but will contain security vulnerabilities
-python3 -m pip install --user --upgrade "Jinja2>=3.1.6"
-```
+    ```bash
+    ./script/bootstrap
+    ```
 
-For development dependencies, please see [pyproject.toml](./pyproject.toml).
+    - Windows PowerShell:
+
+    ```ps1
+    .\script\bootstrap.ps1
+    ```
+
+    - Anywhere:
+
+    ```bash
+    # edit `.python-version` to match your installed Python version,
+    # or remove `--no-managed-python` to let uv install Python
+    uv sync --no-managed-python
+    ```
 
 
 
 ## Execution
 
-Generate your code from templates by running the following command:
+- `pip` and `pipx`:
 
-```bash
-python3 -m src.stempelwerk.StempelWerk [ARGUMENTS] CONFIG_FILE_PATH
+``` bash
+stempelwerk [ARGUMENTS] CONFIG_FILE_PATH
 ```
 
-For help, simply call:
+- `uv`:
+
+``` bash
+uv run stempelwerk [ARGUMENTS] CONFIG_FILE_PATH
+```
+
+- Python package:
+
+``` python
+from stempelwerk.StempelWerk import StempelWerk
+
+StempelWerk(...)
+```
+
+For help on the command line, simply call:
 
 ```bash
-python3 -m src.stempelwerk.StempelWerk --help
+[uv run] stempelwerk --help
 ```
 
 ### Command line argument `--globals`
@@ -316,8 +328,10 @@ StempelWerk and override its public member variable `newline_exceptions`._
 
 ## Code of conduct
 
-Please read the [code of conduct](./CODE_OF_CONDUCT.md) before asking for help,
-filing bug reports or contributing to this project. Thanks!
+Please read the [code of
+conduct](https://github.com/mzuther/StempelWerk/blob/main/CODE_OF_CONDUCT.md)
+before asking for help, filing bug reports or contributing to this project.
+Thanks!
 
 
 
@@ -326,6 +340,6 @@ filing bug reports or contributing to this project. Thanks!
 Copyright (c) 2020-2025 [Martin Zuther](https://www.mzuther.de/)
 
 This program is free software and licensed under the terms of the [BSD 3-Clause
-License](./LICENSE.md).
+License](https://github.com/mzuther/StempelWerk/blob/main/LICENSE.md).
 
 **Thank you for using free software!**
