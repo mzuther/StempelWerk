@@ -295,7 +295,7 @@ template files would be rendered once after starting the system._
 
 **Default values: `### New file:` and `### Content:`**
 
-Each time these strings are encountered in the rendered ouput of a template, a
+Each time these strings are encountered in the rendered output of a template, a
 new file is created. This allows you to create multiple files from a single
 template.
 
@@ -308,6 +308,23 @@ whitespace, and contents of the output file:
 ### Content:
 def spam():
     return 'eggs'
+```
+
+You can insert these markers by using a template filter provided by StempelWerk:
+
+``` jinja
+{{- ('directory/' ~ filename) | start_new_file -}}
+```
+
+or adding a macro to the template:
+
+``` jinja
+{%- macro add_file_markers(filename) %}
+### New file: {{ filename }}
+### Content:
+{% endmacro -%}
+
+{{- add_file_markers('directory/' ~ filename) -}}
 ```
 
 _Good file separators strike a balance between performance (brevity) and

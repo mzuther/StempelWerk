@@ -529,7 +529,7 @@ class StempelWerk:
                 self.printer.debug(f'  - {stencil_path}')
 
             self.printer.debug(' ')
-            self.printer.debug('  Use relative paths to access templates in'
+            self.printer.debug('  Use relative paths to access templates in '
                                'sub-directories')
             self.printer.debug('  (https://stackoverflow.com/a/9644828).')
             self.printer.debug(' ')
@@ -551,7 +551,23 @@ class StempelWerk:
         self.printer.debug()
 
 
+    def _add_stempelwerk_helpers(self):
+
+        # create a new file by inserting a special string into the output;
+        # this allows you to create multiple files from a single template
+        def start_new_file(filename):
+            result = f'''{self.settings.marker_new_file} {filename}
+{self.settings.marker_content}
+'''
+            return result
+
+        assert 'start_new_file' not in self.jinja_environment.filters
+        self.jinja_environment.filters["start_new_file"] = start_new_file
+
+
     def _execute_custom_modules(self):
+        self._add_stempelwerk_helpers()
+
         if not self.settings.custom_modules:
             return
 

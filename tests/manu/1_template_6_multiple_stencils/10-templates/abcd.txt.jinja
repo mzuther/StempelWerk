@@ -24,24 +24,24 @@
 
 {# -------------------------------------------------------------------------- #}
 
-{{- common.start_new_file('ab.txt') -}}
+{{- 'ab.txt' | start_new_file -}}
 
 {{- common.render(all_variables, 'ab') -}}
 
 {# -------------------------------------------------------------------------- #}
 
-{{- common.start_new_file('ab_fancy.txt') -}}
+{{- 'ab_fancy.txt' | start_new_file -}}
 
 {{- fancy.render(all_variables, 'ab') -}}
 
 {# -------------------------------------------------------------------------- #}
 
-{{- common.start_new_file('nested/cd.txt') -}}
+{{- 'nested/cd.txt' | start_new_file -}}
 
 {{- common.render(all_variables, 'cd') -}}
 
 {# -------------------------------------------------------------------------- #}
 
-{{- common.start_new_file('nested/cd_fancy.txt') -}}
+{{- 'nested/cd_fancy.txt' | start_new_file -}}
 
 {{- fancy.render(all_variables, 'cd') -}}

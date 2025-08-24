@@ -1,4 +1,4 @@
-{%- macro start_new_file(filename) %}
+{%- macro start_new_file_template(filename) %}
 START_FILE {{ filename }}
 START_CONTENT
 {% endmacro -%}
@@ -28,6 +28,6 @@ START_CONTENT
 
 {# -------------------------------------------------------------------------- #}
 
-{{- start_new_file('ab.txt') -}}
+{{- start_new_file_template('ab.txt') -}}
 
 {{- render(all_variables) -}}

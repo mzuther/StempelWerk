@@ -95,12 +95,12 @@
 
 {# -------------------------------------------------------------------------- #}
 
-{{- common.start_new_file('Table_Definition.sql') -}}
+{{- 'Table_Definition.sql' | start_new_file -}}
 
 {{- create_table.render(table, columns, common, name) -}}
 
 {# -------------------------------------------------------------------------- #}
 
-{{- common.start_new_file(table.procedure + '.sql') -}}
+{{- (table.procedure ~ '.sql') | start_new_file -}}
 
 {{- create_procedure.render(table, columns, procedure, common, name) -}}

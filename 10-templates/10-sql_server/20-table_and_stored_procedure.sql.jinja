@@ -96,18 +96,18 @@
 
 {# -------------------------------------------------------------------------- #}
 
-{{- common.start_new_file('10-sql_server/10-' + table.target + '.sql') -}}
+{{- ('10-sql_server/10-' ~ table.target ~ '.sql') | start_new_file -}}
 
 {{- create_table.render(table, columns, common, name) -}}
 
 {# -------------------------------------------------------------------------- #}
 
-{{- common.start_new_file('10-sql_server/20-' + table.procedure + '.sql') -}}
+{{- ('10-sql_server/20-' ~ table.procedure ~ '.sql') | start_new_file -}}
 
 {{- create_procedure.render(table, columns, procedure, common, name) -}}
 
 {# -------------------------------------------------------------------------- #}
 
-{{- common.start_new_file('10-sql_server/20-' + table.procedure + '_Debug.txt') -}}
+{{- ('10-sql_server/20-' ~ table.procedure ~ '_Debug.txt') | start_new_file -}}
 
 {% debug %}
