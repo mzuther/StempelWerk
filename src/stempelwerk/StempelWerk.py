@@ -324,9 +324,9 @@ class StempelWerk:
                 dest='verbosity')
 
             parser.add_argument(
-                'config_file_path',
-                help='path to JSON file containing configuration',
-                metavar='CONFIG_FILE')
+                'settings_file_path',
+                help='path to JSON file containing application settings',
+                metavar='SETTINGS_FILE')
 
             return parser
 
@@ -338,13 +338,13 @@ class StempelWerk:
             self.printer = StempelWerk.LinePrinter(args.verbosity)
 
             # all paths are relative to the root directory, except for the path
-            # of the configuration file, which is relative to the current
-            # working directory
-            config_file_path = StempelWerk.Settings.finalize_path(
-                '', args.config_file_path)
+            # of the settings file, which is relative to the current working
+            # directory
+            settings_file_path = StempelWerk.Settings.finalize_path(
+                '', args.settings_file_path)
 
-            # parse config file
-            loaded_settings = self._load_json_file(config_file_path)
+            # parse settings file
+            loaded_settings = self._load_json_file(settings_file_path)
 
             # parse global variables for Jinja environment
             #
@@ -406,7 +406,7 @@ class StempelWerk:
         self.printer = self.LinePrinter(self.verbosity)
         self._display_version(self.verbosity)
 
-        self.printer.debug('Loading configuration:')
+        self.printer.debug('Loading settings:')
         self.printer.debug(' ')
 
         self.settings = settings

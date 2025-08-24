@@ -27,7 +27,7 @@ class TestManu(TestCommon):
         with pytest.raises(SystemExit):
             self.run(None)
 
-        error_message = 'the following arguments are required: CONFIG_FILE'
+        error_message = 'the following arguments are required: SETTINGS_FILE'
         captured = capsys.readouterr()
         assert error_message in captured.err
 

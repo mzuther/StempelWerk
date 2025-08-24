@@ -107,13 +107,13 @@ pipx install --upgrade stempelwerk
 - `pip` and `pipx`:
 
 ``` bash
-stempelwerk [ARGUMENTS] CONFIG_FILE_PATH
+stempelwerk [ARGUMENTS] SETTINGS_FILE_PATH
 ```
 
 - `uv`:
 
 ``` bash
-uv run stempelwerk [ARGUMENTS] CONFIG_FILE_PATH
+uv run stempelwerk [ARGUMENTS] SETTINGS_FILE_PATH
 ```
 
 - Python package:
@@ -176,10 +176,10 @@ debugging such as loaded templates and added extensions.
 
 
 
-## Configuration
+## Settings
 
-Configuration for StempelWerk are provided in the form of a JSON file (see
-`config_example.json` for an example) . The path to this file is specified as
+Settings for StempelWerk are provided in the form of a JSON file (see
+`settings_example.json` for an example) . The path to this file is specified as
 command line argument, and is relative to the current working directory.
 
 _For cross-platform compatibility, I recommend to use a forward slash as path
