@@ -36,11 +36,11 @@ Changelog = "https://github.com/mzuther/StempelWerk/blob/develop/CHANGELOG.md"
 
 [dependency-groups]
 dev = [
-    "flake8>=6.0.0,<7",
-    "flake8-cognitive-complexity>=0.1.0,<0.2",
-    "flake8-fixme>=1.1.1,<2",
-    "flake8-pytest-style>=1.7.2,<2",
-    "pip-licenses>=5.0.0,<6",
+    "flake8>=7.0.0",
+    "flake8-cognitive-complexity>=0.1.0",
+    "flake8-fixme>=1.1.1",
+    "flake8-pytest-style>=2.1.0",
+    "pip-licenses>=5.0.0",
     "pytest>=7.3.0,<8",
     "pytest-datafiles>=3.0.0,<4",
 ]
@@ -53,7 +53,6 @@ build-backend = "hatchling.build"
 path = "src/stempelwerk/StempelWerk.py"
 
 [tool.pytest.ini_options]
-minversion = "6.0"
 markers = [
     "current: marks tests as current (select with '-m current')",
     "slow: marks tests as slow (deselect with '-m \"not slow\"')",
