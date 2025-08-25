@@ -133,3 +133,10 @@ happens._
 [keepachangelog.com]: http://keepachangelog.com/
 [unreleased]: https://github.com/mzuther/StempelWerk/tree/develop
 [1.0.0]: https://github.com/mzuther/StempelWerk/commits/v1.0.0
+[1.0.1]: https://github.com/mzuther/StempelWerk/commits/v1.0.1
+[1.0.2]: https://github.com/mzuther/StempelWerk/commits/v1.0.2
+[1.0.3]: https://github.com/mzuther/StempelWerk/commits/v1.0.3
+[1.0.4]: https://github.com/mzuther/StempelWerk/commits/v1.0.4
+[1.0.5]: https://github.com/mzuther/StempelWerk/commits/v1.0.5
+[1.0.6]: https://github.com/mzuther/StempelWerk/commits/v1.0.6
+[1.1.0]: https://github.com/mzuther/StempelWerk/commits/v1.1.0
