@@ -55,8 +55,8 @@ of working time!
 
 ## Installation
 
-StempelWerk is currently developed in **Python 3.12**. Older versions of Python
-used to work, and some probably still do.
+StempelWerk is currently developed in **Python 3.12**. The tests also run
+successfully on _Python 3.10_ and _Python 3.14_.
 
 ### PyPI package
 
