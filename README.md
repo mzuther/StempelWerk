@@ -1,3 +1,7 @@
+![PyPI - Version](https://img.shields.io/pypi/v/stempelwerk)
+![PyPI - License](https://img.shields.io/pypi/l/stempelwerk)
+![PyPI - Downloads](https://img.shields.io/pypi/dm/stempelwerk)
+
 # StempelWerk
 
 _Automatic code generation from Jinja templates_
