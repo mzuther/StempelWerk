@@ -29,6 +29,7 @@ license-files = ["LICENSE.md"]
 dependencies = [
     "Jinja2>=3.1.6,<4",
     "herkules>=1.0.0,<2",
+    "pytest-cov>=6.2.1",
 ]
 
 [project.scripts]

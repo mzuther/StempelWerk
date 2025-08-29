@@ -12,6 +12,7 @@ wheels/
 
 # pytest
 .pytest_cache/
+.coverage
 
 # Stempelwerk
 *_Debug.txt
