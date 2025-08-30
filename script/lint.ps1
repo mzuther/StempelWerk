@@ -1,8 +1,12 @@
 Write-Output ""
 
-uv run flake8 --config=".flake8" src/
+uv run ruff check --fix
 
 If (-Not $?)
 {
+    Write-Output ""
     exit
 }
+
+
+Write-Output ""

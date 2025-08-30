@@ -2,10 +2,12 @@
 
 echo
 
-uv run flake8 --config="./.flake8" src/
+uv run ruff check --fix
 EXIT_CODE=$?
 
 if [ $EXIT_CODE -ne 0 ]; then
    echo
    exit $EXIT_CODE
 fi
+
+echo

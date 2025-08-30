@@ -34,6 +34,9 @@ if [ $EXIT_CODE -ne 0 ]; then
 	exit $EXIT_CODE
 fi
 
+echo
+echo "------------------------"
+
 ./script/lint
 EXIT_CODE=$?
 
