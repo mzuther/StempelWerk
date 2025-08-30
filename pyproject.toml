@@ -64,6 +64,12 @@ testpaths = [
     "tests",
 ]
 
+[tool.ruff]
+line-length = 80
+
+[tool.ruff.format]
+quote-style = "single"
+
 [tool.ruff.lint]
 select = [
     # pycodestyle (errors)

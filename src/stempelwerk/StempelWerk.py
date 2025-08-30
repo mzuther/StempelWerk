@@ -59,7 +59,6 @@ __version__ = '1.1.0'
 
 
 class StempelWerk:
-
     APPLICATION = 'StempelWerk'
     AUTHOR = 'Martin Zuther'
     DESCRIPTION = 'Automatic code generation from Jinja2 templates.'
@@ -75,23 +74,32 @@ class StempelWerk:
     VERBOSITY_VERY_LOW = -2
 
     @staticmethod
-    def format_version(verbosity=VERBOSITY_NORMAL):
+    def format_version(
+        verbosity=VERBOSITY_NORMAL,
+    ):
         if verbosity < StempelWerk.VERBOSITY_NORMAL:
             return StempelWerk.APPLICATION_VERSION
         else:
             return (
-                StempelWerk.COPYRIGHT + '\n' +
-                f'Licensed under the {StempelWerk.LICENSE}'
+                StempelWerk.COPYRIGHT
+                + '\n'
+                + f'Licensed under the {StempelWerk.LICENSE}'
             )
 
     @staticmethod
-    def format_description(verbosity=VERBOSITY_NORMAL):
+    def format_description(
+        verbosity=VERBOSITY_NORMAL,
+    ):
         return (
-            StempelWerk.format_version(verbosity) + '\n\n' +
-            StempelWerk.DESCRIPTION
+            StempelWerk.format_version(verbosity)
+            + '\n\n'
+            + StempelWerk.DESCRIPTION
         )
 
-    def _display_version(self, verbosity=VERBOSITY_NORMAL):
+    def _display_version(
+        self,
+        verbosity=VERBOSITY_NORMAL,
+    ):
         version_message = self.format_version(verbosity)
 
         print()
@@ -105,21 +113,31 @@ class StempelWerk:
     # ---------------------------------------------------------------------
 
     class LinePrinter:
-        def __init__(self, verbosity):
+        def __init__(
+            self,
+            verbosity,
+        ):
             self.verbosity = verbosity
 
-
-        def _print_context(self, context, message):
+        def _print_context(
+            self,
+            context,
+            message,
+        ):
             if message:
                 message = f'{context}: {message}'
             print(message)
 
-
-        def error(self, message=''):
+        def error(
+            self,
+            message='',
+        ):
             self._print_context('ERROR', message)
 
-
-        def debug(self, message=''):
+        def debug(
+            self,
+            message='',
+        ):
             if self.verbosity > StempelWerk.VERBOSITY_NORMAL:
                 self._print_context('DEBUG', message)
 
@@ -143,23 +161,21 @@ class StempelWerk:
         stencil_dir_name: str = ''
         create_directories: bool = False
         # ----------------------------------------
-        global_namespace: list = dataclasses.field(
-            default_factory=dict)
-        jinja_options: list = dataclasses.field(
-            default_factory=dict)
-        jinja_extensions: list = dataclasses.field(
-            default_factory=list)
-        custom_modules: list = dataclasses.field(
-            default_factory=list)
+        global_namespace: list = dataclasses.field(default_factory=dict)
+        jinja_options: list = dataclasses.field(default_factory=dict)
+        jinja_extensions: list = dataclasses.field(default_factory=list)
+        custom_modules: list = dataclasses.field(default_factory=list)
         # ----------------------------------------
         last_run_file: str = '.last_run'
         marker_new_file: str = '### New file:'
         marker_content: str = '### Content:'
         newline: str = None
 
-
         @staticmethod
-        def finalize_path(root_dir, original_path):
+        def finalize_path(
+            root_dir,
+            original_path,
+        ):
             root_dir = pathlib.Path(root_dir)
             original_path = original_path.strip()
 
@@ -167,27 +183,36 @@ class StempelWerk:
 
             return new_path.expanduser()
 
-
-        def __post_init__(self):
+        def __post_init__(
+            self,
+        ):
             # root directory is relative to the current directory
             current_dir = pathlib.Path.cwd()
 
             self.root_dir = self.finalize_path(
-                current_dir, self.root_dir)
+                current_dir,
+                self.root_dir,
+            )
 
             # all other paths are relative to the root directory
             self.template_dir = self.finalize_path(
                 self.root_dir,
-                self.template_dir)
+                self.template_dir,
+            )
 
             self.output_dir = self.finalize_path(
-                self.root_dir, self.output_dir)
+                self.root_dir,
+                self.output_dir,
+            )
 
             self.last_run_file = self.finalize_path(
-                self.root_dir, self.last_run_file)
+                self.root_dir,
+                self.last_run_file,
+            )
 
-
-        def __str__(self):
+        def __str__(
+            self,
+        ):
             output = []
             separator = ' '
 
@@ -233,35 +258,55 @@ class StempelWerk:
 
     # Template class for customizing the Jinja environment
     class CustomCodeTemplate:
-        def __init__(self, copy_of_settings, printer):
+        def __init__(
+            self,
+            copy_of_settings,
+            printer,
+        ):
             # this is only a copy; changing this variable does *not* change the
             # settings of StempelWerk
             self.settings = copy_of_settings
             self.printer = printer
 
-        def update_environment(self, jinja_environment):
+        def update_environment(
+            self,
+            jinja_environment,
+        ):
             return jinja_environment
 
-        def print_error(self, message=''):
+        def print_error(
+            self,
+            message='',
+        ):
             self.printer.error(message)
 
-        def print_debug(self, message=''):
+        def print_debug(
+            self,
+            message='',
+        ):
             self.printer.debug(message)
 
     # ---------------------------------------------------------------------
 
     class CommandLineParser:
         @property
-        def parser(self):
+        def parser(
+            self,
+        ):
             class HelpfulArgumentParser(argparse.ArgumentParser):
-                def exit(self, status=0, message=None):
+                def exit(
+                    self,
+                    status=0,
+                    message=None,
+                ):
                     if status:
                         # display help on errors without showing usage message
                         # twice
                         help_message = self.format_help()
                         help_message = help_message.replace(
                             self.format_usage(),
-                            '')
+                            '',
+                        )
                         print(help_message, file=sys.stderr)
 
                     # resume default processing
@@ -269,29 +314,34 @@ class StempelWerk:
 
             parser = HelpfulArgumentParser(
                 description=StempelWerk.format_description(),
-                formatter_class=argparse.RawDescriptionHelpFormatter)
+                formatter_class=argparse.RawDescriptionHelpFormatter,
+            )
 
             parser.add_argument(
                 '-V',
                 '--version',
                 action='version',
-                version=StempelWerk.APPLICATION_VERSION)
+                version=StempelWerk.APPLICATION_VERSION,
+            )
 
             parser.add_argument(
                 '-m',
                 '--only-modified',
                 action='store_true',
                 help='only process modified templates',
-                dest='process_only_modified')
+                dest='process_only_modified',
+            )
 
             parser.add_argument(
                 '-g',
                 '--globals',
                 action='store',
-                help=('string or file containing JSON-formatted '
-                      'global variables'),
+                help=(
+                    'string or file containing JSON-formatted global variables'
+                ),
                 metavar='JSON',
-                dest='global_namespace')
+                dest='global_namespace',
+            )
 
             verbosity_group = parser.add_mutually_exclusive_group()
 
@@ -302,7 +352,8 @@ class StempelWerk:
                 const=StempelWerk.VERBOSITY_VERY_LOW,
                 default=StempelWerk.VERBOSITY_NORMAL,
                 help='display minimal output',
-                dest='verbosity')
+                dest='verbosity',
+            )
 
             verbosity_group.add_argument(
                 '-q',
@@ -311,7 +362,8 @@ class StempelWerk:
                 const=StempelWerk.VERBOSITY_LOW,
                 default=StempelWerk.VERBOSITY_NORMAL,
                 help='display less output',
-                dest='verbosity')
+                dest='verbosity',
+            )
 
             verbosity_group.add_argument(
                 '-v',
@@ -320,17 +372,21 @@ class StempelWerk:
                 const=StempelWerk.VERBOSITY_HIGH,
                 default=StempelWerk.VERBOSITY_NORMAL,
                 help='display more output and include debug information',
-                dest='verbosity')
+                dest='verbosity',
+            )
 
             parser.add_argument(
                 'settings_file_path',
                 help='path to JSON file containing application settings',
-                metavar='SETTINGS_FILE')
+                metavar='SETTINGS_FILE',
+            )
 
             return parser
 
-
-        def __init__(self, command_line_arguments):
+        def __init__(
+            self,
+            command_line_arguments,
+        ):
             cla_without_scriptname = command_line_arguments[1:]
             args = self.parser.parse_args(cla_without_scriptname)
 
@@ -340,7 +396,9 @@ class StempelWerk:
             # of the settings file, which is relative to the current working
             # directory
             settings_file_path = StempelWerk.Settings.finalize_path(
-                '', args.settings_file_path)
+                '',
+                args.settings_file_path,
+            )
 
             # parse settings file
             loaded_settings = self._load_json_file(settings_file_path)
@@ -353,11 +411,13 @@ class StempelWerk:
             # parse JSON-formatted dictionary
             elif args.global_namespace.strip().startswith('{'):
                 loaded_settings['global_namespace'] = json.loads(
-                    args.global_namespace)
+                    args.global_namespace
+                )
             # load JSON file
             else:
                 loaded_settings['global_namespace'] = self._load_json_file(
-                    args.global_namespace)
+                    args.global_namespace
+                )
 
             # here's where the magic happens: unpack JSON file into class
             self.settings = StempelWerk.Settings(**loaded_settings)
@@ -366,8 +426,10 @@ class StempelWerk:
             self.process_only_modified = args.process_only_modified
             self.verbosity = args.verbosity
 
-
-        def _load_json_file(self, json_file_path):
+        def _load_json_file(
+            self,
+            json_file_path,
+        ):
             try:
                 # "json_file_path" may be a string, so convert it to a path
                 json_file_path = pathlib.Path(json_file_path)
@@ -387,8 +449,9 @@ class StempelWerk:
                 exit(1)
 
             except TypeError as err:
-                self.printer.error('Did you provide all settings in'
-                                   f'"{json_file_path}"?')
+                self.printer.error(
+                    f'Did you provide all settings in"{json_file_path}"?'
+                )
                 self.printer.error(f'{err}')
                 self.printer.error()
 
@@ -399,8 +462,12 @@ class StempelWerk:
 
     # ---------------------------------------------------------------------
 
-    def __init__(self, settings, verbosity=VERBOSITY_NORMAL,
-                 _testing_autocreate_main_directories=False):
+    def __init__(
+        self,
+        settings,
+        verbosity=VERBOSITY_NORMAL,
+        _testing_autocreate_main_directories=False,
+    ):
         self.verbosity = verbosity
         self.printer = self.LinePrinter(self.verbosity)
         self._display_version(self.verbosity)
@@ -427,28 +494,35 @@ class StempelWerk:
 
         # ease testing
         if _testing_autocreate_main_directories:
-            self.settings.template_dir.mkdir(parents=True, exist_ok=True)
-            self.settings.output_dir.mkdir(parents=True, exist_ok=True)
+            self.settings.template_dir.mkdir(
+                parents=True,
+                exist_ok=True,
+            )
+            self.settings.output_dir.mkdir(
+                parents=True,
+                exist_ok=True,
+            )
         # ease trouble shooting
         else:
             if not self.settings.template_dir.exists():
                 self.printer.error(
-                    f'template directory "{self.settings.template_dir}"')
-                self.printer.error(
-                    'does not exist.')
+                    f'template directory "{self.settings.template_dir}"'
+                )
+                self.printer.error('does not exist.')
                 self.printer.error()
                 exit(1)
 
             if not self.settings.output_dir.exists():
                 self.printer.error(
-                    f'output directory "{self.settings.output_dir}"')
-                self.printer.error(
-                    'does not exist.')
+                    f'output directory "{self.settings.output_dir}"'
+                )
+                self.printer.error('does not exist.')
                 self.printer.error()
                 exit(1)
 
-
-    def create_environment(self):
+    def create_environment(
+        self,
+    ):
         self.printer.debug('Loading templates ...')
 
         # NOTE: Jinja loads templates from sub-directories;
@@ -459,11 +533,13 @@ class StempelWerk:
         # these will be processed
         template_loader = jinja2.FileSystemLoader(
             self.settings.template_dir,
-            encoding='utf-8')
+            encoding='utf-8',
+        )
 
         self.jinja_environment = jinja2.Environment(
             loader=template_loader,
-            **self.settings.jinja_options)
+            **self.settings.jinja_options,
+        )
 
         # load Jinja extensions first so they can be used in custom modules
         self._load_jinja_extensions()
@@ -478,8 +554,9 @@ class StempelWerk:
         self.printer.debug('Done.')
         self.printer.debug()
 
-
-    def _get_templates(self):
+    def _get_templates(
+        self,
+    ):
         template_paths = []
 
         for template_filename in self.jinja_environment.list_templates():
@@ -488,16 +565,20 @@ class StempelWerk:
 
         return template_paths
 
-
-    def _check_templates(self, template_paths):
+    def _check_templates(
+        self,
+        template_paths,
+    ):
         if not template_paths:
             self.printer.error()
             self.printer.error('No templates found.')
             self.printer.error()
             exit(1)
 
-
-    def _get_stencils(self, template_paths):
+    def _get_stencils(
+        self,
+        template_paths,
+    ):
         stencil_paths = []
 
         for template_path in template_paths:
@@ -506,8 +587,10 @@ class StempelWerk:
 
         return stencil_paths
 
-
-    def _check_stencils(self, stencil_paths):
+    def _check_stencils(
+        self,
+        stencil_paths,
+    ):
         if not self.settings.stencil_dir_name:
             return
 
@@ -528,13 +611,15 @@ class StempelWerk:
                 self.printer.debug(f'  - {stencil_path}')
 
             self.printer.debug(' ')
-            self.printer.debug('  Use relative paths to access templates in '
-                               'sub-directories')
+            self.printer.debug(
+                '  Use relative paths to access templates in sub-directories'
+            )
             self.printer.debug('  (https://stackoverflow.com/a/9644828).')
             self.printer.debug(' ')
 
-
-    def _load_jinja_extensions(self):
+    def _load_jinja_extensions(
+        self,
+    ):
         if not self.settings.jinja_extensions:
             return
 
@@ -549,22 +634,23 @@ class StempelWerk:
         self.printer.debug('Done.')
         self.printer.debug()
 
-
-    def _add_stempelwerk_helpers(self):
-
+    def _add_stempelwerk_helpers(
+        self,
+    ):
         # create a new file by inserting a special string into the output;
         # this allows you to create multiple files from a single template
         def start_new_file(filename):
-            result = f'''{self.settings.marker_new_file} {filename}
+            result = f"""{self.settings.marker_new_file} {filename}
 {self.settings.marker_content}
-'''
+"""
             return result
 
         assert 'start_new_file' not in self.jinja_environment.filters
-        self.jinja_environment.filters["start_new_file"] = start_new_file
+        self.jinja_environment.filters['start_new_file'] = start_new_file
 
-
-    def _execute_custom_modules(self):
+    def _execute_custom_modules(
+        self,
+    ):
         self._add_stempelwerk_helpers()
 
         if not self.settings.custom_modules:
@@ -591,25 +677,24 @@ class StempelWerk:
             self.printer.debug(f'  [ {module_name} ]')
 
             # import code as module
-            module_spec = importlib.util.find_spec(
-                module_name)
-            imported_module = importlib.util.module_from_spec(
-                module_spec)
+            module_spec = importlib.util.find_spec(module_name)
+            imported_module = importlib.util.module_from_spec(module_spec)
 
             # execute module its own namespace
-            module_spec.loader.exec_module(
-                imported_module)
+            module_spec.loader.exec_module(imported_module)
 
             # prevent changes to settings
             custom_code = imported_module.CustomCode(
                 copy.deepcopy(self.settings),
-                self.printer)
+                self.printer,
+            )
 
             self.printer.debug('  - Updating environment ...')
 
             # execute custom code and store updated Jinja environment
             self.jinja_environment = custom_code.update_environment(
-                self.jinja_environment)
+                self.jinja_environment
+            )
 
             self.printer.debug('  - Done.')
             self.printer.debug(' ')
@@ -617,28 +702,39 @@ class StempelWerk:
         self.printer.debug('Done.')
         self.printer.debug()
 
-
-    def render_template(self, template_path, custom_global_namespace=None):
+    def render_template(
+        self,
+        template_path,
+        custom_global_namespace=None,
+    ):
         relative_template_path = template_path.relative_to(
-            self.settings.template_dir)
+            self.settings.template_dir
+        )
 
         global_namespace = self._prepare_global_namespace(
-            custom_global_namespace)
+            custom_global_namespace
+        )
 
         # create environment automatically
         if not hasattr(self, 'jinja_environment'):
             self.create_environment()
 
         raw_content_of_multiple_files = self._render_content(
-            relative_template_path, global_namespace)
+            relative_template_path,
+            global_namespace,
+        )
 
         # "run_results" contains number of processed and saved files
-        run_results = self._save_content(raw_content_of_multiple_files)
+        run_results = self._save_content(
+            raw_content_of_multiple_files,
+        )
 
         return run_results
 
-
-    def _prepare_global_namespace(self, custom_global_namespace):
+    def _prepare_global_namespace(
+        self,
+        custom_global_namespace,
+    ):
         # get default global variables
         global_namespace = self.settings.global_namespace
 
@@ -650,12 +746,13 @@ class StempelWerk:
             global_namespace.update(custom_global_namespace)
 
         # force users to explicitly mark global variables in code
-        return {
-            'globals': global_namespace
-        }
+        return {'globals': global_namespace}
 
-
-    def _render_content(self, template_path, global_namespace):
+    def _render_content(
+        self,
+        template_path,
+        global_namespace,
+    ):
         if self.verbosity >= self.VERBOSITY_LOW:
             print(f'- {template_path}')
 
@@ -665,15 +762,18 @@ class StempelWerk:
         try:
             jinja_template = self.jinja_environment.get_template(
                 template_filename,
-                globals=global_namespace)
+                globals=global_namespace,
+            )
 
             # the Jinja2 documentation suggests that applications should use
             # environment globals instead of (local) template context
             # (https://jinja.palletsprojects.com/en/3.1.x/api/#global-namespace)
             content_of_multiple_files = jinja_template.render()
 
-        except (jinja2.exceptions.TemplateSyntaxError,
-                jinja2.exceptions.TemplateAssertionError) as err:
+        except (
+            jinja2.exceptions.TemplateSyntaxError,
+            jinja2.exceptions.TemplateAssertionError,
+        ) as err:
             self.printer.error()
 
             if self.verbosity < self.VERBOSITY_LOW:
@@ -699,11 +799,14 @@ class StempelWerk:
 
         return content_of_multiple_files
 
-
-    def _save_content(self, raw_content_of_multiple_files):
+    def _save_content(
+        self,
+        raw_content_of_multiple_files,
+    ):
         # split content into multiple files
         split_contents = raw_content_of_multiple_files.split(
-            self.settings.marker_new_file)
+            self.settings.marker_new_file
+        )
 
         processed_templates = 1
         saved_files = 0
@@ -721,58 +824,82 @@ class StempelWerk:
 
         return {
             'processed_templates': processed_templates,
-            'saved_files': saved_files
+            'saved_files': saved_files,
         }
 
-
-    def _save_single_file(self, raw_content):
+    def _save_single_file(
+        self,
+        raw_content,
+    ):
         output_file_name, processed_content = self._process_raw_content(
-            raw_content)
+            raw_content
+        )
 
         if self.verbosity >= self.VERBOSITY_NORMAL:
             print(f'  - {output_file_name}')
 
-        output_file_path = self.Settings.finalize_path(self.settings.output_dir,
-                                                       output_file_name)
+        output_file_path = self.Settings.finalize_path(
+            self.settings.output_dir,
+            output_file_name,
+        )
 
-        self._create_output_directory(output_file_path)
+        self._create_output_directory(
+            output_file_path,
+        )
 
         # use default newline character unless there is an exception (such as
         # for Windows batch files)
-        newline = self.newline_exceptions.get(output_file_path.suffix,
-                                              self.settings.newline)
+        newline = self.newline_exceptions.get(
+            output_file_path.suffix,
+            self.settings.newline,
+        )
 
         # Jinja2 encodes all strings in UTF-8
-        output_file_path.write_text(processed_content, encoding='utf-8',
-                                    newline=newline)
+        output_file_path.write_text(
+            processed_content,
+            encoding='utf-8',
+            newline=newline,
+        )
 
         return 1
 
-
-    def _process_raw_content(self, raw_content):
-        new_file_markers = raw_content.count(self.settings.marker_new_file)
-        content_markers = raw_content.count(self.settings.marker_content)
+    def _process_raw_content(
+        self,
+        raw_content,
+    ):
+        new_file_markers = raw_content.count(
+            self.settings.marker_new_file,
+        )
+        content_markers = raw_content.count(
+            self.settings.marker_content,
+        )
 
         # catch problems with file separation markers early
         if new_file_markers != 0 or content_markers != 1:
             self.printer.error(
-                'there was a problem with splitting the output into files,')
+                'there was a problem with splitting the output into files,'
+            )
             self.printer.error(
-                'check "marker_new_file", "marker_content" and your templates.')
+                'check "marker_new_file", "marker_content" and your templates.'
+            )
             self.printer.error()
             exit(1)
 
         # extract name and content of output file
         output_file_name, processed_content = raw_content.split(
-            self.settings.marker_content, 1)
+            self.settings.marker_content,
+            1,
+        )
 
         output_file_name = output_file_name.strip()
         processed_content = processed_content.lstrip()
 
         return output_file_name, processed_content
 
-
-    def _create_output_directory(self, output_file_path):
+    def _create_output_directory(
+        self,
+        output_file_path,
+    ):
         output_directory = output_file_path.parent
 
         if output_directory.is_dir():
@@ -780,19 +907,20 @@ class StempelWerk:
 
         if self.settings.create_directories:
             output_directory.mkdir(parents=True)
+
             if self.verbosity >= self.VERBOSITY_NORMAL:
                 print(f'  - created directory "{output_directory}"')
         else:
-            self.printer.error(
-                f'directory "{output_directory}"')
-            self.printer.error(
-                'does not exist.')
+            self.printer.error(f'directory "{output_directory}"')
+            self.printer.error('does not exist.')
             self.printer.error()
             exit(1)
 
-
-    def render_all_templates(self, process_only_modified=False,
-                             custom_global_namespace=None):
+    def render_all_templates(
+        self,
+        process_only_modified=False,
+        custom_global_namespace=None,
+    ):
         start_of_processing = datetime.datetime.now()
 
         template_filenames = self._find_templates(process_only_modified)
@@ -803,28 +931,39 @@ class StempelWerk:
         for template_filename in template_filenames:
             # "run_results" contains number of processed and saved files
             run_results = self.render_template(
-                template_filename, custom_global_namespace)
+                template_filename,
+                custom_global_namespace,
+            )
 
             processed_templates += run_results['processed_templates']
             saved_files += run_results['saved_files']
 
             if self.verbosity < self.VERBOSITY_LOW:
-                self._show_progress(processed_templates, is_finished=False)
+                self._show_progress(
+                    processed_templates,
+                    is_finished=False,
+                )
 
         # only save time of current run and show statistics when files have
         # actually been processed
         if template_filenames:
             self._store_last_run(start_of_processing)
-            self._display_statistics(start_of_processing, processed_templates,
-                                     saved_files)
+            self._display_statistics(
+                start_of_processing,
+                processed_templates,
+                saved_files,
+            )
 
         return {
             'processed_templates': processed_templates,
-            'saved_files': saved_files
+            'saved_files': saved_files,
         }
 
-
-    def _show_progress(self, processed_templates, is_finished):
+    def _show_progress(
+        self,
+        processed_templates,
+        is_finished,
+    ):
         if is_finished:
             # finish last line
             remaining_dots = processed_templates % 10
@@ -837,16 +976,19 @@ class StempelWerk:
         elif (processed_templates % 10) == 0:
             print('..........', end=' ')
 
-
-    def _get_last_run(self):
+    def _get_last_run(
+        self,
+    ):
         try:
             last_run_timestamp = self.settings.last_run_file.read_text()
             return last_run_timestamp.strip()
         except OSError:
             return None
 
-
-    def _store_last_run(self, last_run):
+    def _store_last_run(
+        self,
+        last_run,
+    ):
         # convert datetime to UNIX time
         last_run_timestamp = last_run.timestamp()
 
@@ -855,11 +997,15 @@ class StempelWerk:
         last_run_timestamp = math.floor(last_run_timestamp) - 2
 
         self.settings.last_run_file.write_text(
-            str(last_run_timestamp))
+            str(last_run_timestamp),
+        )
 
-
-    def _display_statistics(self, start_of_processing, processed_templates,
-                            saved_files):
+    def _display_statistics(
+        self,
+        start_of_processing,
+        processed_templates,
+        saved_files,
+    ):
         processing_time = datetime.datetime.now() - start_of_processing
 
         time_per_template = processing_time / processed_templates
@@ -875,20 +1021,26 @@ class StempelWerk:
 
         if self.verbosity < self.VERBOSITY_NORMAL:
             print()
-            print(f'{processed_templates} =>',
-                  f'{saved_files} in {processing_time}')
+            print(
+                f'{processed_templates} =>',
+                f'{saved_files} in {processing_time}',
+            )
             print()
         else:
-            print(f'TOTAL: {processed_templates} templates =>',
-                  f'{saved_files} files in {processing_time}')
+            print(
+                f'TOTAL: {processed_templates} templates =>',
+                f'{saved_files} files in {processing_time}',
+            )
             print()
 
-
-    def _find_templates(self, process_only_modified):
+    def _find_templates(
+        self,
+        process_only_modified,
+    ):
         herkules_selector = {
             # do not render stencils
             'excluded_directory_names': [
-                self.settings.stencil_dir_name
+                self.settings.stencil_dir_name,
             ],
             'excluded_file_names': [],
             'included_file_names': self.settings.included_file_names,
@@ -900,9 +1052,11 @@ class StempelWerk:
             modified_since = self._get_last_run()
 
         # find matching files in template directory
-        template_filenames = herkules(self.settings.template_dir,
-                                      selector=herkules_selector,
-                                      modified_since=modified_since)
+        template_filenames = herkules(
+            self.settings.template_dir,
+            selector=herkules_selector,
+            modified_since=modified_since,
+        )
 
         return template_filenames
 
@@ -918,8 +1072,10 @@ def main_cli():
     # specified on the command line
     custom_global_namespace = {}
 
-    sw.render_all_templates(parsed_args.process_only_modified,
-                            custom_global_namespace)
+    sw.render_all_templates(
+        parsed_args.process_only_modified,
+        custom_global_namespace,
+    )
 
 
 if __name__ == '__main__':
