@@ -29,7 +29,10 @@ class TestTinTin(TestCommon):
     # As thief who appeared in the global news, he obviously starts by testing
     # global variables.
     @pytest.mark.datafiles(FIXTURE_DIR / '1_global_variables')
-    def test_global_variables_from_string(self, datafiles):
+    def test_global_variables_from_string(
+        self,
+        datafiles,
+    ):
         custom_config = {
             'stencil_dir_name': 'stencils',
         }
@@ -38,15 +41,20 @@ class TestTinTin(TestCommon):
 
         # set up StempelWerk and execute full run
         config_path = datafiles / 'settings.json'
-        self.run_and_compare(custom_config, config_path,
-                             global_namespace=global_namespace_string)
-
+        self.run_and_compare(
+            custom_config,
+            config_path,
+            global_namespace=global_namespace_string,
+        )
 
     # Being a... Wait. Having been a chairman, Tin Tin is used to others doing
     # the dirty work. Pretending to still be in charge, he commands StempelWerk
     # to load global data from a JSON file.
     @pytest.mark.datafiles(FIXTURE_DIR / '1_global_variables')
-    def test_global_variables_from_file(self, datafiles):
+    def test_global_variables_from_file(
+        self,
+        datafiles,
+    ):
         custom_config = {
             'stencil_dir_name': 'stencils',
         }
@@ -58,15 +66,20 @@ class TestTinTin(TestCommon):
 
         # set up StempelWerk and execute full run
         config_path = datafiles / 'settings.json'
-        self.run_and_compare(custom_config, config_path,
-                             global_namespace=global_namespace_file)
-
+        self.run_and_compare(
+            custom_config,
+            config_path,
+            global_namespace=global_namespace_file,
+        )
 
     # After a year of intense testing, Tin Tin moved on to custom modules. He
     # wanted to call them "prison_cell" and "inmate_canteen", but the author of
     # StempelWerk put his foot down.
     @pytest.mark.datafiles(FIXTURE_DIR / '2_custom_module')
-    def test_custom_module(self, datafiles):
+    def test_custom_module(
+        self,
+        datafiles,
+    ):
         custom_config = {
             'stencil_dir_name': 'stencils',
             'custom_modules': [
@@ -77,8 +90,10 @@ class TestTinTin(TestCommon):
 
         # set up StempelWerk and execute full run
         config_path = datafiles / 'settings.json'
-        self.run_and_compare(custom_config, config_path)
-
+        self.run_and_compare(
+            custom_config,
+            config_path,
+        )
 
     # Only 148 years to go! At Tin Tin's current pace, he will run out of work
     # by the end of the century ...
@@ -86,7 +101,10 @@ class TestTinTin(TestCommon):
     # Anyway, he recently started testing Jinja extensions. We will keep you
     # posted on his progress. Don't expect news anytime soon, though.
     @pytest.mark.datafiles(FIXTURE_DIR / '3_jinja_extension')
-    def test_jinja_extension(self, datafiles):
+    def test_jinja_extension(
+        self,
+        datafiles,
+    ):
         custom_config = {
             'stencil_dir_name': 'stencils',
             'jinja_extensions': [
@@ -99,7 +117,10 @@ class TestTinTin(TestCommon):
 
         # set up StempelWerk and execute full run
         config_path = datafiles / 'settings.json'
-        run_results = self.run_with_config(custom_config, config_path)
+        run_results = self.run_with_config(
+            custom_config,
+            config_path,
+        )
 
         assert debug_path.is_file()
 
@@ -114,9 +135,12 @@ class TestTinTin(TestCommon):
         ]
 
         for stencil in stencils:
-            assert debug_output.find(stencil) != -1, \
+            assert debug_output.find(stencil) != -1, (
                 f'stencil "{stencil}" not found in debug output'
+            )
 
         # assert that output files are rendered correctly
         debug_path.unlink()
-        self.compare_directories(run_results['configuration'])
+        self.compare_directories(
+            run_results['configuration'],
+        )

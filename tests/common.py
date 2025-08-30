@@ -14,7 +14,10 @@ from src.stempelwerk.StempelWerk import StempelWerk
 class TestCommon:
     # adapted from https://stackoverflow.com/a/42327075
     @contextlib.contextmanager
-    def does_not_raise(self, exception):
+    def does_not_raise(
+        self,
+        exception,
+    ):
         try:
             yield
         except exception:
@@ -23,7 +26,11 @@ class TestCommon:
 
     # ------------------------------------------------------------------------
 
-    def modify_file(self, config, file_path):
+    def modify_file(
+        self,
+        config,
+        file_path,
+    ):
         with file_path.open() as original_file:
             original_contents = original_file.readlines()
 
@@ -37,17 +44,24 @@ class TestCommon:
         with pytest.raises(AssertionError):
             self.compare_directories(config)
 
-
-    def update_file(self, input_path):
+    def update_file(
+        self,
+        input_path,
+    ):
         output_path = pathlib.Path(
-            str(input_path).replace('_updated', ''))
+            str(input_path).replace('_updated', ''),
+        )
 
         shutil.copyfile(input_path, output_path)
 
     # ------------------------------------------------------------------------
 
-    def create_config(self, custom_config, config_path,
-                      common_path_separator=True):
+    def create_config(
+        self,
+        custom_config,
+        config_path,
+        common_path_separator=True,
+    ):
         root_dir = config_path.parent
         if common_path_separator:
             root_dir = root_dir.as_posix()
@@ -58,7 +72,7 @@ class TestCommon:
             'output_dir': '20-output',
             # ----------------------------------------
             'included_file_names': [
-                '*.jinja'
+                '*.jinja',
             ],
             'stencil_dir_name': '',
             'create_directories': False,
@@ -72,13 +86,17 @@ class TestCommon:
             'last_run_file': '.last_run',
             'marker_new_file': '### New file:',
             'marker_content': '### Content:',
-            'newline': '\n'
+            'newline': '\n',
         }
 
         # overwrite defaults with custom settings
         config.update(custom_config)
 
-        json_string = json.dumps(config, ensure_ascii=False, indent=2)
+        json_string = json.dumps(
+            config,
+            ensure_ascii=False,
+            indent=2,
+        )
         config_path.write_text(json_string)
 
         # load and parse stored settings
@@ -87,23 +105,32 @@ class TestCommon:
 
         return actual_config
 
-
-    def compare_directories(self, config):
+    def compare_directories(
+        self,
+        config,
+    ):
         root_dir = pathlib.Path(config['root_dir'])
         output_path = root_dir / config['output_dir']
         expected_base = root_dir / '30-expected'
 
-        comparator = filecmp.dircmp(expected_base, output_path)
+        comparator = filecmp.dircmp(
+            expected_base,
+            output_path,
+        )
 
-        assert not comparator.left_only, \
-            f'these files were not generated: { comparator.left_only }'
-        assert not comparator.right_only, \
-            f'unexpected files were generated: { comparator.right_only }'
+        assert not comparator.left_only, (
+            f'these files were not generated: {comparator.left_only}'
+        )
+        assert not comparator.right_only, (
+            f'unexpected files were generated: {comparator.right_only}'
+        )
 
-        assert not comparator.common_funny, \
-            f'could not process these files: { comparator.common_funny }'
-        assert not comparator.funny_files, \
-            f'could not compare these files: { comparator.funny_files }'
+        assert not comparator.common_funny, (
+            f'could not process these files: {comparator.common_funny}'
+        )
+        assert not comparator.funny_files, (
+            f'could not compare these files: {comparator.funny_files}'
+        )
 
         if comparator.diff_files:
             # only print first differing file
@@ -121,7 +148,8 @@ class TestCommon:
                 expected_contents,
                 actual_contents,
                 fromfile=str(path_expected),
-                tofile=str(path_actual))
+                tofile=str(path_actual),
+            )
 
             print('------------------------------------------------------')
             print()
@@ -134,9 +162,13 @@ class TestCommon:
 
     # ------------------------------------------------------------------------
 
-    def init_stempelwerk(self, config_path=None, global_namespace=None,
-                         process_only_modified=False,
-                         autocreate_main_directories=True):
+    def init_stempelwerk(
+        self,
+        config_path=None,
+        global_namespace=None,
+        process_only_modified=False,
+        autocreate_main_directories=True,
+    ):
         script_path = sys.argv[0]
         command_line_arguments = [script_path]
 
@@ -149,26 +181,34 @@ class TestCommon:
 
         # allow testing for missing configuration on command line
         if config_path:
-            command_line_arguments.append(str(config_path))
+            command_line_arguments.append(
+                str(config_path),
+            )
 
         parsed_args = StempelWerk.CommandLineParser(command_line_arguments)
         instance = StempelWerk(
             parsed_args.settings,
             parsed_args.verbosity,
-            _testing_autocreate_main_directories=autocreate_main_directories)
+            _testing_autocreate_main_directories=autocreate_main_directories,
+        )
 
         return instance, parsed_args
 
-
-    def run(self, config_path=None, global_namespace=None,
-            process_only_modified=False,
-            autocreate_main_directories=True):
+    def run(
+        self,
+        config_path=None,
+        global_namespace=None,
+        process_only_modified=False,
+        autocreate_main_directories=True,
+    ):
         instance, parsed_args = self.init_stempelwerk(
-            config_path, global_namespace, process_only_modified,
-            autocreate_main_directories=autocreate_main_directories)
+            config_path,
+            global_namespace,
+            process_only_modified,
+            autocreate_main_directories=autocreate_main_directories,
+        )
 
-        assert parsed_args.process_only_modified == \
-            process_only_modified
+        assert parsed_args.process_only_modified == process_only_modified
 
         # "run_results" contains number of processed and saved files
         run_results = instance.render_all_templates(process_only_modified)
@@ -176,26 +216,48 @@ class TestCommon:
 
         return run_results
 
-
-    def run_with_config(self, custom_config, config_path,
-                        global_namespace=None):
-        config = self.create_config(custom_config, config_path)
+    def run_with_config(
+        self,
+        custom_config,
+        config_path,
+        global_namespace=None,
+    ):
+        config = self.create_config(
+            custom_config,
+            config_path,
+        )
 
         print('Configuration:')
-        print(json.dumps(config, ensure_ascii=False, indent=2))
+        print(
+            json.dumps(
+                config,
+                ensure_ascii=False,
+                indent=2,
+            )
+        )
 
-        run_results = self.run(config_path, global_namespace)
+        run_results = self.run(
+            config_path,
+            global_namespace,
+        )
         run_results['configuration'] = config
 
         return run_results
 
-
-    def run_and_compare(self, custom_config, config_path,
-                        global_namespace=None):
+    def run_and_compare(
+        self,
+        custom_config,
+        config_path,
+        global_namespace=None,
+    ):
         run_results = self.run_with_config(
-            custom_config, config_path, global_namespace)
+            custom_config,
+            config_path,
+            global_namespace,
+        )
 
         self.compare_directories(
-            run_results['configuration'])
+            run_results['configuration'],
+        )
 
         return run_results
