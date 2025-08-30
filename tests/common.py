@@ -3,10 +3,11 @@ import difflib
 import filecmp
 import json
 import pathlib
-import sys
 import shutil
+import sys
 
 import pytest
+
 from src.stempelwerk.StempelWerk import StempelWerk
 
 
@@ -17,6 +18,7 @@ class TestCommon:
         try:
             yield
         except exception:
+            # ruff: noqa: B904
             raise pytest.fail(f'raised unwanted exception {exception}')
 
     # ------------------------------------------------------------------------
@@ -128,7 +130,7 @@ class TestCommon:
             sys.stdout.writelines(diff_result)
             print()
 
-            assert False, 'Found differing files.'
+            raise AssertionError('Found differing files.')
 
     # ------------------------------------------------------------------------
 

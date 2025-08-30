@@ -10,6 +10,7 @@
 import pathlib
 
 import pytest
+
 from .common import TestCommon
 
 FIXTURE_DIR = pathlib.Path('tests') / 'manu'
@@ -51,7 +52,7 @@ class TestManu(TestCommon):
         config_dir_path = config_path.parent
         config_dir_path.mkdir(parents=True)
 
-        config = self.create_config(custom_config, config_path)
+        _ = self.create_config(custom_config, config_path)
 
         with pytest.raises(SystemExit):
             self.run(config_path, autocreate_main_directories=False)
@@ -63,7 +64,7 @@ class TestManu(TestCommon):
 
     # She joyfully creates the template directory. In turn, StempelWerk notifies
     # her that she also has to create the output directory.
-    def test_error_on_missing_template_directory(self, capsys, tmp_path):
+    def test_error_on_missing_output_directory(self, capsys, tmp_path):
         custom_config = {}
 
         config_path = tmp_path / 'nested/yet/another/location_and.suffix'
@@ -92,11 +93,11 @@ class TestManu(TestCommon):
         config_path = tmp_path / 'nested/uncommon/location_and.suffix'
         config_path.parent.mkdir(parents=True)
 
-        config = self.create_config(custom_config, config_path)
+        _ = self.create_config(custom_config, config_path)
 
         # check that StempelWerk runs without any templates
         with self.does_not_raise(SystemExit):
-            run_results = self.run(config_path)
+            _ = self.run(config_path)
 
 
     # Manu finally reads (a small part of) the documentation. She dreams of
@@ -112,12 +113,12 @@ class TestManu(TestCommon):
 
         # common path separator can be used (cross-platform support)
         config_path = tmp_path / 'settings.json'
-        config = self.create_config(custom_config, config_path,
-                                    common_path_separator=True)
+        _ = self.create_config(custom_config, config_path,
+                               common_path_separator=True)
 
         # check that StempelWerk runs without any templates
         with self.does_not_raise(SystemExit):
-            run_results = self.run(config_path)
+            _ = self.run(config_path)
 
 
     # She also dislikes trailing path separators (if DOS does not need them, why
@@ -132,12 +133,12 @@ class TestManu(TestCommon):
 
         # common path separator can be used (cross-platform support)
         config_path = tmp_path / 'settings.json'
-        config = self.create_config(custom_config, config_path,
-                                    common_path_separator=True)
+        _ = self.create_config(custom_config, config_path,
+                               common_path_separator=True)
 
         # check that StempelWerk runs without any templates
         with self.does_not_raise(SystemExit):
-            run_results = self.run(config_path)
+            _ = self.run(config_path)
 
     # ------------------------------------------------------------------------
 

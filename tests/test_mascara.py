@@ -11,6 +11,7 @@ import pathlib
 
 import jinja2
 import pytest
+
 from .common import TestCommon
 
 FIXTURE_DIR = pathlib.Path('tests') / 'mascara'

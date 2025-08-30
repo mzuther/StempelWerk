@@ -55,7 +55,6 @@ import sys
 import jinja2
 from herkules.Herkules import herkules
 
-
 __version__ = '1.1.0'
 
 
@@ -843,7 +842,7 @@ class StempelWerk:
         try:
             last_run_timestamp = self.settings.last_run_file.read_text()
             return last_run_timestamp.strip()
-        except IOError:
+        except OSError:
             return None
 
 
