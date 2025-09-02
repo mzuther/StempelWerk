@@ -2,7 +2,7 @@
 
 echo
 
-uv run ruff check --fix
+uv run ruff format && uv run ruff check --fix
 EXIT_CODE=$?
 
 if [ $EXIT_CODE -ne 0 ]; then
