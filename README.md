@@ -56,6 +56,33 @@ of working time!
 
 
 
+## Best practices
+
+### Keep output files under source control
+
+This ensures that you can update StempelWerk, its libraries, and your templates
+with peace of mind. Just execute a full StempelWerk run and see whether the
+output files change (or do not change) in the way you expect. Any
+incompatibilities will become immediately obvious.
+
+There are many other benefits as well, such as the detection (and retention) of
+accidental manual changes to your output files.
+
+### Store output files in a designated directory
+
+It is quite possible to store templates and output files directly next to each
+other. However, I have found that a designated output directory simplifies
+setting up, and working with, StempelWerk. It is hard to describe - you just
+feel less "resistance"...
+
+One example: by design, StempelWerk does not store state. In consequence, it
+does not keep track of generated files and cannot detect superfluous output
+files (such as after deletion or renaming). However, you can easily delete the
+output directory and run StempelWerk again. All superfluous files will be gone,
+whereas your templates and other files are not affected.
+
+
+
 ## Installation
 
 StempelWerk is currently developed in **Python 3.12**. The tests also run
@@ -348,7 +375,7 @@ Rendered files will be written using the operating system's standard newline
 character. Change this setting to use another newline character, such as `\r\n`.
 
 _StempelWerk overrides this setting for certain files, such as Windows Batch
-files. If you want to change this behavior, please create an instance of
+files. If you want to change this behaviour, please create an instance of
 StempelWerk in Python and override its public member variable
 `newline_exceptions`._
 
