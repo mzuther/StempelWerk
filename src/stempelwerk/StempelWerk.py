@@ -1056,6 +1056,7 @@ class StempelWerk:
             self.settings.template_dir,
             selector=herkules_selector,
             modified_since=modified_since,
+            relative_to_root=False,
         )
 
         return template_filenames
