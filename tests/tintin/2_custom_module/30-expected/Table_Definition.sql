@@ -17,6 +17,7 @@ CREATE TABLE DEMO.Target
     Key_Column_1     NVARCHAR(200) COLLATE Latin1_General_100_CI_AS NOT NULL,
     Key_Column_2     NVARCHAR(200) COLLATE Latin1_General_100_CI_AS NOT NULL,
     -- -------------------------------------------------- --
+    -- this is an automated comment
     String_Column    NVARCHAR(200) COLLATE Latin1_General_100_CI_AS,
     -- -------------------------------------------------- --
     -- este es un comentario automatico

@@ -23,6 +23,7 @@ BEGIN
                 Key_Column_1,
                 Key_Column_2,
                 -- -------------------------------------------------- --
+                -- This is an automated comment!
                 String_Column,
                 -- -------------------------------------------------- --
                 -- ¡Este es un comentario automatico!
@@ -55,6 +56,7 @@ BEGIN
         WHEN MATCHED AND EXISTS
             (
                 SELECT
+                    -- this is an automated comment
                     tgt.String_Column,
                     -- -------------------------------------------------- --
                     -- este es un comentario automatico
@@ -64,6 +66,7 @@ BEGIN
                 EXCEPT
 
                 SELECT
+                    -- this is an automated comment
                     src.String_Column,
                     -- -------------------------------------------------- --
                     -- este es un comentario automatico
