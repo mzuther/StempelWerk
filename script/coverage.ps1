@@ -1,7 +1,6 @@
 Write-Output ""
 
-uv run ruff format
-uv run ruff check --fix
+uv run pytest --cov --cov-report=term --cov-report=html
 
 If (-Not $?)
 {

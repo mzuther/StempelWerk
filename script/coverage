@@ -1,0 +1,13 @@
+#! /bin/bash
+
+echo
+
+uv run pytest --cov --cov-report=term --cov-report=html
+EXIT_CODE=$?
+
+if [ $EXIT_CODE -ne 0 ]; then
+	echo
+	exit $EXIT_CODE
+fi
+
+echo
