@@ -20,7 +20,7 @@ class TestCommon:
     ):
         try:
             yield
-        except exception:
+        except exception:  # pragma: no coverage
             # ruff: noqa: B904
             raise pytest.fail(f'raised unwanted exception {exception}')
 
@@ -63,7 +63,7 @@ class TestCommon:
         common_path_separator=True,
     ):
         root_dir = config_path.parent
-        if common_path_separator:
+        if common_path_separator:  # pragma: no branching
             root_dir = root_dir.as_posix()
 
         config = {

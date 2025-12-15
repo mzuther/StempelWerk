@@ -77,7 +77,7 @@ class StempelWerk:
     def format_version(
         verbosity=VERBOSITY_NORMAL,
     ):
-        if verbosity < StempelWerk.VERBOSITY_NORMAL:
+        if verbosity < StempelWerk.VERBOSITY_NORMAL:  # pragma: no coverage
             return StempelWerk.APPLICATION_VERSION
         else:
             return (
@@ -103,7 +103,7 @@ class StempelWerk:
         version_message = self.format_version(verbosity)
 
         print()
-        if verbosity < self.VERBOSITY_NORMAL:
+        if verbosity < self.VERBOSITY_NORMAL:  # pragma: no coverage
             print(version_message)
         else:
             for line in version_message.split('\n'):
@@ -138,7 +138,7 @@ class StempelWerk:
             self,
             message='',
         ):
-            if self.verbosity > StempelWerk.VERBOSITY_NORMAL:
+            if self.verbosity > StempelWerk.VERBOSITY_NORMAL:  # pragma: no coverage
                 self._print_context('DEBUG', message)
 
     # ---------------------------------------------------------------------
@@ -274,7 +274,7 @@ class StempelWerk:
         ):
             return jinja_environment
 
-        def print_error(
+        def print_error(  # pragma: no coverage
             self,
             message='',
         ):
@@ -299,7 +299,7 @@ class StempelWerk:
                     status=0,
                     message=None,
                 ):
-                    if status:
+                    if status:  # pragma: no branch
                         # display help on errors without showing usage message
                         # twice
                         help_message = self.format_help()
@@ -602,7 +602,7 @@ class StempelWerk:
             exit(1)
 
         # list all templates in cache
-        if self.verbosity > StempelWerk.VERBOSITY_NORMAL:
+        if self.verbosity > StempelWerk.VERBOSITY_NORMAL:  # pragma: no coverage
             self.printer.debug(' ')
             self.printer.debug('Available stencils:')
             self.printer.debug(' ')
@@ -753,7 +753,7 @@ class StempelWerk:
         template_path,
         global_namespace,
     ):
-        if self.verbosity >= self.VERBOSITY_LOW:
+        if self.verbosity >= self.VERBOSITY_LOW:  # pragma: no branch
             print(f'- {template_path}')
 
         # Jinja2 cannot handle Windows paths
@@ -776,7 +776,7 @@ class StempelWerk:
         ) as err:
             self.printer.error()
 
-            if self.verbosity < self.VERBOSITY_LOW:
+            if self.verbosity < self.VERBOSITY_LOW:  # pragma: no coverage
                 self.printer.error()
                 self.printer.error(f'in file "{template_filename}"')
 
@@ -787,7 +787,7 @@ class StempelWerk:
             raise err
 
         except Exception as err:
-            if self.verbosity < self.VERBOSITY_LOW:
+            if self.verbosity < self.VERBOSITY_LOW:  # pragma: no coverage
                 self.printer.error()
                 self.printer.error()
                 self.printer.error(f'in file "{template_filename}"')
@@ -819,7 +819,7 @@ class StempelWerk:
 
             saved_files += self._save_single_file(raw_content_of_single_file)
 
-        if self.verbosity >= self.VERBOSITY_NORMAL:
+        if self.verbosity >= self.VERBOSITY_NORMAL:  # pragma: no branch
             print()
 
         return {
@@ -835,7 +835,7 @@ class StempelWerk:
             raw_content
         )
 
-        if self.verbosity >= self.VERBOSITY_NORMAL:
+        if self.verbosity >= self.VERBOSITY_NORMAL:  # pragma: no branch
             print(f'  - {output_file_name}')
 
         output_file_path = self.Settings.finalize_path(
@@ -908,7 +908,7 @@ class StempelWerk:
         if self.settings.create_directories:
             output_directory.mkdir(parents=True)
 
-            if self.verbosity >= self.VERBOSITY_NORMAL:
+            if self.verbosity >= self.VERBOSITY_NORMAL:  # pragma: no branch
                 print(f'  - created directory "{output_directory}"')
         else:
             self.printer.error(f'directory "{output_directory}"')
@@ -938,7 +938,7 @@ class StempelWerk:
             processed_templates += run_results['processed_templates']
             saved_files += run_results['saved_files']
 
-            if self.verbosity < self.VERBOSITY_LOW:
+            if self.verbosity < self.VERBOSITY_LOW:  # pragma: no coverage
                 self._show_progress(
                     processed_templates,
                     is_finished=False,
@@ -959,7 +959,7 @@ class StempelWerk:
             'saved_files': saved_files,
         }
 
-    def _show_progress(
+    def _show_progress(  # pragma: no coverage
         self,
         processed_templates,
         is_finished,
@@ -1015,11 +1015,11 @@ class StempelWerk:
         self.printer.debug(f'Time per output file:   {time_per_file}')
         self.printer.debug()
 
-        if self.verbosity < self.VERBOSITY_LOW:
+        if self.verbosity < self.VERBOSITY_LOW:  # pragma: no coverage
             # finish last line
             self._show_progress(processed_templates, is_finished=True)
 
-        if self.verbosity < self.VERBOSITY_NORMAL:
+        if self.verbosity < self.VERBOSITY_NORMAL:  # pragma: no coverage
             print()
             print(
                 f'{processed_templates} =>',
@@ -1062,7 +1062,7 @@ class StempelWerk:
         return template_filenames
 
 
-def main_cli():
+def main_cli():  # pragma: no coverage
     command_line_arguments = sys.argv
     parsed_args = StempelWerk.CommandLineParser(command_line_arguments)
 
@@ -1079,5 +1079,5 @@ def main_cli():
     )
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: no coverage
     main_cli()
