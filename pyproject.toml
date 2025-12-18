@@ -28,7 +28,7 @@ license = "BSD-3-Clause"
 license-files = ["LICENSE.md"]
 dependencies = [
     "Jinja2>=3.1.6,<4",
-    "herkules>=1.1.1,<2",
+    "herkules>=1.2.0,<2",
     "pytest-cov>=6.2.1",
 ]
 
