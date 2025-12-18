@@ -10,13 +10,13 @@ happens._
 
 <!--- ---------------------------------------------------------------------- -->
 
-## [Unreleased]
+## Unreleased
 
 
 
 <!--- ---------------------------------------------------------------------- -->
 
-## [1.1.0] - 2025-08-24
+## 1.1.0 - 2025-08-24
 ### Added
 - release StempelWerk as package on PyPI
 - provide template filter `start_new_file`
@@ -38,14 +38,14 @@ happens._
 
 <!--- ---------------------------------------------------------------------- -->
 
-## [1.0.6] - 2025-05-20
+## 1.0.6 - 2025-05-20
 
 ### Security
 - update setuptools dependency to fix security vulnerability
 
 <!--- ---------------------------------------------------------------------- -->
 
-## [1.0.5] - 2025-03-11
+## 1.0.5 - 2025-03-11
 
 ### Security
 - update Jinja2 dependency to fix security vulnerability
@@ -58,7 +58,7 @@ happens._
 
 <!--- ---------------------------------------------------------------------- -->
 
-## [1.0.4] - 2024-12-26
+## 1.0.4 - 2024-12-26
 
 ### Security
 - update Jinja2 dependency to fix security vulnerability
@@ -74,7 +74,7 @@ happens._
 
 <!--- ---------------------------------------------------------------------- -->
 
-## [1.0.3] - 2024-07-17
+## 1.0.3 - 2024-07-17
 
 ### Security
 - update setuptools dependency to fix security vulnerability
@@ -84,7 +84,7 @@ happens._
 
 <!--- ---------------------------------------------------------------------- -->
 
-## [1.0.2] - 2024-05-07
+## 1.0.2 - 2024-05-07
 
 ### Security
 - update Jinja2 dependency (again) to fix security vulnerability
@@ -94,7 +94,7 @@ happens._
 - add unit tests for `DirWalk` class
 - run slow tests when all other tests have passed
 - refactor code
-- change directory layout of source code 
+- change directory layout of source code
 
 ### Fixed
 - fix: no files are included in case no suffixes are specified
@@ -103,7 +103,7 @@ happens._
 
 <!--- ---------------------------------------------------------------------- -->
 
-## [1.0.1] - 2024-01-12
+## 1.0.1 - 2024-01-12
 
 ### Security
 - update Jinja2 dependency to fix security vulnerability
@@ -116,7 +116,7 @@ happens._
 
 <!--- ---------------------------------------------------------------------- -->
 
-## [1.0.0] - 2023-07-24
+## 1.0.0 - 2023-07-24
 
 - This is the first stable release (although I have been using StempelWerk professionally for over a year now).
 
@@ -131,12 +131,3 @@ happens._
 <!--- ---------------------------------------------------------------------- -->
 
 [keepachangelog.com]: http://keepachangelog.com/
-[unreleased]: https://github.com/mzuther/StempelWerk/tree/develop
-[1.0.0]: https://github.com/mzuther/StempelWerk/commits/v1.0.0
-[1.0.1]: https://github.com/mzuther/StempelWerk/commits/v1.0.1
-[1.0.2]: https://github.com/mzuther/StempelWerk/commits/v1.0.2
-[1.0.3]: https://github.com/mzuther/StempelWerk/commits/v1.0.3
-[1.0.4]: https://github.com/mzuther/StempelWerk/commits/v1.0.4
-[1.0.5]: https://github.com/mzuther/StempelWerk/commits/v1.0.5
-[1.0.6]: https://github.com/mzuther/StempelWerk/commits/v1.0.6
-[1.1.0]: https://github.com/mzuther/StempelWerk/commits/v1.1.0
