@@ -138,7 +138,9 @@ class StempelWerk:
             self,
             message='',
         ):
-            if self.verbosity > StempelWerk.VERBOSITY_NORMAL:  # pragma: no coverage
+            if (
+                self.verbosity > StempelWerk.VERBOSITY_NORMAL
+            ):  # pragma: no coverage
                 self._print_context('DEBUG', message)
 
     # ---------------------------------------------------------------------
@@ -602,7 +604,9 @@ class StempelWerk:
             exit(1)
 
         # list all templates in cache
-        if self.verbosity > StempelWerk.VERBOSITY_NORMAL:  # pragma: no coverage
+        if (
+            self.verbosity > StempelWerk.VERBOSITY_NORMAL
+        ):  # pragma: no coverage
             self.printer.debug(' ')
             self.printer.debug('Available stencils:')
             self.printer.debug(' ')

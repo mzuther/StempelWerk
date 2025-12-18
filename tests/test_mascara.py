@@ -45,8 +45,8 @@ class TestMascara(TestCommon):
     # application to do what she wants is already coding. She's a good tester,
     # so we'll let someone else break the bad news to her ...
     #
-    # After getting StempelWerk to run (congrats!), Mascara randomly deletes and
-    # changes files and checks whether the application restores the files.
+    # After getting StempelWerk to run (congrats!), Mascara randomly deletes
+    # and changes files and checks whether the application restores the files.
     @pytest.mark.datafiles(FIXTURE_DIR / '1_process_only_modified_1')
     def test_process_only_modified_1(
         self,
@@ -245,8 +245,8 @@ class TestMascara(TestCommon):
         )
         assert run_results['saved_files'] == 1
 
-    # After having become a Python goddess, she wants to start a hacking career.
-    # And what do hackers do? Delete files. Yes! YES!!!
+    # After having become a Python goddess, she wants to start a hacking
+    # career. And what do hackers do? Delete files. Yes! YES!!!
     #
     # "rm -rf /proc/" looks tempting, but Mascara wants to show off her Python
     # skills. She thus deletes a file that StempelWerk creates during runtime.
@@ -304,8 +304,8 @@ class TestMascara(TestCommon):
         # "last_run_file" is re-created
         assert last_run_file.is_file()
 
-    # Mascara, Destroyer of Worlds? Maybe not, but certainly Destroyer of Files.
-    # And now: Destroyer of Templates. We stand in awe.
+    # Mascara, Destroyer of Worlds? Maybe not, but certainly Destroyer of
+    # Files. And now: Destroyer of Templates. We stand in awe.
     @pytest.mark.datafiles(FIXTURE_DIR / '2_exception_syntax_error')
     def test_exception_syntax_error(
         self,

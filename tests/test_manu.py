@@ -50,8 +50,8 @@ class TestManu(TestCommon):
         captured = capsys.readouterr()
         assert 'not found' in captured.out
 
-    # After creating a config file, Manu is impressed that StempelWerk helps her
-    # by pointing out that the template directory is missing.
+    # After creating a config file, Manu is impressed that StempelWerk helps
+    # her by pointing out that the template directory is missing.
     def test_error_on_missing_template_directory(
         self,
         capsys,
@@ -78,8 +78,8 @@ class TestManu(TestCommon):
         assert 'does not exist' in captured.out
         assert 'template directory' in captured.out
 
-    # She joyfully creates the template directory. In turn, StempelWerk notifies
-    # her that she also has to create the output directory.
+    # She joyfully creates the template directory. In turn, StempelWerk
+    # notifies her that she also has to create the output directory.
     def test_error_on_missing_output_directory(
         self,
         capsys,
@@ -160,9 +160,9 @@ class TestManu(TestCommon):
                 config_path,
             )
 
-    # She also dislikes trailing path separators (if DOS does not need them, why
-    # should any other OS?) and stubbornly removes them. StempelWerk just smiles
-    # and keeps on working as before.
+    # She also dislikes trailing path separators (if DOS does not need them,
+    # why should any other OS?) and stubbornly removes them. StempelWerk just
+    # smiles and keeps on working as before.
     def test_path_separators_trailing(
         self,
         tmp_path,
@@ -280,7 +280,8 @@ class TestManu(TestCommon):
                 config_path,
             )
 
-    # After updating the configuration, Manu gets the output she is looking for.
+    # After updating the configuration, Manu gets the output she is looking
+    # for.
     #
     # Meanwhile, Manu's article on Wikipedia was deleted based on the
     # far-fetched argument that ManuTalk is only Turing-complete on Fridays.
@@ -360,8 +361,8 @@ class TestManu(TestCommon):
         )
 
     # Manu tries to render a file into a subdirectory of the output directory.
-    # StempelWerk expects subdirectories to already exist and thus exits with an
-    # error message.
+    # StempelWerk expects subdirectories to already exist and thus exits with
+    # an error message.
     @pytest.mark.datafiles(FIXTURE_DIR / '1_template_7_create_subdirs')
     def test_render_create_subdirectories_1(
         self,
@@ -395,11 +396,11 @@ class TestManu(TestCommon):
             config_path,
         )
 
-    # Enabling the automatic creation of missing directories works just as well,
-    # at the cost of security. In return, Manu has received a lot of spam
-    # messages. After dutifully clicking on every single link she found in them,
-    # sshhhheeee#@$ n0w h[a]S$ Ot@er pr%(#95ems *()$%*)%*&^@%^&^%@)^%(*@%^P@
-    # ..........(*&)...... (()..   ...  . .   .      ..        .
+    # Enabling the automatic creation of missing directories works just as
+    # well, at the cost of security. In return, Manu has received a lot of
+    # spam messages. After dutifully clicking on every single link she found
+    # in them, sshhhheeee#@$ n0w h[a]S$ Ot@er pr%(#95ems *()$%*)%*&^@%^&^%@)^
+    # %(*@%^P@..........(*&)...... (()..   ...  . .   .      ..        .
     @pytest.mark.datafiles(FIXTURE_DIR / '1_template_7_create_subdirs')
     def test_render_create_subdirectories_3(
         self,

@@ -47,7 +47,9 @@ class CustomCode(StempelWerk.CustomCodeTemplate):
         old_filters = set(jinja_environment.filters)
 
         jinja_environment.filters['upper_first'] = uppercase_first
-        jinja_environment.filters['add_exclamation_mark'] = add_exclamation_mark
+        jinja_environment.filters['add_exclamation_mark'] = (
+            add_exclamation_mark
+        )
 
         new_filters = set(jinja_environment.filters)
         self._display_environment_change(new_filters, old_filters, 'filters')

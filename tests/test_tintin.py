@@ -18,13 +18,13 @@ FIXTURE_DIR = pathlib.Path('tests') / 'tintin'
 
 class TestTinTin(TestCommon):
     # Tin Tin lead a double life: he was both developer and a chairman of the
-    # UTP (Union of Technology Purloiners). After "obtaining" StempelWerk from a
-    # project, he noticed with horror that he had stolen free software - a faux
-    # pas of the highest degree for any thief, let alone a chairman.
+    # UTP (Union of Technology Purloiners). After "obtaining" StempelWerk from
+    # a project, he noticed with horror that he had stolen free software - a
+    # faux pas of the highest degree for any thief, let alone a chairman.
     #
     # Not much has changed - Tin Tin still leads a double life. He is now both
-    # prison inmate and UTP outcast. To reduce his sentence (150 years) by a few
-    # days, he agreed to test the more intricate parts of StempelWerk.
+    # prison inmate and UTP outcast. To reduce his sentence (150 years) by a
+    # few days, he agreed to test the more intricate parts of StempelWerk.
     #
     # As thief who appeared in the global news, he obviously starts by testing
     # global variables.
