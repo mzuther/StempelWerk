@@ -57,6 +57,9 @@ path = "src/stempelwerk/StempelWerk.py"
 
 [tool.coverage.run]
 branch = true
+omit = [
+    "*.jinja",
+]
 
 [tool.coverage.report]
 skip_covered = true
