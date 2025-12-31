@@ -29,7 +29,6 @@ license-files = ["LICENSE.md"]
 dependencies = [
     "Jinja2>=3.1.6,<4",
     "herkules>=1.2.0,<2",
-    "pytest-cov>=6.2.1",
 ]
 
 [project.scripts]
@@ -42,8 +41,10 @@ Changelog = "https://github.com/mzuther/StempelWerk/blob/develop/CHANGELOG.md"
 
 [dependency-groups]
 dev = [
+    "mypy>=1.19.1",
     "pip-licenses>=5.0.0",
     "pytest>=7.3.0,<8",
+    "pytest-cov>=6.2.1",
     "pytest-datafiles>=3.0.0,<4",
     "ruff>=0.12.11",
 ]
