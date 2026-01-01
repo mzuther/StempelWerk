@@ -54,7 +54,7 @@ requires = ["hatchling >= 1.27"]
 build-backend = "hatchling.build"
 
 [tool.hatch.version]
-path = "src/stempelwerk/StempelWerk.py"
+path = "stempelwerk/StempelWerk.py"
 
 [tool.coverage.run]
 branch = true
