@@ -982,10 +982,12 @@ class StempelWerk:
 
     def _get_last_run(
         self,
-    ):
+    ) -> int | None:
         try:
             last_run_timestamp = self.settings.last_run_file.read_text()
-            return last_run_timestamp.strip()
+            last_run_timestamp = last_run_timestamp.strip()
+
+            return int(last_run_timestamp)
         except OSError:
             return None
 
