@@ -392,7 +392,7 @@ Thanks!
 
 ## License
 
-Copyright (c) 2020-2025 [Martin Zuther](https://www.mzuther.de/)
+Copyright (c) 2020-2026 [Martin Zuther](https://www.mzuther.de/)
 
 This program is free software and licensed under the terms of the [BSD 3-Clause
 License](https://github.com/mzuther/StempelWerk/blob/main/LICENSE.md).
