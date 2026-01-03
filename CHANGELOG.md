@@ -12,11 +12,25 @@ happens._
 
 ## Unreleased
 
+<!--- ---------------------------------------------------------------------- -->
 
+## 1.1.1 - 2026-01-03
+
+### Added
+- test and improve code coverage
+- add best practices to `README`
+- add build scripts
+
+### Changed
+- move source directory
+- update Herkules and other dependencies
+- update Python version requirements
+- refactor code and tests
 
 <!--- ---------------------------------------------------------------------- -->
 
 ## 1.1.0 - 2025-08-24
+
 ### Added
 - release StempelWerk as package on PyPI
 - provide template filter `start_new_file`

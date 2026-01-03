@@ -55,7 +55,7 @@ import sys
 import jinja2
 from herkules.Herkules import herkules
 
-__version__ = '1.1.0'
+__version__ = '1.1.1'
 
 
 class StempelWerk:
