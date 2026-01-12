@@ -52,6 +52,7 @@ import os
 import pathlib
 import sys
 
+import herkules.Herkules as Herkules
 import jinja2
 from herkules.Herkules import herkules
 
@@ -175,40 +176,37 @@ class StempelWerk:
 
         @staticmethod
         def finalize_path(
-            root_dir,
-            original_path,
-        ):
-            root_dir = pathlib.Path(root_dir)
-            original_path = original_path.strip()
-
+            root_dir: pathlib.Path,
+            original_path: str | pathlib.Path,
+        ) -> pathlib.Path:
             new_path = root_dir / original_path
 
             return new_path.expanduser()
 
         def __post_init__(
             self,
-        ):
+        ) -> None:
             # root directory is relative to the current directory
             current_dir = pathlib.Path.cwd()
 
-            self.root_dir = self.finalize_path(
+            self.root_dir_path = self.finalize_path(
                 current_dir,
                 self.root_dir,
             )
 
             # all other paths are relative to the root directory
-            self.template_dir = self.finalize_path(
-                self.root_dir,
+            self.template_dir_path = self.finalize_path(
+                self.root_dir_path,
                 self.template_dir,
             )
 
-            self.output_dir = self.finalize_path(
-                self.root_dir,
+            self.output_dir_path = self.finalize_path(
+                self.root_dir_path,
                 self.output_dir,
             )
 
-            self.last_run_file = self.finalize_path(
-                self.root_dir,
+            self.last_run_file_path = self.finalize_path(
+                self.root_dir_path,
                 self.last_run_file,
             )
 
@@ -398,7 +396,7 @@ class StempelWerk:
             # of the settings file, which is relative to the current working
             # directory
             settings_file_path = StempelWerk.Settings.finalize_path(
-                '',
+                pathlib.Path.cwd(),
                 args.settings_file_path,
             )
 
@@ -496,27 +494,27 @@ class StempelWerk:
 
         # ease testing
         if _testing_autocreate_main_directories:
-            self.settings.template_dir.mkdir(
+            self.settings.template_dir_path.mkdir(
                 parents=True,
                 exist_ok=True,
             )
-            self.settings.output_dir.mkdir(
+            self.settings.output_dir_path.mkdir(
                 parents=True,
                 exist_ok=True,
             )
         # ease trouble shooting
         else:
-            if not self.settings.template_dir.exists():
+            if not self.settings.template_dir_path.exists():
                 self.printer.error(
-                    f'template directory "{self.settings.template_dir}"'
+                    f'template directory "{self.settings.template_dir_path}"'
                 )
                 self.printer.error('does not exist.')
                 self.printer.error()
                 exit(1)
 
-            if not self.settings.output_dir.exists():
+            if not self.settings.output_dir_path.exists():
                 self.printer.error(
-                    f'output directory "{self.settings.output_dir}"'
+                    f'output directory "{self.settings.output_dir_path}"'
                 )
                 self.printer.error('does not exist.')
                 self.printer.error()
@@ -534,7 +532,7 @@ class StempelWerk:
         # *every* template, and "render_all_templates()" decides which of
         # these will be processed
         template_loader = jinja2.FileSystemLoader(
-            self.settings.template_dir,
+            self.settings.template_dir_path,
             encoding='utf-8',
         )
 
@@ -712,7 +710,7 @@ class StempelWerk:
         custom_global_namespace=None,
     ):
         relative_template_path = template_path.relative_to(
-            self.settings.template_dir
+            self.settings.template_dir_path
         )
 
         global_namespace = self._prepare_global_namespace(
@@ -843,7 +841,7 @@ class StempelWerk:
             print(f'  - {output_file_name}')
 
         output_file_path = self.Settings.finalize_path(
-            self.settings.output_dir,
+            self.settings.output_dir_path,
             output_file_name,
         )
 
@@ -984,7 +982,7 @@ class StempelWerk:
         self,
     ) -> int | None:
         try:
-            last_run_timestamp = self.settings.last_run_file.read_text()
+            last_run_timestamp = self.settings.last_run_file_path.read_text()
             last_run_timestamp = last_run_timestamp.strip()
 
             return int(last_run_timestamp)
@@ -1002,7 +1000,7 @@ class StempelWerk:
         # I mean you!) and other edge cases
         last_run_timestamp = math.floor(last_run_timestamp) - 2
 
-        self.settings.last_run_file.write_text(
+        self.settings.last_run_file_path.write_text(
             str(last_run_timestamp),
         )
 
@@ -1058,8 +1056,8 @@ class StempelWerk:
             modified_since = self._get_last_run()
 
         # find matching files in template directory
-        template_filenames = herkules(
-            self.settings.template_dir,
+        template_filenames = Herkules.herkules(
+            self.settings.template_dir_path,
             selector=herkules_selector,
             modified_since=modified_since,
             relative_to_root=False,
