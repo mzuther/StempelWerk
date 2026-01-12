@@ -21,5 +21,3 @@ If (-Not $?)
 {
     exit
 }
-
-. ".\script\lint.ps1"

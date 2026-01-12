@@ -1,8 +1,22 @@
 #! /bin/bash
 
 echo
+echo "[RUFF]"
+echo
 
 uv run ruff format && uv run ruff check --fix
+EXIT_CODE=$?
+
+if [ $EXIT_CODE -ne 0 ]; then
+   echo
+   exit $EXIT_CODE
+fi
+
+echo
+echo "[MYPY]"
+echo
+
+uv run mypy "."
 EXIT_CODE=$?
 
 if [ $EXIT_CODE -ne 0 ]; then

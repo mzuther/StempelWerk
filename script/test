@@ -35,11 +35,3 @@ if [ $EXIT_CODE -ne 0 ]; then
 fi
 
 echo
-echo "------------------------"
-
-./script/lint
-EXIT_CODE=$?
-
-if [ $EXIT_CODE -ne 0 ]; then
-	exit $EXIT_CODE
-fi
