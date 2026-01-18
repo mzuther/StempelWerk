@@ -53,6 +53,7 @@ import pathlib
 import sys
 
 import herkules.Herkules as Herkules
+import herkules.HerkulesTypes as HerkulesTypes
 import jinja2
 
 from . import Types
@@ -392,6 +393,8 @@ class StempelWerk:
             )
 
             return parser
+
+        process_only_modified: bool
 
         def __init__(
             self,
@@ -933,7 +936,7 @@ class StempelWerk:
 
     def render_all_templates(
         self,
-        process_only_modified=False,
+        process_only_modified: bool = False,
         custom_global_namespace: Types.CustomNamespace | None = None,
     ):
         start_of_processing = datetime.datetime.now()
@@ -993,7 +996,7 @@ class StempelWerk:
 
     def _get_last_run(
         self,
-    ) -> int | None:
+    ) -> HerkulesTypes.ModificationTime:
         try:
             last_run_timestamp = self.settings.last_run_file_path.read_text()
             last_run_timestamp = last_run_timestamp.strip()
@@ -1004,10 +1007,14 @@ class StempelWerk:
 
     def _store_last_run(
         self,
-        last_run,
-    ):
+        last_run: datetime.datetime,
+    ) -> None:
         # convert datetime to UNIX time
-        last_run_timestamp = last_run.timestamp()
+        last_run_timestamp: HerkulesTypes.ModificationTime = (
+            last_run.timestamp()
+        )
+
+        assert last_run_timestamp is not None
 
         # take care of file systems with inaccurate timestamps (Microsoft,
         # I mean you!) and other edge cases
@@ -1052,9 +1059,9 @@ class StempelWerk:
 
     def _find_templates(
         self,
-        process_only_modified,
-    ):
-        herkules_selector = {
+        process_only_modified: bool,
+    ) -> HerkulesTypes.EntryListFlattened:
+        herkules_selector: HerkulesTypes.Selector = {
             # do not render stencils
             'excluded_directory_names': [
                 self.settings.stencil_dir_name,
@@ -1063,7 +1070,7 @@ class StempelWerk:
             'included_file_names': self.settings.included_file_names,
         }
 
-        modified_since = None
+        modified_since: HerkulesTypes.ModificationTime = None
         if process_only_modified:
             # get time of last run
             modified_since = self._get_last_run()
