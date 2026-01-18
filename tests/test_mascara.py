@@ -12,7 +12,7 @@ import pathlib
 import jinja2
 import pytest
 
-from .common import TestCommon
+from .common import CustomConfig, RunResults, TestCommon
 
 FIXTURE_DIR = pathlib.Path('tests') / 'mascara'
 
@@ -20,21 +20,21 @@ FIXTURE_DIR = pathlib.Path('tests') / 'mascara'
 class TestMascara(TestCommon):
     def convenience_run(
         self,
-        config,
-        config_path,
-        process_only_modified,
-        must_match,
-    ):
+        custom_config: CustomConfig,
+        config_path: pathlib.Path | None,
+        process_only_modified: bool,
+        must_match: bool,
+    ) -> RunResults:
         run_results = self.run(
             config_path,
             process_only_modified=process_only_modified,
         )
 
         if must_match:
-            self.compare_directories(config)
+            self.compare_directories(custom_config)
         else:
             with pytest.raises(AssertionError):
-                self.compare_directories(config)
+                self.compare_directories(custom_config)
 
         return run_results
 
@@ -50,8 +50,8 @@ class TestMascara(TestCommon):
     @pytest.mark.datafiles(FIXTURE_DIR / '1_process_only_modified_1')
     def test_process_only_modified_1(
         self,
-        datafiles,
-    ):
+        datafiles: pathlib.Path,
+    ) -> None:
         custom_config = {
             'stencil_dir_name': 'stencils',
         }
@@ -64,14 +64,17 @@ class TestMascara(TestCommon):
         )
 
         config = run_results.configuration
-        assert run_results.counts['saved_files'] == 2
+        assert run_results.counts.saved_files == 2
 
         # full run renders all files unconditonally
         file_to_be_deleted = datafiles / '20-output/ab.txt'
         file_to_be_deleted.unlink()
 
         file_to_be_modified = datafiles / '20-output/cd.txt'
-        self.modify_file(config, file_to_be_modified)
+        self.modify_file(
+            config,
+            file_to_be_modified,
+        )
 
         run_results = self.convenience_run(
             config,
@@ -79,7 +82,7 @@ class TestMascara(TestCommon):
             process_only_modified=False,
             must_match=True,
         )
-        assert run_results.counts['saved_files'] == 2
+        assert run_results.counts.saved_files == 2
 
         # partial run leaves deleted output file alone
         file_to_be_deleted = datafiles / '20-output/cd.txt'
@@ -91,7 +94,7 @@ class TestMascara(TestCommon):
             process_only_modified=True,
             must_match=False,
         )
-        assert run_results.counts['saved_files'] == 0
+        assert run_results.counts.saved_files == 0
 
         # full run re-creates all output files
         run_results = self.convenience_run(
@@ -100,7 +103,7 @@ class TestMascara(TestCommon):
             process_only_modified=False,
             must_match=True,
         )
-        assert run_results.counts['saved_files'] == 2
+        assert run_results.counts.saved_files == 2
 
         # partial run does not render externally modified output file
         file_to_be_modified = datafiles / '20-output/ab.txt'
@@ -112,7 +115,7 @@ class TestMascara(TestCommon):
             process_only_modified=True,
             must_match=False,
         )
-        assert run_results.counts['saved_files'] == 0
+        assert run_results.counts.saved_files == 0
 
         # full run also renders externally modified output files
         run_results = self.convenience_run(
@@ -121,15 +124,15 @@ class TestMascara(TestCommon):
             process_only_modified=False,
             must_match=True,
         )
-        assert run_results.counts['saved_files'] == 2
+        assert run_results.counts.saved_files == 2
 
     # She updates a template and checks whether a partial run updates the
     # respective output file.
     @pytest.mark.datafiles(FIXTURE_DIR / '1_process_only_modified_2')
     def test_process_only_modified_2(
         self,
-        datafiles,
-    ):
+        datafiles: pathlib.Path,
+    ) -> None:
         custom_config = {
             'stencil_dir_name': 'stencils',
         }
@@ -142,7 +145,7 @@ class TestMascara(TestCommon):
         )
 
         config = run_results.configuration
-        assert run_results.counts['saved_files'] == 2
+        assert run_results.counts.saved_files == 2
 
         # partial run does not update changed files
         self.update_file(datafiles / '30-expected_updated/ab.txt')
@@ -153,7 +156,7 @@ class TestMascara(TestCommon):
             process_only_modified=True,
             must_match=False,
         )
-        assert run_results.counts['saved_files'] == 0
+        assert run_results.counts.saved_files == 0
 
         # partial run updates output files of changed templates
         self.update_file(datafiles / '10-templates_updated/ab.jinja')
@@ -164,15 +167,15 @@ class TestMascara(TestCommon):
             process_only_modified=True,
             must_match=True,
         )
-        assert run_results.counts['saved_files'] == 1
+        assert run_results.counts.saved_files == 1
 
     # Having the genes of a real tester, Mascara checks whether updating a
     # stencil changes any output files in a partial run.
     @pytest.mark.datafiles(FIXTURE_DIR / '1_process_only_modified_3')
     def test_process_only_modified_3(
         self,
-        datafiles,
-    ):
+        datafiles: pathlib.Path,
+    ) -> None:
         custom_config = {
             'stencil_dir_name': 'stencils',
         }
@@ -185,7 +188,7 @@ class TestMascara(TestCommon):
         )
 
         config = run_results.configuration
-        assert run_results.counts['saved_files'] == 2
+        assert run_results.counts.saved_files == 2
 
         # partial run does not check for changed stencils
         self.update_file(
@@ -198,7 +201,7 @@ class TestMascara(TestCommon):
             process_only_modified=True,
             must_match=True,
         )
-        assert run_results.counts['saved_files'] == 0
+        assert run_results.counts.saved_files == 0
 
         # full run applies changed stencils
         self.update_file(datafiles / '30-expected_updated/ab.txt')
@@ -210,15 +213,15 @@ class TestMascara(TestCommon):
             process_only_modified=False,
             must_match=True,
         )
-        assert run_results.counts['saved_files'] == 2
+        assert run_results.counts.saved_files == 2
 
     # Mascara wants to become more proficient in Python [ahem] and checks
     # whether StempelWerk is really as lean as its developer promises.
     @pytest.mark.datafiles(FIXTURE_DIR / '1_process_only_modified_1')
     def test_lean_template_removal(
         self,
-        datafiles,
-    ):
+        datafiles: pathlib.Path,
+    ) -> None:
         custom_config = {
             'stencil_dir_name': 'stencils',
         }
@@ -231,7 +234,7 @@ class TestMascara(TestCommon):
         )
 
         config = run_results.configuration
-        assert run_results.counts['saved_files'] == 2
+        assert run_results.counts.saved_files == 2
 
         # deleting a template leaves the output file alone
         file_to_be_deleted = datafiles / '10-templates/ab.jinja'
@@ -243,7 +246,7 @@ class TestMascara(TestCommon):
             process_only_modified=False,
             must_match=True,
         )
-        assert run_results.counts['saved_files'] == 1
+        assert run_results.counts.saved_files == 1
 
     # After having become a Python goddess, she wants to start a hacking
     # career. And what do hackers do? Delete files. Yes! YES!!!
@@ -254,8 +257,8 @@ class TestMascara(TestCommon):
     @pytest.mark.datafiles(FIXTURE_DIR / '1_process_only_modified_1')
     def test_last_run_file(
         self,
-        datafiles,
-    ):
+        datafiles: pathlib.Path,
+    ) -> None:
         last_run_file = datafiles / 'mascara.HACKED'
 
         custom_config = {
@@ -273,7 +276,7 @@ class TestMascara(TestCommon):
         )
 
         config = run_results.configuration
-        assert run_results.counts['saved_files'] == 2
+        assert run_results.counts.saved_files == 2
 
         # "last_run_file" is created
         assert last_run_file.is_file()
@@ -285,7 +288,7 @@ class TestMascara(TestCommon):
             process_only_modified=True,
             must_match=True,
         )
-        assert run_results.counts['saved_files'] == 0
+        assert run_results.counts.saved_files == 0
 
         # "last_run_file" is not deleted accidentally
         assert last_run_file.is_file()
@@ -299,7 +302,7 @@ class TestMascara(TestCommon):
             process_only_modified=True,
             must_match=True,
         )
-        assert run_results.counts['saved_files'] == 2
+        assert run_results.counts.saved_files == 2
 
         # "last_run_file" is re-created
         assert last_run_file.is_file()
@@ -309,9 +312,9 @@ class TestMascara(TestCommon):
     @pytest.mark.datafiles(FIXTURE_DIR / '2_exception_syntax_error')
     def test_exception_syntax_error(
         self,
-        datafiles,
-    ):
-        custom_config = {}
+        datafiles: pathlib.Path,
+    ) -> None:
+        custom_config: CustomConfig = {}
 
         # set up StempelWerk and execute full run
         config_path = datafiles / 'settings.json'
@@ -326,9 +329,9 @@ class TestMascara(TestCommon):
     @pytest.mark.datafiles(FIXTURE_DIR / '2_exception_template_not_found')
     def test_exception_template_not_found(
         self,
-        datafiles,
-    ):
-        custom_config = {}
+        datafiles: pathlib.Path,
+    ) -> None:
+        custom_config: CustomConfig = {}
 
         # set up StempelWerk and execute full run
         config_path = datafiles / 'settings.json'

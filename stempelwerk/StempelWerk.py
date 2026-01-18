@@ -843,8 +843,11 @@ class StempelWerk:
             self.settings.marker_new_file
         )
 
-        processed_templates: Types.FileCount = 1
-        saved_files: Types.FileCount = 0
+        # one template is being processed, no files saved yet
+        file_counts = Types.FileCounts(
+            processed_templates=1,
+            saved_files=0,
+        )
 
         for raw_content_of_single_file in split_contents:
             # content starts with "marker_new_file", so first string is empty
@@ -852,20 +855,23 @@ class StempelWerk:
             if not raw_content_of_single_file.strip():
                 continue
 
-            saved_files += self._save_single_file(raw_content_of_single_file)
+            # "run_results" contains number of saved files
+            run_results = self._save_single_file(
+                raw_content_of_single_file,
+            )
+
+            # update number of saved files
+            file_counts += run_results
 
         if self.verbosity >= self.VERBOSITY_NORMAL:  # pragma: no branch
             print()
 
-        return {
-            'processed_templates': processed_templates,
-            'saved_files': saved_files,
-        }
+        return file_counts
 
     def _save_single_file(
         self,
         raw_content: Types.RenderedContent,
-    ) -> Types.FileCount:
+    ) -> Types.FileCounts:
         output_file_name, processed_content = self._process_raw_content(
             raw_content
         )
@@ -896,8 +902,13 @@ class StempelWerk:
             newline=newline,
         )
 
-        saved_files = 1
-        return saved_files
+        # templates are handled elsewhere, but a file was saved
+        file_counts = Types.FileCounts(
+            processed_templates=0,
+            saved_files=1,
+        )
+
+        return file_counts
 
     def _process_raw_content(
         self,
@@ -963,8 +974,11 @@ class StempelWerk:
             process_only_modified,
         )
 
-        processed_templates: Types.FileCount = 0
-        saved_files: Types.FileCount = 0
+        # nothing was processed yet
+        file_counts = Types.FileCounts(
+            processed_templates=0,
+            saved_files=0,
+        )
 
         for template_filename in template_filenames:
             # "run_results" contains number of processed and saved files
@@ -973,12 +987,12 @@ class StempelWerk:
                 custom_global_namespace,
             )
 
-            processed_templates += run_results['processed_templates']
-            saved_files += run_results['saved_files']
+            # update number of processed templates and saved files
+            file_counts += run_results
 
             if self.verbosity < self.VERBOSITY_LOW:  # pragma: no coverage
                 self._show_progress(
-                    processed_templates,
+                    file_counts,
                     is_finished=False,
                 )
 
@@ -988,30 +1002,26 @@ class StempelWerk:
             self._store_last_run(start_of_processing)
             self._display_statistics(
                 start_of_processing,
-                processed_templates,
-                saved_files,
+                file_counts,
             )
 
-        return {
-            'processed_templates': processed_templates,
-            'saved_files': saved_files,
-        }
+        return file_counts
 
     def _show_progress(  # pragma: no coverage
         self,
-        processed_templates: int,
+        file_counts: Types.FileCounts,
         is_finished: bool,
     ) -> None:
         if is_finished:
             # finish last line
-            remaining_dots = processed_templates % 10
+            remaining_dots = file_counts.processed_templates % 10
             print('.' * remaining_dots, end='')
 
-            if (processed_templates % 40) != 0:
+            if (file_counts.processed_templates % 40) != 0:
                 print()
-        elif (processed_templates % 40) == 0:
+        elif (file_counts.processed_templates % 40) == 0:
             print('..........', end='\n')
-        elif (processed_templates % 10) == 0:
+        elif (file_counts.processed_templates % 10) == 0:
             print('..........', end=' ')
 
     def _get_last_run(
@@ -1047,13 +1057,12 @@ class StempelWerk:
     def _display_statistics(
         self,
         start_of_processing: datetime.datetime,
-        processed_templates: int,
-        saved_files: int,
+        file_counts: Types.FileCounts,
     ) -> None:
         processing_time = datetime.datetime.now() - start_of_processing
 
-        time_per_template = processing_time / processed_templates
-        time_per_file = processing_time / saved_files
+        time_per_template = processing_time / file_counts.processed_templates
+        time_per_file = processing_time / file_counts.saved_files
 
         self.printer.debug(f'Time per template file: {time_per_template}')
         self.printer.debug(f'Time per output file:   {time_per_file}')
@@ -1062,21 +1071,21 @@ class StempelWerk:
         if self.verbosity < self.VERBOSITY_LOW:  # pragma: no coverage
             # finish last line
             self._show_progress(
-                processed_templates,
+                file_counts,
                 is_finished=True,
             )
 
         if self.verbosity < self.VERBOSITY_NORMAL:  # pragma: no coverage
             print()
             print(
-                f'{processed_templates} =>',
-                f'{saved_files} in {processing_time}',
+                f'{file_counts.processed_templates} =>',
+                f'{file_counts.saved_files} in {processing_time}',
             )
             print()
         else:
             print(
-                f'TOTAL: {processed_templates} templates =>',
-                f'{saved_files} files in {processing_time}',
+                f'TOTAL: {file_counts.processed_templates} templates =>',
+                f'{file_counts.saved_files} files in {processing_time}',
             )
             print()
 

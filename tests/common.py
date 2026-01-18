@@ -219,7 +219,7 @@ class TestCommon:
         process_only_modified: bool = False,
         autocreate_main_directories: bool = True,
     ) -> RunResults:
-        instance, parsed_args = self.init_stempelwerk(
+        stempelwerk_instance, parsed_args = self.init_stempelwerk(
             config_path,
             global_namespace,
             process_only_modified,
@@ -228,12 +228,14 @@ class TestCommon:
 
         assert parsed_args.process_only_modified == process_only_modified
 
+        file_counts = stempelwerk_instance.render_all_templates(
+            process_only_modified,
+        )
+
         # "run_results" contains number of processed and saved files
         run_results = RunResults(
-            counts=instance.render_all_templates(
-                process_only_modified,
-            ),
-            instance=instance,
+            counts=file_counts,
+            instance=stempelwerk_instance,
             configuration={},
         )
 

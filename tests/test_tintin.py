@@ -31,8 +31,8 @@ class TestTinTin(TestCommon):
     @pytest.mark.datafiles(FIXTURE_DIR / '1_global_variables')
     def test_global_variables_from_string(
         self,
-        datafiles,
-    ):
+        datafiles: pathlib.Path,
+    ) -> None:
         custom_config = {
             'stencil_dir_name': 'stencils',
         }
@@ -53,8 +53,8 @@ class TestTinTin(TestCommon):
     @pytest.mark.datafiles(FIXTURE_DIR / '1_global_variables')
     def test_global_variables_from_file(
         self,
-        datafiles,
-    ):
+        datafiles: pathlib.Path,
+    ) -> None:
         custom_config = {
             'stencil_dir_name': 'stencils',
         }
@@ -78,8 +78,8 @@ class TestTinTin(TestCommon):
     @pytest.mark.datafiles(FIXTURE_DIR / '2_custom_module')
     def test_custom_module(
         self,
-        datafiles,
-    ):
+        datafiles: pathlib.Path,
+    ) -> None:
         custom_config = {
             'stencil_dir_name': 'stencils',
             'custom_modules': [
@@ -103,8 +103,8 @@ class TestTinTin(TestCommon):
     @pytest.mark.datafiles(FIXTURE_DIR / '3_jinja_extension')
     def test_jinja_extension(
         self,
-        datafiles,
-    ):
+        datafiles: pathlib.Path,
+    ) -> None:
         custom_config = {
             'stencil_dir_name': 'stencils',
             'jinja_extensions': [

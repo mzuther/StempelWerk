@@ -11,7 +11,7 @@ import pathlib
 
 import pytest
 
-from .common import TestCommon
+from .common import CustomConfig, TestCommon
 
 FIXTURE_DIR = pathlib.Path('tests') / 'manu'
 
@@ -25,8 +25,8 @@ class TestManu(TestCommon):
     # she gets a nice error message to that regard.
     def test_error_on_missing_config(
         self,
-        capsys,
-    ):
+        capsys: pytest.CaptureFixture[str],
+    ) -> None:
         with pytest.raises(SystemExit):
             self.run(
                 None,
@@ -40,11 +40,11 @@ class TestManu(TestCommon):
     # file. Thankfully, she gets another error message.
     def test_error_on_missing_config_2(
         self,
-        capsys,
-    ):
+        capsys: pytest.CaptureFixture[str],
+    ) -> None:
         with pytest.raises(SystemExit):
             self.run(
-                './settings.json',
+                pathlib.Path('./settings.json'),
             )
 
         captured = capsys.readouterr()
@@ -54,10 +54,10 @@ class TestManu(TestCommon):
     # her by pointing out that the template directory is missing.
     def test_error_on_missing_template_directory(
         self,
-        capsys,
-        tmp_path,
-    ):
-        custom_config = {}
+        capsys: pytest.CaptureFixture[str],
+        tmp_path: pathlib.Path,
+    ) -> None:
+        custom_config: CustomConfig = {}
 
         config_path = tmp_path / 'nested/uncommon/location_and.suffix'
         config_dir_path = config_path.parent
@@ -82,10 +82,10 @@ class TestManu(TestCommon):
     # notifies her that she also has to create the output directory.
     def test_error_on_missing_output_directory(
         self,
-        capsys,
-        tmp_path,
-    ):
-        custom_config = {}
+        capsys: pytest.CaptureFixture[str],
+        tmp_path: pathlib.Path,
+    ) -> None:
+        custom_config: CustomConfig = {}
 
         config_path = tmp_path / 'nested/yet/another/location_and.suffix'
         config_dir_path = config_path.parent
@@ -114,9 +114,9 @@ class TestManu(TestCommon):
     # have to provide any templates.
     def test_autocreation_of_directories(
         self,
-        tmp_path,
-    ):
-        custom_config = {}
+        tmp_path: pathlib.Path,
+    ) -> None:
+        custom_config: CustomConfig = {}
 
         config_path = tmp_path / 'nested/uncommon/location_and.suffix'
         config_path.parent.mkdir(parents=True)
@@ -137,8 +137,8 @@ class TestManu(TestCommon):
     # be specified in a cross-platform way.
     def test_path_separators(
         self,
-        tmp_path,
-    ):
+        tmp_path: pathlib.Path,
+    ) -> None:
         # paths without trailing path separator are functional;
         # auto-creation of nested directories works
         custom_config = {
@@ -165,8 +165,8 @@ class TestManu(TestCommon):
     # smiles and keeps on working as before.
     def test_path_separators_trailing(
         self,
-        tmp_path,
-    ):
+        tmp_path: pathlib.Path,
+    ) -> None:
         # paths without trailing path separator are functional
         custom_config = {
             'template_dir': 'templates',
@@ -195,8 +195,8 @@ class TestManu(TestCommon):
     @pytest.mark.datafiles(FIXTURE_DIR / '1_template_1_notrim')
     def test_render_notrim(
         self,
-        datafiles,
-    ):
+        datafiles: pathlib.Path,
+    ) -> None:
         # assert that StempelWerk can change Jinja options
         custom_config = {
             'jinja_options': {
@@ -216,8 +216,8 @@ class TestManu(TestCommon):
     @pytest.mark.datafiles(FIXTURE_DIR / '1_template_2_trim')
     def test_render_trim(
         self,
-        datafiles,
-    ):
+        datafiles: pathlib.Path,
+    ) -> None:
         custom_config = {
             'jinja_options': {
                 'trim_blocks': True,
@@ -236,8 +236,8 @@ class TestManu(TestCommon):
     @pytest.mark.datafiles(FIXTURE_DIR / '1_template_3_splitfile')
     def test_render_splitfile(
         self,
-        datafiles,
-    ):
+        datafiles: pathlib.Path,
+    ) -> None:
         # assert that a subdirectory under "datafiles" also works
         root_dir = datafiles / 'DRY/nested'
 
@@ -269,9 +269,9 @@ class TestManu(TestCommon):
     @pytest.mark.datafiles(FIXTURE_DIR / '1_template_4_file_separator')
     def test_render_file_separator_code_only(
         self,
-        datafiles,
-    ):
-        custom_config = {}
+        datafiles: pathlib.Path,
+    ) -> None:
+        custom_config: CustomConfig = {}
 
         config_path = datafiles / 'settings.json'
         with pytest.raises(SystemExit):
@@ -290,8 +290,8 @@ class TestManu(TestCommon):
     @pytest.mark.datafiles(FIXTURE_DIR / '1_template_4_file_separator')
     def test_render_file_separator(
         self,
-        datafiles,
-    ):
+        datafiles: pathlib.Path,
+    ) -> None:
         custom_config = {
             'marker_new_file': 'START_FILE',
             'marker_content': 'START_CONTENT',
@@ -309,8 +309,8 @@ class TestManu(TestCommon):
     @pytest.mark.datafiles(FIXTURE_DIR / '1_template_5_with_stencil')
     def test_render_missing_stencil(
         self,
-        datafiles,
-    ):
+        datafiles: pathlib.Path,
+    ) -> None:
         custom_config = {
             'stencil_dir_name': 'stencils',
         }
@@ -326,8 +326,8 @@ class TestManu(TestCommon):
     @pytest.mark.datafiles(FIXTURE_DIR / '1_template_5_with_stencil')
     def test_render_with_stencil(
         self,
-        datafiles,
-    ):
+        datafiles: pathlib.Path,
+    ) -> None:
         custom_config = {
             'stencil_dir_name': '00-stencils',
         }
@@ -344,8 +344,8 @@ class TestManu(TestCommon):
     @pytest.mark.datafiles(FIXTURE_DIR / '1_template_6_multiple_stencils')
     def test_render_multiple_stencils(
         self,
-        datafiles,
-    ):
+        datafiles: pathlib.Path,
+    ) -> None:
         custom_config = {
             'stencil_dir_name': 'stencils',
         }
@@ -366,9 +366,9 @@ class TestManu(TestCommon):
     @pytest.mark.datafiles(FIXTURE_DIR / '1_template_7_create_subdirs')
     def test_render_create_subdirectories_1(
         self,
-        datafiles,
-    ):
-        custom_config = {}
+        datafiles: pathlib.Path,
+    ) -> None:
+        custom_config: CustomConfig = {}
 
         config_path = datafiles / 'settings.json'
         with pytest.raises(SystemExit):
@@ -382,9 +382,9 @@ class TestManu(TestCommon):
     @pytest.mark.datafiles(FIXTURE_DIR / '1_template_7_create_subdirs')
     def test_render_create_subdirectories_2(
         self,
-        datafiles,
-    ):
-        custom_config = {}
+        datafiles: pathlib.Path,
+    ) -> None:
+        custom_config: CustomConfig = {}
 
         # create nested output subdirectory by hand
         output_subpath = datafiles / '20-output/other/name'
@@ -404,8 +404,8 @@ class TestManu(TestCommon):
     @pytest.mark.datafiles(FIXTURE_DIR / '1_template_7_create_subdirs')
     def test_render_create_subdirectories_3(
         self,
-        datafiles,
-    ):
+        datafiles: pathlib.Path,
+    ) -> None:
         custom_config = {
             'create_directories': True,
         }
@@ -421,8 +421,8 @@ class TestManu(TestCommon):
     @pytest.mark.datafiles(FIXTURE_DIR / '1_template_8_file_endings')
     def test_render_file_endings_1(
         self,
-        datafiles,
-    ):
+        datafiles: pathlib.Path,
+    ) -> None:
         custom_config = {
             'create_directories': True,
             'newline': '\n',
@@ -438,8 +438,8 @@ class TestManu(TestCommon):
     @pytest.mark.datafiles(FIXTURE_DIR / '1_template_8_file_endings')
     def test_render_file_endings_2(
         self,
-        datafiles,
-    ):
+        datafiles: pathlib.Path,
+    ) -> None:
         custom_config = {
             'create_directories': True,
             # invert logic, part 1
@@ -459,6 +459,7 @@ class TestManu(TestCommon):
         }
 
         instance.render_all_templates()
+
         self.compare_directories(
             run_results.configuration,
         )
@@ -468,9 +469,9 @@ class TestManu(TestCommon):
     @pytest.mark.datafiles(FIXTURE_DIR / '2_templates_1_no_stencil')
     def test_render_multi_no_stencil(
         self,
-        datafiles,
-    ):
-        custom_config = {}
+        datafiles: pathlib.Path,
+    ) -> None:
+        custom_config: CustomConfig = {}
 
         config_path = datafiles / 'settings.json'
         self.run_and_compare(
@@ -483,8 +484,8 @@ class TestManu(TestCommon):
     @pytest.mark.datafiles(FIXTURE_DIR / '2_templates_2_with_stencil')
     def test_render_multi_with_stencil(
         self,
-        datafiles,
-    ):
+        datafiles: pathlib.Path,
+    ) -> None:
         custom_config = {
             'stencil_dir_name': 'stencils',
         }

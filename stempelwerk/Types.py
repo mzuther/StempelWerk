@@ -1,10 +1,23 @@
+import dataclasses
 import pathlib
 import typing
 
 Verbosity = int
 
-FileCount = int
-FileCounts = dict[str, FileCount]
+
+@dataclasses.dataclass
+class FileCounts:
+    processed_templates: int
+    saved_files: int
+
+    def __add__(
+        self,
+        other: typing.Self,
+    ) -> typing.Self:
+        self.processed_templates += other.processed_templates
+        self.saved_files += other.saved_files
+
+        return self
 
 
 TemplatePath = pathlib.Path
