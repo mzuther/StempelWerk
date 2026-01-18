@@ -62,14 +62,14 @@ class TestTinTin(TestCommon):
         global_namespace_file = datafiles / 'global.json'
 
         # paths are passed to client application as string
-        global_namespace_file = str(global_namespace_file)
+        global_namespace_string = str(global_namespace_file)
 
         # set up StempelWerk and execute full run
         config_path = datafiles / 'settings.json'
         self.run_and_compare(
             custom_config,
             config_path,
-            global_namespace=global_namespace_file,
+            global_namespace=global_namespace_string,
         )
 
     # After a year of intense testing, Tin Tin moved on to custom modules. He

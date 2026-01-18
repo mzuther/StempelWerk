@@ -161,19 +161,28 @@ class StempelWerk:
         template_dir: str
         output_dir: str
         # ----------------------------------------
-        included_file_names: list
+        included_file_names: list[str]
         stencil_dir_name: str = ''
         create_directories: bool = False
         # ----------------------------------------
-        global_namespace: list = dataclasses.field(default_factory=dict)
-        jinja_options: list = dataclasses.field(default_factory=dict)
-        jinja_extensions: list = dataclasses.field(default_factory=list)
-        custom_modules: list = dataclasses.field(default_factory=list)
+        global_namespace: Types.JinjaNamespace = dataclasses.field(
+            default_factory=dict
+        )
+        jinja_options: Types.JinjaOptions = dataclasses.field(
+            default_factory=dict
+        )
+
+        jinja_extensions: Types.JinjaExtensions = dataclasses.field(
+            default_factory=list
+        )
+        custom_modules: Types.CustomModules = dataclasses.field(
+            default_factory=list
+        )
         # ----------------------------------------
         last_run_file: str = '.last_run'
         marker_new_file: str = '### New file:'
         marker_content: str = '### Content:'
-        newline: str = None
+        newline: str | None = None
 
         @staticmethod
         def finalize_path(
