@@ -273,9 +273,9 @@ class StempelWerk:
     class CustomCodeTemplate:
         def __init__(
             self,
-            copy_of_settings,
-            printer,
-        ):
+            copy_of_settings: 'StempelWerk.Settings',
+            printer: 'StempelWerk.LinePrinter',
+        ) -> None:
             # this is only a copy; changing this variable does *not* change the
             # settings of StempelWerk
             self.settings = copy_of_settings
@@ -283,20 +283,20 @@ class StempelWerk:
 
         def update_environment(
             self,
-            jinja_environment,
-        ):
+            jinja_environment: jinja2.environment.Environment,
+        ) -> jinja2.environment.Environment:
             return jinja_environment
 
         def print_error(  # pragma: no coverage
             self,
-            message='',
-        ):
+            message: str = '',
+        ) -> None:
             self.printer.error(message)
 
         def print_debug(
             self,
-            message='',
-        ):
+            message: str = '',
+        ) -> None:
             self.printer.debug(message)
 
     # ---------------------------------------------------------------------
@@ -479,7 +479,7 @@ class StempelWerk:
 
     def __init__(
         self,
-        settings,
+        settings: Settings,
         verbosity: Types.Verbosity = VERBOSITY_NORMAL,
         _testing_autocreate_main_directories: bool = False,
     ) -> None:
@@ -653,10 +653,12 @@ class StempelWerk:
 
     def _add_stempelwerk_helpers(
         self,
-    ):
+    ) -> None:
         # create a new file by inserting a special string into the output;
         # this allows you to create multiple files from a single template
-        def start_new_file(filename):
+        def start_new_file(
+            filename: pathlib.Path,
+        ) -> str:
             result = f"""{self.settings.marker_new_file} {filename}
 {self.settings.marker_content}
 """
@@ -695,10 +697,22 @@ class StempelWerk:
 
             # import code as module
             module_spec = importlib.util.find_spec(module_name)
+            assert module_spec is not None, (
+                f'could not open custom module "{module_name}" (spec)'
+            )
+
             imported_module = importlib.util.module_from_spec(module_spec)
+            assert imported_module is not None, (
+                f'could not open custom module "{module_name}" (module)'
+            )
+
+            module_loader = module_spec.loader
+            assert module_loader is not None, (
+                f'could not open custom module "{module_name}" (loader)'
+            )
 
             # execute module its own namespace
-            module_spec.loader.exec_module(imported_module)
+            module_loader.exec_module(imported_module)
 
             # prevent changes to settings
             custom_code = imported_module.CustomCode(
