@@ -2,8 +2,24 @@ import typing
 
 Verbosity = int
 
-JinjaNamespace = dict[str, typing.Any]
-JinjaOptions = dict[str, typing.Any]
 
-JinjaExtensions = list[str]
-CustomModules = list[str]
+JinjaOptionName = str
+JinjaOptionValue = typing.Any
+
+JinjaOptions = dict[JinjaOptionName, JinjaOptionValue]
+
+
+NamespaceOptionName = str
+NamespaceOptionValue = str
+
+JinjaNamespace = dict[NamespaceOptionName, NamespaceOptionValue]
+CustomNamespace = JinjaNamespace
+TemplateNamespace = dict[str, JinjaNamespace]
+
+
+JinjaExtensionName = str
+JinjaExtensions = list[JinjaExtensionName]
+
+
+CustomModuleName = str
+CustomModules = list[CustomModuleName]

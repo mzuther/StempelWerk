@@ -717,11 +717,14 @@ class StempelWerk:
     def render_template(
         self,
         template_path,
-        custom_global_namespace=None,
+        custom_global_namespace: Types.CustomNamespace | None = None,
     ):
         relative_template_path = template_path.relative_to(
             self.settings.template_dir_path
         )
+
+        if custom_global_namespace is None:
+            custom_global_namespace = {}
 
         global_namespace = self._prepare_global_namespace(
             custom_global_namespace
@@ -745,8 +748,8 @@ class StempelWerk:
 
     def _prepare_global_namespace(
         self,
-        custom_global_namespace,
-    ):
+        custom_global_namespace: Types.CustomNamespace,
+    ) -> Types.TemplateNamespace:
         # get default global variables
         global_namespace = self.settings.global_namespace
 
@@ -763,7 +766,7 @@ class StempelWerk:
     def _render_content(
         self,
         template_path,
-        global_namespace,
+        global_namespace: Types.TemplateNamespace,
     ):
         if self.verbosity >= self.VERBOSITY_LOW:  # pragma: no branch
             print(f'- {template_path}')
@@ -931,7 +934,7 @@ class StempelWerk:
     def render_all_templates(
         self,
         process_only_modified=False,
-        custom_global_namespace=None,
+        custom_global_namespace: Types.CustomNamespace | None = None,
     ):
         start_of_processing = datetime.datetime.now()
 
@@ -1076,7 +1079,7 @@ class StempelWerk:
         return template_filenames
 
 
-def main_cli():  # pragma: no coverage
+def main_cli() -> None:  # pragma: no coverage
     command_line_arguments = sys.argv
     parsed_args = StempelWerk.CommandLineParser(command_line_arguments)
 
@@ -1085,7 +1088,7 @@ def main_cli():  # pragma: no coverage
     # if you want to modify the global namespace programmatically, here is the
     # right place to do so; this will extend / overwrite the global variables
     # specified on the command line
-    custom_global_namespace = {}
+    custom_global_namespace: Types.CustomNamespace = {}
 
     sw.render_all_templates(
         parsed_args.process_only_modified,
