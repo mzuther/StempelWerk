@@ -223,8 +223,8 @@ class StempelWerk:
 
         def __str__(
             self,
-        ):
-            output = []
+        ) -> str:
+            collected_settings = []
             separator = ' '
 
             settings = [
@@ -249,7 +249,7 @@ class StempelWerk:
 
             for setting in settings:
                 if setting == separator:
-                    output.append(separator)
+                    collected_settings.append(separator)
                     continue
 
                 setting_name = f'{setting + ":":<20s}'
@@ -260,9 +260,11 @@ class StempelWerk:
                 else:
                     setting_value = repr(setting_value)
 
-                output.append(f'{setting_name}  {setting_value}')
+                collected_settings.append(
+                    f'{setting_name}  {setting_value}',
+                )
 
-            output = '\n'.join(output)
+            output = '\n'.join(collected_settings)
             return output
 
     # ---------------------------------------------------------------------
@@ -303,13 +305,13 @@ class StempelWerk:
         @property
         def parser(
             self,
-        ):
+        ) -> argparse.ArgumentParser:
             class HelpfulArgumentParser(argparse.ArgumentParser):
                 def exit(
                     self,
-                    status=0,
-                    message=None,
-                ):
+                    status: int = 0,
+                    message: str | None = None,
+                ) -> typing.NoReturn:
                     if status:  # pragma: no branch
                         # display help on errors without showing usage message
                         # twice
@@ -398,8 +400,8 @@ class StempelWerk:
 
         def __init__(
             self,
-            command_line_arguments,
-        ):
+            command_line_arguments: list[str],
+        ) -> None:
             cla_without_scriptname = command_line_arguments[1:]
             args = self.parser.parse_args(cla_without_scriptname)
 
@@ -441,8 +443,8 @@ class StempelWerk:
 
         def _load_json_file(
             self,
-            json_file_path,
-        ):
+            json_file_path: str | pathlib.Path,
+        ) -> typing.Any:
             try:
                 # "json_file_path" may be a string, so convert it to a path
                 json_file_path = pathlib.Path(json_file_path)
@@ -479,8 +481,8 @@ class StempelWerk:
         self,
         settings,
         verbosity: Types.Verbosity = VERBOSITY_NORMAL,
-        _testing_autocreate_main_directories=False,
-    ):
+        _testing_autocreate_main_directories: bool = False,
+    ) -> None:
         self.verbosity = verbosity
         self.printer = self.LinePrinter(self.verbosity)
         self._display_version(self.verbosity)
@@ -535,7 +537,7 @@ class StempelWerk:
 
     def create_environment(
         self,
-    ):
+    ) -> None:
         self.printer.debug('Loading templates ...')
 
         # NOTE: Jinja loads templates from sub-directories;
@@ -634,7 +636,7 @@ class StempelWerk:
 
     def _load_jinja_extensions(
         self,
-    ):
+    ) -> None:
         if not self.settings.jinja_extensions:
             return
 
@@ -665,7 +667,7 @@ class StempelWerk:
 
     def _execute_custom_modules(
         self,
-    ):
+    ) -> None:
         self._add_stempelwerk_helpers()
 
         if not self.settings.custom_modules:
@@ -979,9 +981,9 @@ class StempelWerk:
 
     def _show_progress(  # pragma: no coverage
         self,
-        processed_templates,
-        is_finished,
-    ):
+        processed_templates: int,
+        is_finished: bool,
+    ) -> None:
         if is_finished:
             # finish last line
             remaining_dots = processed_templates % 10
@@ -1027,9 +1029,9 @@ class StempelWerk:
     def _display_statistics(
         self,
         start_of_processing,
-        processed_templates,
-        saved_files,
-    ):
+        processed_templates: int,
+        saved_files: int,
+    ) -> None:
         processing_time = datetime.datetime.now() - start_of_processing
 
         time_per_template = processing_time / processed_templates
@@ -1041,7 +1043,10 @@ class StempelWerk:
 
         if self.verbosity < self.VERBOSITY_LOW:  # pragma: no coverage
             # finish last line
-            self._show_progress(processed_templates, is_finished=True)
+            self._show_progress(
+                processed_templates,
+                is_finished=True,
+            )
 
         if self.verbosity < self.VERBOSITY_NORMAL:  # pragma: no coverage
             print()
