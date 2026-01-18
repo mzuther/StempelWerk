@@ -51,6 +51,7 @@ import math
 import os
 import pathlib
 import sys
+import typing
 
 import herkules.Herkules as Herkules
 import herkules.HerkulesTypes as HerkulesTypes
@@ -737,7 +738,7 @@ class StempelWerk:
         self,
         template_path: Types.TemplatePath,
         custom_global_namespace: Types.CustomNamespace | None = None,
-    ):
+    ) -> Types.FileCounts:
         relative_template_path = template_path.relative_to(
             self.settings.template_dir_path
         )
@@ -786,7 +787,7 @@ class StempelWerk:
         self,
         template_path: Types.TemplatePath,
         global_namespace: Types.TemplateNamespace,
-    ):
+    ) -> Types.RenderedContent:
         if self.verbosity >= self.VERBOSITY_LOW:  # pragma: no branch
             print(f'- {template_path}')
 
@@ -835,15 +836,15 @@ class StempelWerk:
 
     def _save_content(
         self,
-        raw_content_of_multiple_files,
-    ):
+        raw_content_of_multiple_files: str,
+    ) -> Types.FileCounts:
         # split content into multiple files
         split_contents = raw_content_of_multiple_files.split(
             self.settings.marker_new_file
         )
 
-        processed_templates = 1
-        saved_files = 0
+        processed_templates: Types.FileCount = 1
+        saved_files: Types.FileCount = 0
 
         for raw_content_of_single_file in split_contents:
             # content starts with "marker_new_file", so first string is empty
@@ -863,8 +864,8 @@ class StempelWerk:
 
     def _save_single_file(
         self,
-        raw_content,
-    ):
+        raw_content: Types.RenderedContent,
+    ) -> Types.FileCount:
         output_file_name, processed_content = self._process_raw_content(
             raw_content
         )
@@ -895,12 +896,13 @@ class StempelWerk:
             newline=newline,
         )
 
-        return 1
+        saved_files = 1
+        return saved_files
 
     def _process_raw_content(
         self,
-        raw_content,
-    ):
+        raw_content: Types.RenderedContent,
+    ) -> tuple[str, Types.RenderedContent]:
         new_file_markers = raw_content.count(
             self.settings.marker_new_file,
         )
@@ -954,13 +956,15 @@ class StempelWerk:
         self,
         process_only_modified: bool = False,
         custom_global_namespace: Types.CustomNamespace | None = None,
-    ):
+    ) -> Types.FileCounts:
         start_of_processing = datetime.datetime.now()
 
-        template_filenames = self._find_templates(process_only_modified)
+        template_filenames = self._find_templates(
+            process_only_modified,
+        )
 
-        processed_templates = 0
-        saved_files = 0
+        processed_templates: Types.FileCount = 0
+        saved_files: Types.FileCount = 0
 
         for template_filename in template_filenames:
             # "run_results" contains number of processed and saved files
@@ -1042,7 +1046,7 @@ class StempelWerk:
 
     def _display_statistics(
         self,
-        start_of_processing,
+        start_of_processing: datetime.datetime,
         processed_templates: int,
         saved_files: int,
     ) -> None:

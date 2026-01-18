@@ -77,7 +77,7 @@ testpaths = [
 ]
 
 [tool.mypy]
-strict = false
+strict = true
 
 [tool.ruff]
 line-length = 79

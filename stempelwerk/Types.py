@@ -3,10 +3,14 @@ import typing
 
 Verbosity = int
 
+FileCount = int
+FileCounts = dict[str, FileCount]
+
 
 TemplatePath = pathlib.Path
 TemplatePaths = list[TemplatePath]
 
+RenderedContent = str
 ResultPath = pathlib.Path
 
 
