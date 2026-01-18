@@ -451,7 +451,7 @@ class TestManu(TestCommon):
             custom_config,
             config_path,
         )
-        instance = run_results['instance']
+        instance = run_results.instance
 
         instance.newline_exceptions = {
             # invert logic, part 2
@@ -460,7 +460,7 @@ class TestManu(TestCommon):
 
         instance.render_all_templates()
         self.compare_directories(
-            run_results['configuration'],
+            run_results.configuration,
         )
 
     # After playing around with a single template, Manu is excited that

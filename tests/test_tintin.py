@@ -142,5 +142,5 @@ class TestTinTin(TestCommon):
         # assert that output files are rendered correctly
         debug_path.unlink()
         self.compare_directories(
-            run_results['configuration'],
+            run_results.configuration,
         )

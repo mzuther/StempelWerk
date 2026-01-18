@@ -1,14 +1,26 @@
 import contextlib
+import dataclasses
 import difflib
 import filecmp
 import json
 import pathlib
 import shutil
 import sys
+import typing
 
 import pytest
 
+from stempelwerk import Types
 from stempelwerk.StempelWerk import StempelWerk
+
+CustomConfig = dict[str, typing.Any]
+
+
+@dataclasses.dataclass
+class RunResults:
+    counts: Types.FileCounts
+    instance: StempelWerk
+    configuration: CustomConfig
 
 
 class TestCommon:
@@ -28,9 +40,9 @@ class TestCommon:
 
     def modify_file(
         self,
-        config,
-        file_path,
-    ):
+        config: CustomConfig,
+        file_path: pathlib.Path,
+    ) -> None:
         with file_path.open() as original_file:
             original_contents = original_file.readlines()
 
@@ -46,8 +58,8 @@ class TestCommon:
 
     def update_file(
         self,
-        input_path,
-    ):
+        input_path: pathlib.Path | str,
+    ) -> None:
         output_path = pathlib.Path(
             str(input_path).replace('_updated', ''),
         )
@@ -58,16 +70,20 @@ class TestCommon:
 
     def create_config(
         self,
-        custom_config,
-        config_path,
-        common_path_separator=True,
-    ):
+        custom_config: CustomConfig,
+        config_path: pathlib.Path,
+        common_path_separator: bool = True,
+    ) -> CustomConfig:
+        config_path = pathlib.Path(config_path)
         root_dir = config_path.parent
-        if common_path_separator:  # pragma: no branching
-            root_dir = root_dir.as_posix()
 
-        config = {
-            'root_dir': str(root_dir),
+        if common_path_separator:  # pragma: no branching
+            root_dir_as_string = root_dir.as_posix()
+        else:
+            root_dir_as_string = str(root_dir)
+
+        config: CustomConfig = {
+            'root_dir': root_dir_as_string,
             'template_dir': '10-templates',
             'output_dir': '20-output',
             # ----------------------------------------
@@ -101,14 +117,16 @@ class TestCommon:
 
         # load and parse stored settings
         actual_contents = config_path.read_text()
-        actual_config = json.loads(actual_contents)
+        actual_config: CustomConfig = json.loads(
+            actual_contents,
+        )
 
         return actual_config
 
     def compare_directories(
         self,
-        config,
-    ):
+        config: CustomConfig,
+    ) -> None:
         root_dir = pathlib.Path(config['root_dir'])
         output_path = root_dir / config['output_dir']
         expected_base = root_dir / '30-expected'
@@ -164,11 +182,11 @@ class TestCommon:
 
     def init_stempelwerk(
         self,
-        config_path=None,
-        global_namespace=None,
-        process_only_modified=False,
-        autocreate_main_directories=True,
-    ):
+        config_path: pathlib.Path | None = None,
+        global_namespace: str | None = None,
+        process_only_modified: bool = False,
+        autocreate_main_directories: bool = True,
+    ) -> tuple[StempelWerk, StempelWerk.CommandLineParser]:
         script_path = sys.argv[0]
         command_line_arguments = [script_path]
 
@@ -196,11 +214,11 @@ class TestCommon:
 
     def run(
         self,
-        config_path=None,
-        global_namespace=None,
-        process_only_modified=False,
-        autocreate_main_directories=True,
-    ):
+        config_path: pathlib.Path | None = None,
+        global_namespace: str | None = None,
+        process_only_modified: bool = False,
+        autocreate_main_directories: bool = True,
+    ) -> RunResults:
         instance, parsed_args = self.init_stempelwerk(
             config_path,
             global_namespace,
@@ -211,17 +229,22 @@ class TestCommon:
         assert parsed_args.process_only_modified == process_only_modified
 
         # "run_results" contains number of processed and saved files
-        run_results = instance.render_all_templates(process_only_modified)
-        run_results['instance'] = instance
+        run_results = RunResults(
+            counts=instance.render_all_templates(
+                process_only_modified,
+            ),
+            instance=instance,
+            configuration={},
+        )
 
         return run_results
 
     def run_with_config(
         self,
-        custom_config,
-        config_path,
-        global_namespace=None,
-    ):
+        custom_config: CustomConfig,
+        config_path: pathlib.Path,
+        global_namespace: str | None = None,
+    ) -> RunResults:
         config = self.create_config(
             custom_config,
             config_path,
@@ -240,24 +263,27 @@ class TestCommon:
             config_path,
             global_namespace,
         )
-        run_results['configuration'] = config
+
+        run_results.configuration = config
 
         return run_results
 
     def run_and_compare(
         self,
-        custom_config,
-        config_path,
-        global_namespace=None,
-    ):
+        custom_config: CustomConfig,
+        config_path: pathlib.Path,
+        global_namespace: str | None = None,
+    ) -> RunResults:
         run_results = self.run_with_config(
             custom_config,
             config_path,
             global_namespace,
         )
 
+        assert run_results.configuration is not None
+
         self.compare_directories(
-            run_results['configuration'],
+            run_results.configuration,
         )
 
         return run_results
