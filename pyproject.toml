@@ -20,6 +20,7 @@ classifiers = [
     "Topic :: Software Development :: Pre-processors",
     "Topic :: Text Processing",
     "Topic :: Utilities",
+    "Typing :: Typed",
 ]
 authors = [{ name = "Martin Zuther", email = "code@mzuther.de" }]
 requires-python = ">=3.10,<4.0"
@@ -74,6 +75,9 @@ markers = [
 testpaths = [
     "tests",
 ]
+
+[tool.mypy]
+strict = false
 
 [tool.ruff]
 line-length = 79

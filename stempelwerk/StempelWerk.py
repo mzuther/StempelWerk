@@ -55,6 +55,8 @@ import sys
 import herkules.Herkules as Herkules
 import jinja2
 
+from . import Types
+
 __version__ = '1.1.1'
 
 
@@ -75,8 +77,8 @@ class StempelWerk:
 
     @staticmethod
     def format_version(
-        verbosity=VERBOSITY_NORMAL,
-    ):
+        verbosity: Types.Verbosity = VERBOSITY_NORMAL,
+    ) -> str:
         if verbosity < StempelWerk.VERBOSITY_NORMAL:  # pragma: no coverage
             return StempelWerk.APPLICATION_VERSION
         else:
@@ -88,8 +90,8 @@ class StempelWerk:
 
     @staticmethod
     def format_description(
-        verbosity=VERBOSITY_NORMAL,
-    ):
+        verbosity: Types.Verbosity = VERBOSITY_NORMAL,
+    ) -> str:
         return (
             StempelWerk.format_version(verbosity)
             + '\n\n'
@@ -98,8 +100,8 @@ class StempelWerk:
 
     def _display_version(
         self,
-        verbosity=VERBOSITY_NORMAL,
-    ):
+        verbosity: Types.Verbosity = VERBOSITY_NORMAL,
+    ) -> None:
         version_message = self.format_version(verbosity)
 
         print()
@@ -115,29 +117,29 @@ class StempelWerk:
     class LinePrinter:
         def __init__(
             self,
-            verbosity,
+            verbosity: Types.Verbosity,
         ):
             self.verbosity = verbosity
 
         def _print_context(
             self,
-            context,
-            message,
-        ):
+            context: str,
+            message: str,
+        ) -> None:
             if message:
                 message = f'{context}: {message}'
             print(message)
 
         def error(
             self,
-            message='',
-        ):
+            message: str = '',
+        ) -> None:
             self._print_context('ERROR', message)
 
         def debug(
             self,
-            message='',
-        ):
+            message: str = '',
+        ) -> None:
             if (
                 self.verbosity > StempelWerk.VERBOSITY_NORMAL
             ):  # pragma: no coverage
@@ -464,7 +466,7 @@ class StempelWerk:
     def __init__(
         self,
         settings,
-        verbosity=VERBOSITY_NORMAL,
+        verbosity: Types.Verbosity = VERBOSITY_NORMAL,
         _testing_autocreate_main_directories=False,
     ):
         self.verbosity = verbosity
