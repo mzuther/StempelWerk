@@ -127,10 +127,9 @@ class TestManu(TestCommon):
         )
 
         # check that StempelWerk runs without any templates
-        with self.does_not_raise(SystemExit):
-            _ = self.run(
-                config_path,
-            )
+        _ = self.run(
+            config_path,
+        )
 
     # Manu finally reads (a small part of) the documentation. She dreams of
     # leaving the DOS ecosystem behind, so she verfifies that paths can really
@@ -155,10 +154,9 @@ class TestManu(TestCommon):
         )
 
         # check that StempelWerk runs without any templates
-        with self.does_not_raise(SystemExit):
-            _ = self.run(
-                config_path,
-            )
+        _ = self.run(
+            config_path,
+        )
 
     # She also dislikes trailing path separators (if DOS does not need them,
     # why should any other OS?) and stubbornly removes them. StempelWerk just
@@ -182,10 +180,9 @@ class TestManu(TestCommon):
         )
 
         # check that StempelWerk runs without any templates
-        with self.does_not_raise(SystemExit):
-            _ = self.run(
-                config_path,
-            )
+        _ = self.run(
+            config_path,
+        )
 
     # ------------------------------------------------------------------------
 

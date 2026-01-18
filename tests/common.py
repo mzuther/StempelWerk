@@ -1,4 +1,3 @@
-import contextlib
 import dataclasses
 import difflib
 import filecmp
@@ -24,20 +23,6 @@ class RunResults:
 
 
 class TestCommon:
-    # adapted from https://stackoverflow.com/a/42327075
-    @contextlib.contextmanager
-    def does_not_raise(
-        self,
-        exception,
-    ):
-        try:
-            yield
-        except exception:  # pragma: no coverage
-            # ruff: noqa: B904
-            raise pytest.fail(f'raised unwanted exception {exception}')
-
-    # ------------------------------------------------------------------------
-
     def modify_file(
         self,
         config: CustomConfig,
