@@ -1,6 +1,13 @@
+import pathlib
 import typing
 
 Verbosity = int
+
+
+TemplatePath = pathlib.Path
+TemplatePaths = list[TemplatePath]
+
+ResultPath = pathlib.Path
 
 
 JinjaOptionName = str

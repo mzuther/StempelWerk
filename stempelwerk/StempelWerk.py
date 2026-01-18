@@ -571,19 +571,19 @@ class StempelWerk:
 
     def _get_templates(
         self,
-    ):
+    ) -> Types.TemplatePaths:
         template_paths = []
 
         for template_filename in self.jinja_environment.list_templates():
-            template_path = pathlib.Path(template_filename)
+            template_path = Types.TemplatePath(template_filename)
             template_paths.append(template_path)
 
         return template_paths
 
     def _check_templates(
         self,
-        template_paths,
-    ):
+        template_paths: Types.TemplatePaths,
+    ) -> None:
         if not template_paths:
             self.printer.error()
             self.printer.error('No templates found.')
@@ -592,8 +592,8 @@ class StempelWerk:
 
     def _get_stencils(
         self,
-        template_paths,
-    ):
+        template_paths: Types.TemplatePaths,
+    ) -> Types.TemplatePaths:
         stencil_paths = []
 
         for template_path in template_paths:
@@ -604,8 +604,8 @@ class StempelWerk:
 
     def _check_stencils(
         self,
-        stencil_paths,
-    ):
+        stencil_paths: Types.TemplatePaths,
+    ) -> None:
         if not self.settings.stencil_dir_name:
             return
 
@@ -657,7 +657,7 @@ class StempelWerk:
         # create a new file by inserting a special string into the output;
         # this allows you to create multiple files from a single template
         def start_new_file(
-            filename: pathlib.Path,
+            filename: Types.ResultPath,
         ) -> str:
             result = f"""{self.settings.marker_new_file} {filename}
 {self.settings.marker_content}
@@ -735,7 +735,7 @@ class StempelWerk:
 
     def render_template(
         self,
-        template_path,
+        template_path: Types.TemplatePath,
         custom_global_namespace: Types.CustomNamespace | None = None,
     ):
         relative_template_path = template_path.relative_to(
@@ -784,7 +784,7 @@ class StempelWerk:
 
     def _render_content(
         self,
-        template_path,
+        template_path: Types.TemplatePath,
         global_namespace: Types.TemplateNamespace,
     ):
         if self.verbosity >= self.VERBOSITY_LOW:  # pragma: no branch
@@ -932,8 +932,8 @@ class StempelWerk:
 
     def _create_output_directory(
         self,
-        output_file_path,
-    ):
+        output_file_path: Types.ResultPath,
+    ) -> None:
         output_directory = output_file_path.parent
 
         if output_directory.is_dir():
