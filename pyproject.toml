@@ -35,12 +35,12 @@ dependencies = [
 
 [dependency-groups]
 dev = [
-    "mypy>=1.19.1",
+    "mypy>=2.0.0",
     "pip-licenses>=5.0.0",
-    "pytest>=7.3.0,<8",
-    "pytest-cov>=6.2.1",
+    "pytest>=9.2.0",
+    "pytest-cov>=7.0.0",
     "pytest-datafiles>=3.0.0,<4",
-    "ruff>=0.12.11",
+    "ruff>=0.17.0",
 ]
 
 [build-system]
