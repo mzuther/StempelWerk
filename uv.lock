@@ -360,11 +360,11 @@ wheels = [
 
 [[package]]
 name = "herkules"
-version = "1.3.0"
+version = "1.3.1"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/ef/45/5a21c5fd3d98577cc6ea27a055c7c4784ef32897651730fe89945e11dc4f/herkules-1.3.0.tar.gz", hash = "sha256:2a5a67bf7a30d815fef99abcb1d55d55e76feb8cb0da9913f54118d213dc225a", size = 277296, upload-time = "2026-01-03T20:09:18.568Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/bd/cb/2a1e737762ed28193f8239046a16d5a9217c65e633eb578f678646e5d6e8/herkules-1.3.1.tar.gz", hash = "sha256:bb641af656aaae4f85381b8fb9f2e863449e5db1956b3c0ea2604abd3c5119a3", size = 290557, upload-time = "2026-11-05T13:07:17.511Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/90/91/68a9efdd2598e4891ed0d87f3f0f0b22be26a955c00cb77ac291949d6a29/herkules-1.3.0-py3-none-any.whl", hash = "sha256:3cf1b7a5af3c3bd69995c47ed22f4b7dc4acd23d43d2af6e4df2d68d61838b86", size = 11446, upload-time = "2026-01-03T20:09:16.924Z" },
+    { url = "https://files.pythonhosted.org/packages/f9/11/e6f2fefaf20856fb354638ea03ad95faf4d98fb85979f84ab8f877b895cd/herkules-1.3.1-py3-none-any.whl", hash = "sha256:fba07d42f66336038b64cf3f296342ba18a17b236063efa7b04f18348373689e", size = 11442, upload-time = "2026-11-05T13:07:16.405Z" },
 ]
 
 [[package]]
@@ -888,7 +888,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "herkules", specifier = ">=1.3.0,<1.4" },
+    { name = "herkules", specifier = ">=1.3.1,<1.4" },
     { name = "jinja2", specifier = ">=3.1.6,<4" },
 ]
 
